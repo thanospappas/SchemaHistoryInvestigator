@@ -2,19 +2,26 @@ import * as path from 'path';
 import * as express from 'express';
 //import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
-import ProjectRouter from './controllers/routes/ProjectRouter';
-
+import {ProjectRouter} from './controllers/routes/ProjectRouter';
+import {SManager} from "./models/project/Project";
+import "reflect-metadata";
+import {BuildRouter} from "./controllers/routes/BuildRouter";
+import {ReleaseRouter} from "./controllers/routes/ReleaseRouter";
 // Creates and configures an ExpressJS web server.
 class App {
 
     // ref to Express instance
     public express: express.Application;
+    public database;
 
     //Run configuration methods on the Express instance.
     constructor() {
         this.express = express();
         this.middleware();
         this.routes();
+        var storageManager = new SManager();
+        //storageManager.init();
+
     }
 
     // Configure Express middleware.
@@ -32,12 +39,22 @@ class App {
         let router = express.Router();
         // placeholder route handler
         router.get('/', (req, res, next) => {
-            res.json({
-                message: 'Hello World!'
-            });
+            res.send('<h1>Hello World!</h1>');
         });
-        this.express.use('/', router);
-        this.express.use('/api/v1/projects', ProjectRouter);
+
+        let prouter = new ProjectRouter();
+        let brouter = new BuildRouter();
+        let rrouter = new ReleaseRouter();
+        prouter.router.use('/:id/builds', brouter.brouter);
+        prouter.router.use('/:id/releases',rrouter.rrouter);
+
+        prouter.init();
+        brouter.init();
+        rrouter.init();
+
+        this.express.use('/api/v1/projects', prouter.router);
+        //this.express.use("/", router);
+
     }
 
 }
