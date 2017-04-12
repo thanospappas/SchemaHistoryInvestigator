@@ -7,6 +7,7 @@ import {SManager} from "./models/project/Project";
 import "reflect-metadata";
 import {BuildRouter} from "./controllers/routes/BuildRouter";
 import {ReleaseRouter} from "./controllers/routes/ReleaseRouter";
+import {IndexRouter} from "./controllers/routes/IndexRouter";
 // Creates and configures an ExpressJS web server.
 class App {
 
@@ -19,9 +20,19 @@ class App {
         this.express = express();
         this.middleware();
         this.routes();
-        var storageManager = new SManager();
-        //storageManager.init();
+        this.setViews();
 
+    }
+
+    private setViews(): void{
+        this.express.set('views', path.join(__dirname + '/app/views'));
+        this.express.set('view engine', 'html');
+        this.express.engine('html', require('ejs').renderFile);
+        this.express.use(express.static(path.join(__dirname, '/app/bower_components')));
+        this.express.use('/public',express.static(path.join(__dirname, '/app/public')));
+        this.express.use('/mod', express.static(path.join(__dirname, '../node_modules/')));
+        this.express.use('/ngapp', express.static(path.join(__dirname, '/app/')))
+        //this.express.set('view engine', 'html');
     }
 
     // Configure Express middleware.
@@ -45,13 +56,16 @@ class App {
         let prouter = new ProjectRouter();
         let brouter = new BuildRouter();
         let rrouter = new ReleaseRouter();
+        let irouter = new IndexRouter();
         prouter.router.use('/:id/builds', brouter.brouter);
         prouter.router.use('/:id/releases',rrouter.rrouter);
 
         prouter.init();
         brouter.init();
         rrouter.init();
+        irouter.init();
 
+        this.express.use('/', irouter.irouter);
         this.express.use('/api/v1/projects', prouter.router);
         //this.express.use("/", router);
 

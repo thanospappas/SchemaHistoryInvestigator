@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Angular QuickStart</title>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.css">
+
+    <!-- Polyfill(s) for older browsers -->
+    <script src="./mod/core-js/client/shim.min.js"></script>
+
+    <script src="./mod/zone.js/dist/zone.js"></script>
+    <script src="./mod/systemjs/dist/system.src.js"></script>
+
+    <script src="../public/js/systemjs.config.js"></script>
+    <script>
+        System.import('/ngapp/main.js').catch(function(err){ console.error(err); });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <my-app>Loading AppComponent content here ...</my-app>
+        <history-app>yy</history-app>
+    </div>
+
+</body>
+</html>

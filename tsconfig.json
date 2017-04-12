@@ -4,6 +4,10 @@
     "typeRoots": ["node_modules/@types"],
     "module": "commonjs",
     "target": "es5",
+    "moduleResolution": "node",
+    //"lib": [ "es2015", "dom" ],
+    //"noImplicitAny": true,
+    //"suppressImplicitAnyIndexErrors": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true
@@ -11,4 +15,6 @@
   "exclude": [
     "node_modules"
   ]
+
+
 }

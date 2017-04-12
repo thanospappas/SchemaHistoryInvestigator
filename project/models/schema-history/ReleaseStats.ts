@@ -3,10 +3,6 @@
  */
 
 export class ReleaseStats{
-    private oldTables:number;
-    private newTables:number;
-    private oldAttributes:number;
-    private newAttributes:number;
     private tableInsertions:number;
     private tableDeletions:number;
     private attributeInsertionsAtExistingTables:number;
@@ -19,44 +15,11 @@ export class ReleaseStats{
     private averageShemaSizeAttributes:number;
 
     constructor(){
-        this.oldTables = this.newTables = this.oldAttributes
-        = this.newAttributes = this.tableInsertions = this.tableDeletions
+        this.tableInsertions = this.tableDeletions
         = this.attributeInsertionsAtExistingTables = this.attributeDeletionsAtExistingTables
         = this.attributeTypeAlternations = this.keyAlternations = this.attributesInsertedAtNewTables
         = this.attributesDeletedAtDeletedTables = this.averageShemaSizeAttributes
         = this.averageShemaSizeTables = 0;
-    }
-
-    public getOldTables():number {
-        return this.oldTables;
-    }
-
-    public setOldTables(oldTables:number) {
-        this.oldTables = oldTables;
-    }
-
-    public getNewTables():number {
-        return this.newTables;
-    }
-
-    public setNewTables(newTables:number) {
-        this.newTables = newTables;
-    }
-
-    public getOldAttributes():number {
-        return this.oldAttributes;
-    }
-
-    public setOldAttributes(oldAttributes:number) {
-        this.oldAttributes = oldAttributes;
-    }
-
-    public getNewAttributes():number {
-        return this.newAttributes;
-    }
-
-    public setNewAttributes(newAttributes:number) {
-        this.newAttributes = newAttributes;
     }
 
     public getTableInsertions():number {

@@ -27,9 +27,14 @@ export class ReleaseRouter{
         let query = parseInt(req.params.id);
 
         let releaseMng = new ReleaseManager();
+        let selectedBranchId = -1;
         releaseMng.getBranchId(req.params.id)
-            .then((res) => {
-                return releaseMng.getReleases(res[0].BR_ID);
+            .then((res) =>{
+                selectedBranchId = res[0].BR_ID;
+                return releaseMng.getReleasesOnly(res[0].BR_ID);
+            })
+            .then((releases) => {
+                return releaseMng.getReleases(selectedBranchId,releases);
             })
             .then((result) => {
                 //console.log("I got your answer");
