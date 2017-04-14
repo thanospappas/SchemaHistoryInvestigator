@@ -17,7 +17,7 @@ export class AreaChart implements OnInit, OnChanges {
     //@ViewChild('chart')
     private chartContainer: ElementRef;
     @Input() private data: Array<any>;
-    private margin: any = { top: 20, bottom: 90, left: 40, right: 20};
+    private margin: any = { top: 20, bottom: 90, left: 40, right: 40};
     private chart: any;
     private width: number;
     private height: number;
@@ -26,39 +26,41 @@ export class AreaChart implements OnInit, OnChanges {
     private colors: any;
     private xAxis: any;
     private yAxis: any;
-
+    private barPadding = 1;
+    private yAxisRight: any;
+    private yScaleRight:any;
     constructor(private element: ElementRef) {
         console.log("yo constructor hereee");
         this.chartContainer = element;
     }
 
     ngOnInit() {
-        var parseDate = D3.timeParse("%d-%b-%y");
+        var parseDate = D3.timeParse("%d-%m-%y");
         this.data = [
-            { "x": parseDate("10-Jun-10"), "y": 0 },
-            { "x": parseDate("11-Aug-10"),"y": 0 },
-            { "x": parseDate("09-Sep-10"), "y": 0.7 },
-            { "x": parseDate("25-Jun-10"),  "y": 0.1 },
-            { "x": parseDate("15-Jan-11"), "y": 0 },
-            { "x": parseDate("15-Feb-11"), "y": 0.4 },
-            { "x": parseDate("15-Mar-11"), "y": 0 },
-            { "x": parseDate("15-Jun-11"), "y": 0.5 },
-            { "x": parseDate("15-Jun-12"), "y": 0.1 },
-            { "x": parseDate("15-Jun-12"), "y": 0.4 },
-            { "x": parseDate("15-Mar-12"), "y": 0.3 },
-            { "x": parseDate("15-Jun-12"), "y": 0.4 },
-            /*{ "x": parseDate("15-Jun-13"), "y": 1 },
-            { "x": parseDate("15-Jun-13"), "y": 0.8 },
-            { "x": parseDate("15-Mar-14"), "y": 0.8 },
-            { "x": parseDate("15-Jun-14"), "y": 0.2 },
-            { "x": parseDate("15-Jun-15"), "y": 0.3 },
-            { "x": parseDate("15-Mar-16"), "y": 0.5 },
-            { "x": parseDate("15-Jun-16"), "y": 0.4 },
-            { "x": parseDate("15-Jun-16"), "y": 0.1 },
-            { "x": parseDate("09-Jun-17"), "y": 0.4 },
-            { "x": parseDate("11-Jun-17"), "y": 0.1 },
-            { "x": parseDate("12-Jun-17"), "y": 0.6 },
-            { "x": parseDate("25-Jun-17"), "y": 0.1 }*/
+            { "x": parseDate("10-01-10"), "y": 0.9 },
+            { "x": parseDate("11-03-10"),"y": 1 },
+            { "x": parseDate("09-09-10"), "y": 0.7 },
+            { "x": parseDate("25-05-11"),  "y": 0.1 },
+            { "x": parseDate("15-06-11"), "y": 0 },
+            { "x": parseDate("15-07-11"), "y": 0.4 },
+            { "x": parseDate("15-09-11"), "y": 0 },
+            { "x": parseDate("15-11-11"), "y": 0.5 },
+            { "x": parseDate("15-02-12"), "y": 0.1 },
+            { "x": parseDate("15-05-12"), "y": 0.4 },
+            { "x": parseDate("15-09-12"), "y": 0.3 },
+            { "x": parseDate("15-11-12"), "y": 0.4 },
+            { "x": parseDate("15-01-13"), "y": 1 },
+            { "x": parseDate("15-02-13"), "y": 0.8 },
+            { "x": parseDate("15-04-14"), "y": 0.8 },
+            { "x": parseDate("15-05-14"), "y": 0.2 },
+            { "x": parseDate("15-10-15"), "y": 0.3 },
+            { "x": parseDate("15-01-16"), "y": 0.5 },
+            { "x": parseDate("15-02-16"), "y": 0.4 },
+            { "x": parseDate("15-09-16"), "y": 0.1 },
+            { "x": parseDate("09-01-17"), "y": 0.4 },
+            { "x": parseDate("11-02-17"), "y": 0.1 },
+            { "x": parseDate("12-02-17"), "y": 0.6 },
+            { "x": parseDate("25-03-17"), "y": 0.1 }
             ];
         console.log(this.data);
         this.createChart();
@@ -91,10 +93,24 @@ export class AreaChart implements OnInit, OnChanges {
         // define X & Y domains
         let xDomain = this.data.map(d => d.x);
         let yDomain = [0, D3.max(this.data, d => d.y)];
-
+        let yDomainRight = [0, D3.max(this.data, d => d.y+100)];
         // create scales
-        this.xScale = D3.scaleBand().padding(0.1).domain(xDomain).rangeRound([0, this.width]);
+        //this.xScale = D3.scaleTime().domain(xDomain).rangeRound([0, this.width]);
+
+        this.xScale = D3.scaleTime().domain([new Date(this.data[0].x), new Date(this.data[this.data.length - 1].x)])
+            .range([0, this.width-this.margin.right-10]);
+
+
         this.yScale = D3.scaleLinear().domain(yDomain).range([this.height, 0]);
+
+        this.yScaleRight = D3.scaleLinear().domain(yDomainRight).range([this.height, 0]);
+        //this.yAxisRight = D3.axisRight(this.yScale).ticks(5);
+
+        this.yAxisRight = svg.append('g')
+            .attr('class', 'axis axis-y-right')
+            .attr('transform', `translate(${this.width - this.margin.right  }, ${ this.margin.top})`)
+            .call(D3.axisRight(this.yScaleRight));
+
 
         // bar colors
         this.colors = D3.scaleLinear().domain([0, this.data.length]).range(<any[]>['red', 'blue']);
@@ -103,20 +119,42 @@ export class AreaChart implements OnInit, OnChanges {
         this.xAxis = svg.append('g')
             .attr('class', 'axis axis-x')
             .attr('transform', `translate(${this.margin.left}, ${this.margin.top + this.height})`)
-            .call(D3.axisBottom(this.xScale));
+            .call(D3.axisBottom(this.xScale).ticks(D3.timeDay, 1)
+                .tickFormat(D3.timeFormat("%m-%y")) );
+
         this.yAxis = svg.append('g')
             .attr('class', 'axis axis-y')
             .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
             .call(D3.axisLeft(this.yScale));
+
+
     }
 
     updateChart() {
         // update scales & axis
-        this.xScale.domain(this.data.map(d => d.x));
+        //this.xScale.domain(this.data.map(d => d.x));
+        this.xScale = D3.scaleTime().range([0, this.width - this.margin.right - this.margin.left]).domain([new Date(this.data[0].x), new Date(this.data[this.data.length - 1].x)]);
+
         this.yScale.domain([0, D3.max(this.data, d => d.y)]);
         this.colors.domain([0, this.data.length]);
-        this.xAxis.transition().call(D3.axisBottom(this.xScale));
+       // this.xAxis.transition().call(D3.axisBottom(this.xScale));
+        this.xAxis
+            .call(D3.axisBottom(this.xScale)
+                .ticks(D3.timeMonth, 3)
+                .tickSize(10)
+                .tickFormat(D3.timeFormat("%m-%y"))
+
+            ).selectAll("text")
+            .attr("y", 0)
+            .attr("x", 9)
+            .attr("dy", ".35em")
+            .attr("dx", "-1.9em")
+            .attr("transform", "rotate(-68)")
+            .style("text-anchor", "end");
         this.yAxis.transition().call(D3.axisLeft(this.yScale));
+
+
+
 
         let update = this.chart.selectAll('.bar')
             .data(this.data);
@@ -124,28 +162,85 @@ export class AreaChart implements OnInit, OnChanges {
         // remove exiting bars
         update.exit().remove();
 
+        var line = D3.line()
+            .x(d => this.xScale(d.x))
+            .y(d => this.yScale(d.y));
+
+        /*this.chart.append("path")
+            .datum(this.data)
+            .attr("class", "line")
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
+         */
+
+        this.yAxisRight.call(D3.axisRight(this.yScaleRight));
+        var line1 = D3.line()
+            .x(d => this.xScale(d.x))
+            .y((d, i) => (this.yScaleRight(parseInt(d.y) + i*2)));
+
+        this.chart.append("path")
+            .datum(this.data)
+            .attr("class", "line")
+            .attr("fill", "none")
+            .attr("stroke", "#000")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", line1);
+
+
+
         // update existing bars
         this.chart.selectAll('.bar').transition()
-            .attr('x', d => this.xScale(d.x))
+            .attr('x', d => {
+                this.xScale(new Date(d.x));
+                    console.log(d.x);
+            })
             .attr('y', d => this.yScale(d.y))
-            .attr('width', d => this.xScale.bandwidth())
+            .attr('width', d => 5)//this.width / this.data.length - this.barPadding)
             .attr('height', d => this.height - this.yScale(d.y))
             .style('fill', (d, i) => this.colors(i));
+
+
 
         // add new bars
         update
             .enter()
             .append('rect')
             .attr('class', 'bar')
-            .attr('x', d => this.xScale(d.x))
+            .attr('x', d => this.xScale(new Date(d.x)))
             .attr('y', d => this.yScale(0))
-            .attr('width', this.xScale.bandwidth())
+            .attr('width', 5)//this.width / this.data.length - this.barPadding)
             .attr('height', 0)
             .style('fill', (d, i) => this.colors(i))
             .transition()
             .delay((d, i) => i * 10)
             .attr('y', d => this.yScale(d.y))
             .attr('height', d => this.height - this.yScale(d.y));
+
+        // draw dots
+        this.chart.selectAll(".dot")
+            .data(this.data)
+            .enter().append("circle")
+            .attr("class", "dot")
+            .attr("r", 3.5)
+            .attr("cx", d => this.xScale(new Date(d.x)) )
+            .attr("cy", (d, i) =>  (this.yScaleRight(parseInt(d.y) + i*2)))
+            .style("fill", "#000");
+
+        // draw dots
+        this.chart.selectAll(".dot1")
+            .data(this.data)
+            .enter().append("circle")
+            .attr("class", "dot1")
+            .attr("r", 4)
+            .attr("cx", d => this.xScale(new Date(d.x)) )
+            .attr("cy", d => this.height)
+            .style("fill", "#000");
     }
 }
 
