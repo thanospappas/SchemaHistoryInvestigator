@@ -36,7 +36,7 @@ export class TopNavBar {
   
 
   ngOnInit() {
-    console.log('hello `topnavbar` component');
+    //console.log('hello `topnavbar` component');
   }
 
   ngAfterViewInit(){

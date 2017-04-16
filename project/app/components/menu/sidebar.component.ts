@@ -60,7 +60,6 @@ export class Sidebar {
 
     plot()
     {     
-        console.log('in sidebar');
 
         this.$BODY = $('body');
         this.$MENU_TOGGLE = $('#menu_toggle');
@@ -113,7 +112,7 @@ export class Sidebar {
     }   
 
     ngOnInit() {
-        console.log('hello `sidebar` component');
+        //console.log('hello `sidebar` component');
     }
 
     setContentHeight() {

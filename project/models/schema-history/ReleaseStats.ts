@@ -11,15 +11,18 @@ export class ReleaseStats{
     private keyAlternations:number;
     private attributesInsertedAtNewTables:number;
     private attributesDeletedAtDeletedTables:number;
-    private averageShemaSizeTables:number;
-    private averageShemaSizeAttributes:number;
+
+    private averageSchemaSizeTables:number;
+    private averageSchemaSizeAttributes:number;
+
+    private attributesUpdates:number;
 
     constructor(){
         this.tableInsertions = this.tableDeletions
         = this.attributeInsertionsAtExistingTables = this.attributeDeletionsAtExistingTables
         = this.attributeTypeAlternations = this.keyAlternations = this.attributesInsertedAtNewTables
-        = this.attributesDeletedAtDeletedTables = this.averageShemaSizeAttributes
-        = this.averageShemaSizeTables = 0;
+        = this.attributesDeletedAtDeletedTables = this.averageSchemaSizeAttributes
+        = this.averageSchemaSizeTables = 0;
     }
 
     public getTableInsertions():number {
@@ -87,18 +90,27 @@ export class ReleaseStats{
     }
 
     public getSchemaSizeTable():number{
-        return this.averageShemaSizeTables;
+        return this.averageSchemaSizeTables;
     }
 
     public setSchemaSizeTable(schemaSize:number){
-        this.averageShemaSizeTables = schemaSize;
+        this.averageSchemaSizeTables = schemaSize;
     }
 
     public getSchemaSizeAttribute(){
-        return this.averageShemaSizeAttributes;
+        return this.averageSchemaSizeAttributes;
     }
 
     public setSchemaSizeAttribute(schemaSize:number){
-        this.averageShemaSizeAttributes = schemaSize;
+        this.averageSchemaSizeAttributes = schemaSize;
+    }
+
+    public computeAttributeUpdates(){
+        this.attributesUpdates = this.getKeyAlternations() + this.getAttributeTypeAlternations() +
+                this.getAttributeInsertionsAtExistingTables() + this.getAttributeDeletionsAtExistingTables();
+    }
+
+    public getAttributesUpdates(){
+        return this.attributesUpdates;
     }
 }

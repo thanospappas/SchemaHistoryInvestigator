@@ -45,6 +45,12 @@ export class ReleaseManager {
         } else if (type==("keyAlt")) {
             stats.setKeyAlternations(value + stats.getKeyAlternations());
         }
+        else if (type==("newT")){
+            stats.setSchemaSizeTable(value + stats.getSchemaSizeTable());
+        }
+        else if (type==("newA")){
+            stats.setSchemaSizeAttribute(value + stats.getSchemaSizeAttribute());
+        }
     }
 
     public populateDurations(releases:Array<Release>, allReleases:Array<any>){
@@ -65,6 +71,9 @@ export class ReleaseManager {
                     break;
                 }
             }
+            releases[i].releaseMetrics.setSchemaSizeTable(1.0*releases[i].releaseMetrics.getSchemaSizeTable()/releases[i].commitNumber);
+            releases[i].releaseMetrics.setSchemaSizeAttribute(1.0*releases[i].releaseMetrics.getSchemaSizeAttribute()/releases[i].commitNumber);
+            releases[i].releaseMetrics.computeAttributeUpdates();
             releases[i].commitDuration = Math.ceil((releases[i].newestCommitDate * 1000 - releases[i].oldestCommitDate * 1000) / (1000 * 3600 * 24));
         }
     }
@@ -142,6 +151,7 @@ export class ReleaseManager {
                     i++;
                 }
                 releases.sort((release1:any, release2:any) => release1.startDate - release2.startDate);
+
                 currentPointer.populateDurations(releases, allReleases);
                 console.log(releases.length);
                 resolve(releases);

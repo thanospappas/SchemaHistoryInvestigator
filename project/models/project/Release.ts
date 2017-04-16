@@ -23,6 +23,9 @@ export class Release{
         this.releaseMetrics = new ReleaseStats();
     }
 
+    public setReleaseStats(releaseM:ReleaseStats){
+        this.releaseMetrics = releaseM;
+    }
 
 
 }

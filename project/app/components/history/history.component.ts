@@ -11,7 +11,7 @@ import {AreaChart} from "../charts/change-breakdown.component";
 })
 export class HistoryComponent  implements OnInit{
     description = 'Here goes the history chart....';
-    private areaChartConfig: Array<AreaChartConfig>;
+    //private areaChartConfig: Array<AreaChartConfig>;
     private stats: Array<any>;
 
     ngOnInit(){
