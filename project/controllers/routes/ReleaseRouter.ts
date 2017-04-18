@@ -7,42 +7,44 @@ import * as Promise from "bluebird";
 import * as express from 'express';
 import {SManager} from "../../models/project/Project";
 import {ReleaseManager} from "../../models/project/ReleaseManager";
+import {ApiRouter} from "./ApiRouter";
+import {DatabaseController} from "../../models/DatabaseController";
+import {ReleaseController} from "../../models/db-controllers/ReleaseController";
+import {ReleaseCommitRouter} from "./ReleaseCommitRouter";
 
-export class ReleaseRouter{
+export class ReleaseRouter implements ApiRouter{
 
-    rrouter: Router;
+    router: Router;
+    releaseBasedRouters:Array<ApiRouter>;
+
     /**
      * Initialize the ProjectRouter
      */
     constructor() {
-        this.rrouter = express.Router({mergeParams: true});
+        this.router = express.Router({mergeParams: true});
+        this.releaseBasedRouters = new Array<ApiRouter>();
     }
-
 
 
     /**
      * GET all projects.
      */
-    public getAll1(req: Request, res: Response, next: NextFunction) {
+    public getAll(req: Request, res: Response, next: NextFunction) {
         let query = parseInt(req.params.id);
 
-        let releaseMng = new ReleaseManager();
-        let selectedBranchId = -1;
-        releaseMng.getBranchId(req.params.id)
-            .then((res) =>{
-                selectedBranchId = res[0].BR_ID;
-                return releaseMng.getReleasesOnly(res[0].BR_ID);
-            })
-            .then((releases) => {
-                return releaseMng.getReleases(selectedBranchId,releases);
-            })
+        let databaseController:DatabaseController = new ReleaseController();
+        databaseController.getAllData(req.params.id)
             .then((result) => {
-                //console.log("I got your answer");
-                //console.log(result);
                 res.json(result);
             });
+    }
 
-        //res.send('hello items from user you' + req.params.id);
+    getSingle() {
+        throw new Error('Method not implemented.');
+    }
+
+    getPath(): string {
+        return "/:id/releases";
     }
 
     /**
@@ -50,9 +52,14 @@ export class ReleaseRouter{
      * endpoints.
      */
     init() {
-        this.rrouter.get('/', this.getAll1);
-        //this.router.get('/:id', this.getSingleProject);
-        //this.router.get('/buils', this.getBranches);
+        this.router.get('/', this.getAll);
+
+        /*initialize all nested routers*/
+        this.releaseBasedRouters.push(new ReleaseCommitRouter());
+        for(let r of this.releaseBasedRouters){
+            this.router.use(r.getPath(), r.router);
+            r.init();
+        }
 
     }
 

@@ -5,6 +5,7 @@
 import {ReleaseStats} from "../schema-history/ReleaseStats";
 
 export class Release{
+    releaseID:number;
     releaseMetrics:ReleaseStats;
     name:string;
     startDate:number;
@@ -12,6 +13,7 @@ export class Release{
     duration:number;
     commitDuration:number;
     commitNumber:number;
+    contributorNumber:number;
     commitGap:number;
     schemaGrowth:number;
     attrsInjectedEjected:number;

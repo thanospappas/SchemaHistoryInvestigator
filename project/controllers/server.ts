@@ -5,7 +5,7 @@ import App from '../app';
 
 debug('ts-express:server');
 
-const port = normalizePort(process.env.PORT || 3006);
+const port = normalizePort(process.env.PORT || 3004);
 App.set('port', port);
 
 const server = http.createServer(App);

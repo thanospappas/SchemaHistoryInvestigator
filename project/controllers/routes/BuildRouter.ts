@@ -9,33 +9,39 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import * as express from 'express';
 import {SManager} from "../../models/project/Project";
+import {ApiRouter} from "./ApiRouter";
+import {DatabaseController} from "../../models/DatabaseController";
+import {BuildController} from "../../models/db-controllers/BuildController";
 
-//const Projects = require('../../public/assets/data.json');
 
-export class BuildRouter{
+export class BuildRouter implements ApiRouter{
+    router: Router;
 
-    brouter: Router;
     /**
      * Initialize the ProjectRouter
      */
     constructor() {
-        this.brouter = express.Router({mergeParams: true});
+        this.router = express.Router({mergeParams: true});
     }
 
     /**
      * GET all projects.
      */
-    public getAll1(req: Request, res: Response, next: NextFunction) {
+    public getAll(req: Request, res: Response, next: NextFunction) {
         let query = parseInt(req.params.id);
-
-        let prjManager = new SManager();
-        //var pCust: Promise<any>;
-        prjManager.getBuilds(req.params.id)
+        let databaseController:DatabaseController = new BuildController();
+        databaseController.getAllData(req.params.id)
             .then((result) => {
                 res.json(result);
             });
+    }
 
-        //res.send('hello items from user you' + req.params.id);
+    getSingle() {
+        throw new Error('Method not implemented.');
+    }
+
+    getPath(): string {
+        return "/:id/builds";
     }
 
     /**
@@ -43,17 +49,11 @@ export class BuildRouter{
      * endpoints.
      */
     init() {
-        console.log("iai");
-        this.brouter.get('/', this.getAll1);
-        //this.router.get('/:id', this.getSingleProject);
-        //this.router.get('/buils', this.getBranches);
+        this.router.get('/', this.getAll);
 
     }
 
+
+
+
 }
-
-// Create the ProjectRouter, and export its configured Express.Router
-//const buildRoutes = new BuildRouter();
-//buildRoutes.init();
-
-//export default buildRoutes.brouter;

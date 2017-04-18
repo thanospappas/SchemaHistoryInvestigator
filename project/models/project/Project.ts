@@ -4,6 +4,7 @@
 
 import * as Promise from "bluebird";
 import {isUndefined} from "util";
+import {promise} from "selenium-webdriver";
 
 
 export interface StorageManager {
@@ -25,7 +26,7 @@ export class SManager implements StorageManager {
         //let config 	  = require(path.join(__dirname, '../../config/config.json'))[env];
 
         var sqlite3 = require('sqlite3').verbose();
-        var file = path.join(__dirname, '../database/schemaEvolutionDB.db') ;
+        var file = path.join(__dirname, '../database/schemaEvolutionDB_new.db') ;
         this.db = new sqlite3.Database(file);
 
 
@@ -62,6 +63,22 @@ export class SManager implements StorageManager {
         console.log(projectID);
         return new Promise((resolve,reject) => {
             this.db.all("SELECT * FROM Branches,Builds WHERE BR_PRJ_ID=" + projectID + " AND BR_NAME='master' AND BU_BRANCH_ID=BR_ID;", function (err, rows) {
+                if (rows){
+                    resolve(rows);
+                }
+                else{
+                    reject("404");
+                }
+            });
+        });
+    }
+
+    public getFilesAffected(projectID:number):Promise<any>{
+        //TODO Create a view for this
+        return new Promise((resolve,reject) => {
+            this.db.all("SELECT FA_NEW_NAME, COUNT(Files_Affected.FA_NEW_NAME) AS Ranked FROM Projects, Branches, Commits, Files_Affected WHERE Projects.PRJ_ID = "
+            + projectID + " AND Projects.PRJ_ID = Branches.BR_PRJ_ID AND Branches.BR_NAME = 'master' AND Branches.BR_ID = Commits.CO_BRANCH_ID " +
+                "AND Commits.CO_ID = Files_Affected.FA_COMMIT_ID GROUP BY Files_Affected.FA_NEW_NAME ORDER BY Ranked DESC;", function (err, rows) {
                 if (rows){
                     resolve(rows);
                 }

@@ -4,11 +4,9 @@ var path = require("path");
 var express = require("express");
 //import * as logger from 'morgan';
 var bodyParser = require("body-parser");
-var ProjectRouter_1 = require("./controllers/routes/ProjectRouter");
 require("reflect-metadata");
-var BuildRouter_1 = require("./controllers/routes/BuildRouter");
-var ReleaseRouter_1 = require("./controllers/routes/ReleaseRouter");
-var IndexRouter_1 = require("./controllers/routes/IndexRouter");
+var DatabaseConnection_1 = require("./models/DatabaseConnection");
+var RouteManager_1 = require("./controllers/routes/RouteManager");
 // Creates and configures an ExpressJS web server.
 var App = (function () {
     //Run configuration methods on the Express instance.
@@ -17,6 +15,7 @@ var App = (function () {
         this.middleware();
         this.routes();
         this.setViews();
+        this.db = new DatabaseConnection_1.DatabaseConnection();
     }
     App.prototype.setViews = function () {
         this.express.set('views', path.join(__dirname + '/app/views'));
@@ -44,18 +43,26 @@ var App = (function () {
         router.get('/', function (req, res, next) {
             res.send('<h1>Hello World!</h1>');
         });
-        var prouter = new ProjectRouter_1.ProjectRouter();
-        var brouter = new BuildRouter_1.BuildRouter();
-        var rrouter = new ReleaseRouter_1.ReleaseRouter();
-        var irouter = new IndexRouter_1.IndexRouter();
-        prouter.router.use('/:id/builds', brouter.brouter);
-        prouter.router.use('/:id/releases', rrouter.rrouter);
-        prouter.init();
-        brouter.init();
-        rrouter.init();
-        irouter.init();
-        this.express.use('/', irouter.irouter);
-        this.express.use('/api/v1/projects', prouter.router);
+        this.routeManager = new RouteManager_1.RouteManager();
+        this.routeManager.createRoutes(this.express);
+        //let prouter = new ProjectRouter();
+        //let brouter = new BuildRouter();
+        //let rrouter = new ReleaseRouter();
+        //let irouter = new IndexRouter();
+        //let farouter = new FilesAffectedRouter();
+        //this.apiRouter = new ReleaseCommitRouter(true);
+        //prouter.router.use('/:id/builds', brouter.brouter);
+        //prouter.router.use('/:id/releases',rrouter.rrouter);
+        //prouter.router.use('/:id/files_affected',farouter.farouter);
+        //prouter.router.use('/:id/commits',this.apiRouter.router);
+        //prouter.init();
+        //brouter.init();
+        //rrouter.init();
+        //irouter.init();
+        //farouter.init();
+        //this.apiRouter.init();
+        //this.express.use('/', irouter.irouter);
+        //this.express.use('/api/v1/projects', prouter.router);
         //this.express.use("/", router);
     };
     return App;

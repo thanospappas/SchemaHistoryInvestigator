@@ -8,12 +8,19 @@ import "reflect-metadata";
 import {BuildRouter} from "./controllers/routes/BuildRouter";
 import {ReleaseRouter} from "./controllers/routes/ReleaseRouter";
 import {IndexRouter} from "./controllers/routes/IndexRouter";
+import {FilesAffectedRouter} from "./controllers/routes/FilesAffectedRouter";
+import {DatabaseConnection} from "./models/DatabaseConnection";
+import {ApiRouter} from "./controllers/routes/ApiRouter";
+import {CommitRouter} from "./controllers/routes/CommitRouter";
+import {RouteManager} from "./controllers/routes/RouteManager";
 // Creates and configures an ExpressJS web server.
 class App {
 
     // ref to Express instance
     public express: express.Application;
-    public database;
+    public db;
+    apiRouter;
+    routeManager:RouteManager;
 
     //Run configuration methods on the Express instance.
     constructor() {
@@ -21,7 +28,7 @@ class App {
         this.middleware();
         this.routes();
         this.setViews();
-
+        this.db = new DatabaseConnection();
     }
 
     private setViews(): void{
@@ -52,21 +59,33 @@ class App {
         router.get('/', (req, res, next) => {
             res.send('<h1>Hello World!</h1>');
         });
+        this.routeManager = new RouteManager();
+        this.routeManager.createRoutes(this.express);
 
-        let prouter = new ProjectRouter();
-        let brouter = new BuildRouter();
-        let rrouter = new ReleaseRouter();
-        let irouter = new IndexRouter();
-        prouter.router.use('/:id/builds', brouter.brouter);
-        prouter.router.use('/:id/releases',rrouter.rrouter);
 
-        prouter.init();
-        brouter.init();
-        rrouter.init();
-        irouter.init();
+        //let prouter = new ProjectRouter();
+        //let brouter = new BuildRouter();
+        //let rrouter = new ReleaseRouter();
+        //let irouter = new IndexRouter();
+        //let farouter = new FilesAffectedRouter();
 
-        this.express.use('/', irouter.irouter);
-        this.express.use('/api/v1/projects', prouter.router);
+        //this.apiRouter = new ReleaseCommitRouter(true);
+
+        //prouter.router.use('/:id/builds', brouter.brouter);
+        //prouter.router.use('/:id/releases',rrouter.rrouter);
+        //prouter.router.use('/:id/files_affected',farouter.farouter);
+        //prouter.router.use('/:id/commits',this.apiRouter.router);
+
+        //prouter.init();
+        //brouter.init();
+        //rrouter.init();
+        //irouter.init();
+        //farouter.init();
+
+        //this.apiRouter.init();
+
+        //this.express.use('/', irouter.irouter);
+        //this.express.use('/api/v1/projects', prouter.router);
         //this.express.use("/", router);
 
     }

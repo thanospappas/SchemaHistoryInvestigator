@@ -7,23 +7,15 @@
       </div>
       <ul class="nav navbar-nav navbar-right">
 
+
+
+
         <li role="presentation" class="dropdown">
-          <a id="drop5" href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
-            Biosql
-            <span class="caret"></span>
-          </a>
-          <ul id="menu2" class="dropdown-menu animated fadeInDown" role="menu" aria-labelledby="drop5">
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Ensembl</a>
-            </li>
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Mediawiki</a>
-            </li>
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Opencart</a>
-            </li>
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">PhpBB</a>
-            </li>
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Typo3</a>
-            </li>
-          </ul>
+
+          <select id="drop5" role="presentation" class="dropdown-toggle project-selection " (change)="projectSelection($event.target.value)">
+            <option *ngFor='let project of projects' value="{{project.ID}}" ng-selected="classifier.value==selection">{{project.Name}}</option>
+          </select>
+
         </li>
         <li role="presentation" style="padding-top:20px;color:#313232;margin-right:10px;"><b>Selected Dataset</b></li>
       </ul>

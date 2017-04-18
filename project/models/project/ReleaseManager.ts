@@ -14,7 +14,7 @@ export class ReleaseManager {
 
         var path = require("path");
         var sqlite3 = require('sqlite3').verbose();
-        var file = path.join(__dirname, '../database/schemaEvolutionDB.db') ;
+        var file = path.join(__dirname, '../database/schemaEvolutionDB_new.db') ;
         this.db = new sqlite3.Database(file);
 
     }
@@ -96,9 +96,10 @@ export class ReleaseManager {
         let releases:Array<Release> = new Array;
         let currentPointer = this;
         return new Promise((resolve) => {
-            this.db.all("SELECT * FROM Phases WHERE BR_ID=" + projectID + " ORDER BY CO_DATE ASC;", function (err, rows) {
+            this.db.all("SELECT * FROM Phases,Authors  WHERE BR_ID=" + projectID + " AND CO_AUTHOR_ID=Authors.AU_ID ORDER BY CO_DATE ASC;", function (err, rows) {
                 let i =0;
                 //let releaseStats:ReleaseStats = new ReleaseStats();
+                let contributors= [];
 
                 for(let row of rows){
                     let found = false;
@@ -117,11 +118,28 @@ export class ReleaseManager {
                     }
                     if(i % 12 == 0){
 
+                        //console.log(row.)
+
+
                         if(found){
                             currentPointer.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
                             rel.commitNumber++;
+
+                            let authFound = false;
+                            for(let auth of contributors){
+                                if(auth == row.AU_NAME){
+                                    authFound = true;
+                                    break;
+                                }
+                            }
+                            if(!authFound){
+                                console.log(row.AU_NAME);
+                                contributors.push(row.AU_NAME);
+                                rel.contributorNumber++;
+                            }
                         }
                         else{
+                            contributors = [];
                             let release:Release = new Release();
                             if(row.CO_PREV_RELEASE_ID == null){
                                 release.name = "Start_Of_Project";
@@ -136,7 +154,12 @@ export class ReleaseManager {
 
                             currentPointer.assignStatsValue(release.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
                             release.commitNumber = 1;
+                            contributors.push(row.AU_NAME);
+                            release.contributorNumber = 1;
                             releases.push(release);
+
+
+
                         }
 
                         //releaseStats = new ReleaseStats();

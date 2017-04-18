@@ -7,10 +7,11 @@ import {Router, Request, Response, NextFunction} from 'express';
 import * as express from 'express';
 import {SManager} from "../../models/project/Project";
 import {BuildRouter} from "./BuildRouter";
+import {ApiRouter} from "./ApiRouter";
 
 //const Projects = require('../../public/assets/data.json');
 
-export class ProjectRouter{
+export class ProjectRouter implements ApiRouter{
 
     router: Router;
     /**
@@ -18,8 +19,6 @@ export class ProjectRouter{
      */
     constructor() {
         this.router = express.Router();
-        //this.router.use('/:id/builds', BuildRouter);
-        //this.init();
     }
 
     /**
@@ -35,37 +34,16 @@ export class ProjectRouter{
                 res.json(result);
             });
 
-
     }
 
-    /**
-     * GET all branches using project's id
-     */
-    public getBranches(req: Request, res: Response, next: NextFunction) {
-        let query = parseInt(req.params.id);
-        //let hero = Projects.find(hero => hero.id === query);
-        let prjManager = new SManager();
-        console.log(query);
-        console.log("haha");
-
-        prjManager.getBranches(query)
-            .then((result) => {
-                res.status(200)
-                    .send({
-                        message: 'Success',
-                        status: res.status,
-                        result
-                    });
-                //res.json(result);
-            })
-            .catch((result) =>{
-                res.status(404)
-                    .send({
-                        message: 'No branches found with the given project id.',
-                        status: res.status
-                    });
-            });
+    getSingle() {
+        throw new Error('Method not implemented.');
     }
+
+    getPath(): string {
+        return "/api/v1/projects";
+    }
+
 
 
     /**
@@ -74,15 +52,7 @@ export class ProjectRouter{
      */
     init() {
         this.router.get('/', this.getAll);
-        //this.router.get('/:id', this.getSingleProject);
-        this.router.get('/:id', this.getBranches);
 
     }
 
 }
-
-// Create the ProjectRouter, and export its configured Express.Router
-//const projectRoutes = new ProjectRouter();
-//projectRoutes.init();
-
-//export default projectRoutes.router;

@@ -2,7 +2,6 @@
  * Created by thanosp on 12/4/2017.
  */
 import { Component , OnInit} from '@angular/core';
-import {AreaChartConfig} from '../charts/change-breakdown.config';
 import {AreaChart} from "../charts/change-breakdown.component";
 @Component({
     selector: 'history-app',

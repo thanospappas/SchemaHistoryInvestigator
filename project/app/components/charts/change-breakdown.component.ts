@@ -7,14 +7,14 @@ import * as $ from 'jquery';
 import * as d3Axis from 'd3-axis';
 import { Release } from '../../../models/project/release';
 import {ReleaseService} from '../../services/releases.service';
-import { EmitterService } from '../../emmiter.service';
-
+import {ProjectService} from "../../services/Projects.services";
+import { Subscription }   from 'rxjs/Subscription';
 @Component({
     selector: 'area-chart',
     //template: `<ng-content></ng-content>`,
     templateUrl: './change-breakdown.html',
     styleUrls: ['./change-breakdown.style.css'],
-    providers: [ReleaseService]
+    providers: [ReleaseService,ProjectService]
 })
 
 export class AreaChart implements OnInit, OnChanges {
@@ -41,16 +41,23 @@ export class AreaChart implements OnInit, OnChanges {
     private releases ;
     private legendHeight:number;
     private isDataAvailable:boolean = true;
+    subscription: Subscription;
 
     // Input properties
     //@Input() listId: string;
     //@Input() editId: string;
 
-    constructor(private element: ElementRef, private releaseService:ReleaseService) {
+    constructor(private element: ElementRef, private releaseService:ReleaseService, private projectService:ProjectService) {
         this.chartContainer = element;
         this.getReleases();
         console.log("haha");
         console.log($('.x_content .col-md-9').width());
+        this.subscription = projectService.projectChanged$.subscribe(
+            mission => {
+                console.log("In breakdown...");
+                console.log(mission);
+                this.createChart();
+            });
     }
 
 
@@ -80,9 +87,16 @@ export class AreaChart implements OnInit, OnChanges {
             $ICON.toggleClass('fa-chevron-up fa-chevron-down');
         });
 
+        $('.close-link').click(function () {
+            var $BOX_PANEL = $(this).closest('.x_panel');
+
+            $BOX_PANEL.remove();
+        });
+
     }
 
     getReleases(){
+        //console.log(this.se)
         this.releaseService.getReleases()
             .subscribe(releases => {
                     this.releases = releases;
@@ -104,6 +118,8 @@ export class AreaChart implements OnInit, OnChanges {
         if (this.releases) {
             this.updateChart();
         }
+        console.log(this.projectService.getProjects());
+
     }
 
 
@@ -327,6 +343,7 @@ export class AreaChart implements OnInit, OnChanges {
                 }
                 return (this.yScale(d.y));
             })
+            .attr("class", (d,i) => {return "barpos-" + i;})
             .attr('width', d => this.barWidth)//this.width / this.data.length - this.barPadding)
             .attr('height', (d,i) => {
                 return (this.height - this.yScale(d.y) )
@@ -417,7 +434,7 @@ export class AreaChart implements OnInit, OnChanges {
             .attr("dy", ".35em")
             .attr("text-anchor", "start")
             .text(function(d,i) { return lala[i] });
-        this.savetoPng();
+       // this.savetoPng();
     }
 
 
