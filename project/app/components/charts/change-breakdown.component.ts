@@ -9,12 +9,14 @@ import { Release } from '../../../models/project/release';
 import {ReleaseService} from '../../services/releases.service';
 import {ProjectService} from "../../services/Projects.services";
 import { Subscription }   from 'rxjs/Subscription';
+import {Project} from "../../shared/Project";
+
 @Component({
     selector: 'area-chart',
     //template: `<ng-content></ng-content>`,
     templateUrl: './change-breakdown.html',
     styleUrls: ['./change-breakdown.style.css'],
-    providers: [ReleaseService,ProjectService]
+    providers: [ReleaseService]
 })
 
 export class AreaChart implements OnInit, OnChanges {
@@ -41,7 +43,9 @@ export class AreaChart implements OnInit, OnChanges {
     private releases ;
     private legendHeight:number;
     private isDataAvailable:boolean = true;
-    subscription: Subscription;
+    private selectedProject:Project = {selectedPrj: '', projectId: -1};
+    loading = false;
+    tooltip;
 
     // Input properties
     //@Input() listId: string;
@@ -50,14 +54,8 @@ export class AreaChart implements OnInit, OnChanges {
     constructor(private element: ElementRef, private releaseService:ReleaseService, private projectService:ProjectService) {
         this.chartContainer = element;
         this.getReleases();
-        console.log("haha");
         console.log($('.x_content .col-md-9').width());
-        this.subscription = projectService.projectChanged$.subscribe(
-            mission => {
-                console.log("In breakdown...");
-                console.log(mission);
-                this.createChart();
-            });
+
     }
 
 
@@ -68,6 +66,19 @@ export class AreaChart implements OnInit, OnChanges {
         this.marginOverview = { top: this.height - 70, right: this.margin.right, bottom: 20,  left: this.margin.left };
         this.heightOverview= this.height - this.marginOverview.top - this.marginOverview.bottom;
         this.margin.top = this.legendHeight;
+
+        //this.projectService.projectChanged$.subscribe(value => console.log('Received new subject value: '))
+        //this.projectService.activeProject.subscribe(active => console.log('Received new subject value: '));
+
+        this.projectService.getSelectedProject().subscribe(
+            project => {
+                console.log("In breakdown...");
+                console.log(project['projectId']);
+                this.selectedProject.selectedPrj = project['selectedPrj'];
+                this.selectedProject.projectId = project['projectId'];
+                this.getReleases();
+            });
+
 
         $('.collapse-link').on('click', function() {
             var $BOX_PANEL = $(this).closest('.x_panel'),
@@ -97,20 +108,28 @@ export class AreaChart implements OnInit, OnChanges {
 
     getReleases(){
         //console.log(this.se)
-        this.releaseService.getReleases()
-            .subscribe(releases => {
-                    this.releases = releases;
-                    console.log(this.releases);
-                    this.isDataAvailable = true;
-                    if (this.releases) {
-                        this.createChart();
+        let url = "http://localhost:3002/api/v1/projects/" +
+            this.selectedProject.projectId + "/releases";
+        console.log(url);
+        if(this.selectedProject.projectId != -1) {
+            this.loading = true;
+            D3.select(".summary-chart svg").remove();
+            this.releaseService.getReleases(url)
+                .subscribe(releases => {
+                        this.releases = releases;
+                        console.log(this.releases);
+                        this.isDataAvailable = true;
+                        D3.select(".summary-chart svg").remove();
+                        if (this.releases) {
+                            this.createChart();
 
-                    }
-                },
+                        }
+                    },
                     err => {
                         console.log(err);
                     }
-            );
+                );
+        }
     }
 
     ngOnChanges() {
@@ -118,7 +137,7 @@ export class AreaChart implements OnInit, OnChanges {
         if (this.releases) {
             this.updateChart();
         }
-        console.log(this.projectService.getProjects());
+        //console.log(this.projectService.getProjects());
 
     }
 
@@ -130,7 +149,6 @@ export class AreaChart implements OnInit, OnChanges {
         this.svg = D3.select(".x_content .col-md-9").append('svg')
             .attr('width', this.width + this.margin.left + this.margin.right)//element.offsetWidth)
             .attr('height', this.height + this.margin.top + this.margin.bottom + this.legendHeight);//element.offsetHeight);
-
 
         // chart plot area
         this.chart = this.svg.append('g')
@@ -174,7 +192,16 @@ export class AreaChart implements OnInit, OnChanges {
         if (this.releases) {
             this.updateChart();
         }
-        console.log(this.releases);
+
+        this.tooltip = D3.select("body")
+            .append("div")
+            .attr("class", "tooltip");
+
+        this.loading = false;
+
+
+
+        //console.log(this.releases);
 
     }
 
@@ -308,7 +335,7 @@ export class AreaChart implements OnInit, OnChanges {
            });
             return xx
         });
-        console.log(remapped);
+        //console.log(remapped);
 
         let update = this.chart.selectAll('.layer')
             .data(remapped);
@@ -323,13 +350,13 @@ export class AreaChart implements OnInit, OnChanges {
             .style("fill", (d, i) => this.colors[i] ) ;
 
 
-        layer.selectAll('rect')
+        let rects = layer.selectAll('rect')
             .data(d => {
                 return d;
             })
             .enter()
             .append("rect")
-            .transition()
+            //.transition()
             .attr('x', d => {
                 return this.xScale(new Date(d.x))
             })
@@ -349,11 +376,12 @@ export class AreaChart implements OnInit, OnChanges {
                 return (this.height - this.yScale(d.y) )
             } );
 
-
+        //let currentPointer = this;
         layer.selectAll('rect')
             .on("mouseover", function() {
                 D3.select(this)
                     .classed("hovered-bar", true);
+
             });
         var tmp = this.colors;
         layer.selectAll('rect')
@@ -362,9 +390,12 @@ export class AreaChart implements OnInit, OnChanges {
                     .classed("hovered-bar", false)
         })  ;
 
+        rects
+            .on("mouseover", this.mouseoverFunc)
+            .on("mousemove", this.mousemoveFunc)
+            .on("mouseout", this.mouseoutFunc);
+
         //this.createZoomOverview(remapped);
-
-
 
         this.createLineChart()
             .then((res) =>{
@@ -388,14 +419,13 @@ export class AreaChart implements OnInit, OnChanges {
             .attr("class", "dot1")
             .attr("r", 4)
             .attr("cx", d => this.xScale(new Date(d.startDateHuman))+2.5 )
-            .attr("cy", d => this.height)
+            .attr("cy", d => this.height+2)
             .attr("stroke", "#bb19c4")
             .attr("stroke-width", 1)
             .style("fill", "#313232");
 
 
         this.createLegend();
-
 
     }
 
@@ -435,6 +465,48 @@ export class AreaChart implements OnInit, OnChanges {
             .attr("text-anchor", "start")
             .text(function(d,i) { return lala[i] });
        // this.savetoPng();
+    }
+
+    highlighRelease(isHighlight:boolean, index:number){
+        D3.selectAll(".barpos-" + index).classed("hovered-bar", isHighlight);
+        /*if(isHighlight){
+            D3.selectAll(".barpos-" + index)
+                .classed("hovered-bar", false)
+        }
+        else{
+            D3.selectAll(".barpos-" + index)
+                .classed("hovered-bar", false)
+        }*/
+
+    }
+
+
+    mouseoverFunc(d) {
+
+        console.log("moused over", d.x);
+
+            console.log("segmentsStacked", d, "percent", d.y);
+        D3.select(".tooltip")
+            //this.tooltip
+                .style("opacity", "1")
+                .html("<p><span class='tooltipHeader'>" +d.y + "</p>");
+        D3.select(this)
+            .classed("hovered-bar", true);
+            // .html("<p><span class='tooltipHeader'>" + d.x + "</span><br>"+ d.component + ": " +d.y + "</p>");
+
+    }
+
+    mousemoveFunc(d) {
+        D3.select(".tooltip")
+        //this.tooltip
+            .style("top", (D3.event.pageY - 5) + "px")
+            .style("left", (D3.event.pageX + 10) + "px");
+    }
+
+    mouseoutFunc(d) {
+        D3.select(this)
+            .classed("hovered-bar", false)
+        return D3.select(".tooltip").style("opacity", "0"); // this sets it to invisible!
     }
 
 

@@ -25,12 +25,23 @@ export class AuthorsRouter implements ApiRouter{
      * GET all builds.
      */
     public getAll(req: Request, res: Response, next: NextFunction) {
-        let query = parseInt(req.params.id);
-        let databaseController:DatabaseController = new AuthorsController();
-        databaseController.getAllData(req.params.id)
-            .then((result) => {
-                res.json(result);
-            });
+        let prjId = parseInt(req.params.id);
+        let databaseController:AuthorsController = new AuthorsController();
+        let groupby = req.query.group_by;
+
+        if(groupby == "release"){
+            databaseController.getReleaseAuthors(prjId)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
+        else{
+            databaseController.getAllData(prjId)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
+
     }
 
     getSingle() {

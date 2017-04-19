@@ -2,12 +2,13 @@ import {Component, Input} from '@angular/core';
 import {    OnChanges, SimpleChange } from '@angular/core';
 import * as $ from 'jquery';
 import {ProjectService} from "../../services/Projects.services";
+import {Project} from "../../shared/Project";
 @Component({
   selector: 'topnav-bar',  // <home></home>
 
     // We need to tell Angular's Dependency Injection which providers are in our app.
   providers: [
-      ProjectService
+   //   ProjectService
   ],
   // Our list of styles in our component. We may add more to compose many styles together
  // styleUrls: [ '../app.style.css' ],
@@ -52,8 +53,12 @@ export class TopNavBar{
         else{
             selectedIndex = parseInt(projectValue)-1;
         }
-        this.projectService.setSelectedProject(this.projects[parseInt(projectValue)-1]);
-        //console.log(this.projects[selectedIndex]);
+        let prj:Project = {selectedPrj: '', projectId: -1};
+
+        prj.selectedPrj = this.projects[selectedIndex].Name;
+        prj.projectId = this.projects[selectedIndex].ID;
+        this.projectService.setSelectedProject(prj);
+
     }
   
 
@@ -63,6 +68,7 @@ export class TopNavBar{
           .subscribe(projects => {
               projects.splice(1,1);
                   this.projects = projects;
+                  //this.projectService.setSelectedProject();
               },
               err => {
                   console.log(err);
