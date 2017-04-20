@@ -199,6 +199,93 @@ export class ReleaseController extends DatabaseController{
     }
 
 
+    getDevStyleInfo(){
+
+    }
+
+
+    /**
+     *
+     * @param releases
+     * @returns {Array}
+     *
+     */
+
+    createdata(releases){
+
+        let rNames = [];
+        for(let r of releases){
+            if(r.CO_PREV_RELEASE_ID == null && rNames.indexOf("Start_Of_Project") == -1){
+                rNames.push("Start_Of_Project");
+                continue;
+            }
+            if(rNames.indexOf(r.RE_NAME) == -1){
+                rNames.push(r.RE_NAME);
+            }
+        }
+
+        let finalData = [];
+        for(let r of releases){
+
+            let index;
+            if(rNames.indexOf(r.RE_NAME) == -1)
+                index = rNames.indexOf("Start_Of_Project")
+            else
+                index = rNames.indexOf(r.RE_NAME);
+
+            let found = false;
+            for(let table of finalData){
+
+                if(table.tableName == r.TA_NAME){
+                    found = true;
+
+                    let ridFound = false;
+                    for(let relCh of table.changes){
+
+                        if(relCh[0] == index){
+                            ridFound = true;
+                            relCh[1] += (parseInt(r.CM_DELETIONS) + parseInt(r.CM_INSERTIONS) + parseInt(r.CM_TYPE_ALT) + parseInt(r.CM_KEY))
+                        }
+                    }
+                    if(!ridFound){
+
+                        let ii =[];
+                        ii.push(index);
+                        ii.push(parseInt(r.CM_DELETIONS) + parseInt(r.CM_INSERTIONS) + parseInt(r.CM_TYPE_ALT) + parseInt(r.CM_KEY))
+                        table.changes.push(ii);
+                    }
+                }
+            }
+
+            if(!found){
+                let tableInfo = {changes:[], tableName: ''}
+
+                let tmpArr = [];
+                tmpArr.push(index);
+                let ch = parseInt(r.CM_DELETIONS) + parseInt(r.CM_INSERTIONS) + parseInt(r.CM_TYPE_ALT) + parseInt(r.CM_KEY)
+                tmpArr.push(ch);
+                tableInfo.changes.push(tmpArr);
+                tableInfo.tableName = r.TA_NAME;
+                finalData.push(tableInfo);
+            }
+        }
+
+        return finalData;
+
+    }
+
+    getReleaseTables(projectID){
+        return new Promise((resolve) => {
+            this.database.DB.all("SELECT DISTINCT TA_NAME, RE_NAME, RE_DATE, TR_TRANSITION_ID, CM_DELETIONS, CM_INSERTIONS, CM_TYPE_ALT, CM_KEY FROM Phases, Changes_Metrics, Tables WHERE" +
+                " BR_PRJ_ID =" + projectID + " AND BR_NAME = 'master' AND TR_ID = CM_TR_ID AND CM_TA_ID = Tables.TA_ID AND CM_DELETIONS <> '-' ORDER BY RE_DATE",  (err, rows) => {
+
+                resolve(this.createdata(rows));
+            });
+        });
+
+    }
+
+
 
 
 }

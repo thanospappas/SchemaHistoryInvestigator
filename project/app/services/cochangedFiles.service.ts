@@ -15,14 +15,11 @@ import 'rxjs/add/operator/catch';
 export class CochangedService {
     // Resolve HTTP using the constructor
     constructor (private http: Http) {}
-    // private instance variable to hold base url
-    private releasesUrl = 'http://localhost:3002/api/v1/projects/1/files_affected';
-    // private commentsUrl = 'http://578f454de2fa491100415d08.mockapi.io/api/Comment';
 
     // Fetch all existing comments
-    getCochangedFiles() : Observable<Release[]>{
+    getCochangedFiles(url) : Observable<Release[]>{
         // ...using get request
-        return this.http.get(this.releasesUrl)
+        return this.http.get(url)
         // ...and calling .json() on the response to return data
             .map((res:Response) => res.json())
             //...errors if any

@@ -32,11 +32,22 @@ export class ReleaseRouter implements ApiRouter{
     public getAll(req: Request, res: Response, next: NextFunction) {
         let query = parseInt(req.params.id);
 
-        let databaseController:DatabaseController = new ReleaseController();
-        databaseController.getAllData(req.params.id)
-            .then((result) => {
-                res.json(result);
-            });
+        let databaseController:ReleaseController = new ReleaseController();
+
+        if(req.query.group_by == "tables"){
+            databaseController.getReleaseTables(req.params.id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
+        else{
+            databaseController.getAllData(req.params.id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
+
+
     }
 
     getSingle() {

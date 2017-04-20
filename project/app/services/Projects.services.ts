@@ -23,10 +23,10 @@ export class ProjectService {
     // private instance variable to hold base url
     private url = 'http://localhost:3002/api/v1/projects/';
     private projects;
-    private selectedProject:Subject<Project> = new Subject<Project>();
+    //private selectedProject:Subject<Project> = new Subject<Project>();
     private selProject:Project = {selectedPrj: '', projectId: -1};
     projectChanged$ = new ReplaySubject(1);
-    public activeProject:ReplaySubject<any> = new ReplaySubject(1);
+    //public activeProject:ReplaySubject<any> = new ReplaySubject(1);
 
     // Fetch all existing comments
     retrieveProjects() : Observable<Release[]>{

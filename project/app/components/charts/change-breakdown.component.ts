@@ -16,7 +16,7 @@ import {Project} from "../../shared/Project";
     //template: `<ng-content></ng-content>`,
     templateUrl: './change-breakdown.html',
     styleUrls: ['./change-breakdown.style.css'],
-    providers: [ReleaseService]
+    //providers: [ReleaseService]
 })
 
 export class AreaChart implements OnInit, OnChanges {
@@ -117,7 +117,6 @@ export class AreaChart implements OnInit, OnChanges {
             this.releaseService.getReleases(url)
                 .subscribe(releases => {
                         this.releases = releases;
-                        console.log(this.releases);
                         this.isDataAvailable = true;
                         D3.select(".summary-chart svg").remove();
                         if (this.releases) {
@@ -482,14 +481,10 @@ export class AreaChart implements OnInit, OnChanges {
 
 
     mouseoverFunc(d) {
-
-        console.log("moused over", d.x);
-
-            console.log("segmentsStacked", d, "percent", d.y);
         D3.select(".tooltip")
             //this.tooltip
                 .style("opacity", "1")
-                .html("<p><span class='tooltipHeader'>" +d.y + "</p>");
+                .html("<div class='tooltip-section'><p><span class='tooltipHeader'>" +d.y + "</p></div>");
         D3.select(this)
             .classed("hovered-bar", true);
             // .html("<p><span class='tooltipHeader'>" + d.x + "</span><br>"+ d.component + ": " +d.y + "</p>");
