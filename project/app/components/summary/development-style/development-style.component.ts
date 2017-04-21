@@ -3,12 +3,13 @@
  */
 import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation }  from '@angular/core';
 import * as $ from 'jquery';
-import {CochangedService} from '../../services/cochangedFiles.service';
+import {CochangedService} from '../../../services/cochangedFiles.service';
 import * as d3 from 'd3/build/d3.js';
-import {ProjectService} from "../../services/Projects.services";
-import {AuthorsService} from "../../services/authors.service";
-import {Project} from "../../shared/Project";
-import {ReleaseService} from "../../services/releases.service";
+import {ProjectService} from "../../../services/Projects.services";
+import {AuthorsService} from "../../../services/authors.service";
+import {Project} from "../../../shared/Project";
+import {ReleaseService} from "../../../services/releases.service";
+import {serverPort} from "../../../config/server-info";
 @Component({
     selector: 'development-chart',
     //template: `<ng-content></ng-content>`,
@@ -175,7 +176,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
     }
 
     getTables(){
-        let url = "http://localhost:3002/api/v1/projects/" +
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             this.selectedProject.projectId + "/releases?group_by=tables";
         this.coChangedFilesService.getCochangedFiles(url)
             .subscribe(releases => {
@@ -190,7 +191,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
     }
 
     getCochangedFiles(){
-        let url = "http://localhost:3002/api/v1/projects/" +
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             this.selectedProject.projectId + "/files_affected";
         this.coChangedFilesService.getCochangedFiles(url)
             .subscribe(releases => {
@@ -204,7 +205,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
     }
 
     getAuthors(){
-        let url = "http://localhost:3002/api/v1/projects/" +
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             this.selectedProject.projectId + "/authors";
         //console.log(url);
         if( this.selectedProject.projectId != -1){
@@ -221,7 +222,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
     }
 
     getCochangedAuthors(){
-        let url = "http://localhost:3002/api/v1/projects/" +
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             this.selectedProject.projectId + "/authors?group_by=release";
         d3.select(".development-style svg").remove();
         if( this.selectedProject.projectId != -1){

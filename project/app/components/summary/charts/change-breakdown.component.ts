@@ -5,15 +5,14 @@ import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsu
 import * as D3 from 'd3/build/d3.js';
 import * as $ from 'jquery';
 import * as d3Axis from 'd3-axis';
-import { Release } from '../../../models/project/release';
-import {ReleaseService} from '../../services/releases.service';
-import {ProjectService} from "../../services/Projects.services";
-import { Subscription }   from 'rxjs/Subscription';
-import {Project} from "../../shared/Project";
+import { Release } from '../../../../models/project/release';
+import {ReleaseService} from '../../../services/releases.service';
+import {ProjectService} from "../../../services/Projects.services";
+import {Project} from "../../../shared/Project";
+import {serverPort} from "../../../config/server-info";
 
 @Component({
     selector: 'area-chart',
-    //template: `<ng-content></ng-content>`,
     templateUrl: './change-breakdown.html',
     styleUrls: ['./change-breakdown.style.css'],
     //providers: [ReleaseService]
@@ -108,7 +107,7 @@ export class AreaChart implements OnInit, OnChanges {
 
     getReleases(){
         //console.log(this.se)
-        let url = "http://localhost:3002/api/v1/projects/" +
+        let url = "http://localhost:" + serverPort +"/api/v1/projects/" +
             this.selectedProject.projectId + "/releases";
         console.log(url);
         if(this.selectedProject.projectId != -1) {
@@ -118,6 +117,7 @@ export class AreaChart implements OnInit, OnChanges {
                 .subscribe(releases => {
                         this.releases = releases;
                         this.isDataAvailable = true;
+                        console.log(this.releases);
                         D3.select(".summary-chart svg").remove();
                         if (this.releases) {
                             this.createChart();

@@ -6,6 +6,7 @@ import * as Promise from "bluebird";
 import {Release} from "../project/Release";
 import {ReleaseStats} from "../schema-history/ReleaseStats";
 import {DatabaseController} from "../DatabaseController";
+import {Commit} from "../project/Commit";
 
 export class ReleaseController extends DatabaseController{
 
@@ -86,90 +87,97 @@ export class ReleaseController extends DatabaseController{
         });
     }
 
-    private getReleases(projectID:number, allReleases:Array<string>):Promise<any>{
+    private populateReleases(rows){
         let releases:Array<Release> = new Array;
-        let currentPointer = this;
-        return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Phases,Authors  WHERE BR_ID=" + projectID + " AND CO_AUTHOR_ID=Authors.AU_ID ORDER BY CO_DATE ASC;", function (err, rows) {
-                let i =0;
-                //let releaseStats:ReleaseStats = new ReleaseStats();
-                let contributors= [];
+        let i =0;
+        //let releaseStats:ReleaseStats = new ReleaseStats();
+        let contributors= [];
 
-                for(let row of rows){
-                    let found = false;
-                    let rel:Release = new Release();
-                    for(let r of releases){
-                        if(row.CO_PREV_RELEASE_ID == null) {
-                            if(r.name == "Start_Of_Project") {
-                                rel = r;
-                                found = true;
-                            }
-                        }
-                        else if(r.name == row.RE_NAME){
-                            rel = r;
-                            found = true;
+        for(let row of rows){
+            let found = false;
+            let rel:Release = new Release();
+            for(let r of releases){
+                if(row.CO_PREV_RELEASE_ID == null) {
+                    if(r.name == "Start_Of_Project") {
+                        rel = r;
+                        found = true;
+                    }
+                }
+                else if(r.name == row.RE_NAME){
+                    rel = r;
+                    found = true;
+                }
+            }
+            if(i % 12 == 0){
+
+                //console.log(row.)
+
+
+                if(found){
+                    this.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                    rel.commitNumber++;
+
+                    let authFound = false;
+                    for(let auth of contributors){
+                        if(auth == row.AU_NAME){
+                            authFound = true;
+                            break;
                         }
                     }
-                    if(i % 12 == 0){
-
-                        //console.log(row.)
-
-
-                        if(found){
-                            currentPointer.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
-                            rel.commitNumber++;
-
-                            let authFound = false;
-                            for(let auth of contributors){
-                                if(auth == row.AU_NAME){
-                                    authFound = true;
-                                    break;
-                                }
-                            }
-                            if(!authFound){
-                                console.log(row.AU_NAME);
-                                contributors.push(row.AU_NAME);
-                                rel.contributorNumber++;
-                            }
-                        }
-                        else{
-                            contributors = [];
-                            let release:Release = new Release();
-                            if(row.CO_PREV_RELEASE_ID == null){
-                                release.name = "Start_Of_Project";
-                                release.startDate = row.CO_DATE;
-                            }
-                            else{
-                                release.name = row.RE_NAME;
-                                release.startDate = row.RE_DATE;
-                            }
-                            release.oldestCommitDate = row.CO_DATE;
-                            release.startDateHuman = new Date(parseInt(row.RE_DATE)*1000);
-                            release.releaseID = row.RE_ID;
-                            currentPointer.assignStatsValue(release.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
-                            release.commitNumber = 1;
-                            contributors.push(row.AU_NAME);
-                            release.contributorNumber = 1;
-                            releases.push(release);
-
-
-
-                        }
-
-                        //releaseStats = new ReleaseStats();
+                    if(!authFound){
+                        console.log(row.AU_NAME);
+                        contributors.push(row.AU_NAME);
+                        rel.contributorNumber++;
                     }
-                    else if(i % 12 == 11){
-                        rel.newestCommitDate = row.CO_DATE;
-                        currentPointer.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                }
+                else{
+                    contributors = [];
+                    let release:Release = new Release();
+                    if(row.CO_PREV_RELEASE_ID == null){
+                        release.name = "Start_Of_Project";
+                        release.startDate = row.CO_DATE;
                     }
                     else{
-                        currentPointer.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                        release.name = row.RE_NAME;
+                        release.startDate = row.RE_DATE;
                     }
-                    i++;
+                    release.oldestCommitDate = row.CO_DATE;
+                    release.startDateHuman = new Date(parseInt(row.RE_DATE)*1000);
+                    release.releaseID = row.RE_ID;
+                    this.assignStatsValue(release.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                    release.commitNumber = 1;
+                    contributors.push(row.AU_NAME);
+                    release.contributorNumber = 1;
+                    releases.push(release);
+
+
+
                 }
+
+                //releaseStats = new ReleaseStats();
+            }
+            else if(i % 12 == 11){
+                rel.newestCommitDate = row.CO_DATE;
+                this.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+            }
+            else{
+                this.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+            }
+            i++;
+        }
+        return releases;
+    }
+
+    private getReleases(projectID:number, allReleases:Array<string>):Promise<any>{
+        let releases:Array<Release> = new Array;
+        //let currentPointer = this;
+        return new Promise((resolve) => {
+            this.database.DB.all("SELECT * FROM Phases,Authors  WHERE BR_ID=" + projectID + " AND CO_AUTHOR_ID=Authors.AU_ID ORDER BY CO_DATE ASC;", (err, rows) => {
+
+                releases = this.populateReleases(rows);
                 releases.sort((release1:any, release2:any) => release1.startDate - release2.startDate);
 
-                currentPointer.populateDurations(releases, allReleases);
+                this.populateDurations(releases, allReleases);
                 console.log(releases.length);
                 resolve(releases);
             });
@@ -197,12 +205,6 @@ export class ReleaseController extends DatabaseController{
     getSingle(): Promise<any> {
         throw new Error('Method not implemented.');
     }
-
-
-    getDevStyleInfo(){
-
-    }
-
 
     /**
      *
@@ -284,6 +286,55 @@ export class ReleaseController extends DatabaseController{
         });
 
     }
+
+    populateReleasesWithCommits(rows){
+        let i =0;
+        let commits:Array<Commit> = new Array<Commit>();
+        let contributors= [];
+        let rel:Release = new Release();
+        for(let row of rows){
+
+            if(i % 12 == 0){
+
+                let release:Release = new Release();
+                if(row.CO_PREV_RELEASE_ID == null){
+                    release.name = "Start_Of_Project";
+                    release.startDate = row.CO_DATE;
+                }
+                else{
+                    release.name = row.RE_NAME;
+                    release.startDate = row.RE_DATE;
+                }
+                release.oldestCommitDate = row.CO_DATE;
+                release.startDateHuman = new Date(parseInt(row.RE_DATE)*1000);
+                release.releaseID = row.RE_ID;
+                this.assignStatsValue(release.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                release.commitNumber = 1;
+                contributors.push(row.AU_NAME);
+                release.contributorNumber = 1;
+
+            }
+            else{
+                this.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+            }
+            i++;
+        }
+        return commits;
+    }
+
+    getReleaseById(releaseID){
+
+        return new Promise((resolve) => {
+            this.database.DB.all("SELECT * FROM Phases WHERE RE_ID = " + releaseID
+                + " ORDER BY CO_DATE ASC;",  (err, rows) => {
+                console.log(this.populateReleases(rows));
+                resolve(this.populateReleases(rows));
+            });
+        });
+
+    }
+
+
 
 
 

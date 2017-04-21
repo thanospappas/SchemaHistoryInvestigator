@@ -9,7 +9,7 @@ export interface ApiRouter{
 
     init();
     getAll(req: Request, res: Response, next: NextFunction);
-    getSingle();
+    getSingle(req: Request, res: Response, next: NextFunction);
 
     getPath():string;
 

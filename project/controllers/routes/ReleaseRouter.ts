@@ -50,8 +50,15 @@ export class ReleaseRouter implements ApiRouter{
 
     }
 
-    getSingle() {
-        throw new Error('Method not implemented.');
+    getSingle(req: Request, res: Response, next: NextFunction) {
+        console.log("release single id: " + req.params.release_id);
+        let databaseController:ReleaseController = new ReleaseController();
+        databaseController.getReleaseById(req.params.release_id)
+            .then((result) => {
+                res.json(result);
+            });
+
+        //throw new Error('Method not implemented.');
     }
 
     getPath(): string {
@@ -64,6 +71,7 @@ export class ReleaseRouter implements ApiRouter{
      */
     init() {
         this.router.get('/', this.getAll);
+        this.router.get('/:release_id', this.getSingle);
 
         /*initialize all nested routers*/
         this.releaseBasedRouters.push(new ReleaseCommitRouter());

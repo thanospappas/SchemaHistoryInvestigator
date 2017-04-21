@@ -57,6 +57,7 @@ export class TopNavBar{
 
         prj.selectedPrj = this.projects[selectedIndex].Name;
         prj.projectId = this.projects[selectedIndex].ID;
+
         this.projectService.setSelectedProject(prj);
 
     }

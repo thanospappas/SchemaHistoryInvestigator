@@ -13,6 +13,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Project} from "../shared/Project";
 import {ReplaySubject} from "rxjs/ReplaySubject";
+import {serverPort} from "../config/server-info";
 
 @Injectable()
 export class ProjectService {
@@ -21,7 +22,7 @@ export class ProjectService {
         this.retrieveProjects();
     }
     // private instance variable to hold base url
-    private url = 'http://localhost:3002/api/v1/projects/';
+    private url = 'http://localhost:' + serverPort + '/api/v1/projects/';
     private projects;
     //private selectedProject:Subject<Project> = new Subject<Project>();
     private selProject:Project = {selectedPrj: '', projectId: -1};
@@ -49,6 +50,26 @@ export class ProjectService {
 
     }
 
+    retrieveProjects1(id) : Observable<Release[]>{
+        // ...using get request
+        return this.http.get(this.url)
+        // ...and calling .json() on the response to return data
+            .map((res:Response) => {
+                this.projects = res.json();
+                this.selProject.selectedPrj = this.projects[id].Name;
+                this.selProject.projectId = this.projects[id].ID;
+
+                this.setSelectedProject(this.selProject);
+                return res.json()
+            })
+            //...errors if any
+            .catch((error:any) => {
+                console.log(error);
+                return Observable.throw(error.json().error || 'Server error')
+            });
+
+    }
+
     getProjects(){
         return this.projects;
     }
@@ -56,6 +77,8 @@ export class ProjectService {
     setSelectedProject(project:Project){
         this.selProject = project;
         //this.selectedProject.next(this.selProject);
+        console.log("inside project set" + this.selProject.selectedPrj + ";" + this.selProject.projectId);
+
         this.projectChanged$.next(this.selProject);
         //this.activeProject.next("haha");
         //console.log("I am changing...");
