@@ -1,21 +1,18 @@
 /**
  * Created by thanosp on 17/4/2017.
  */
-import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation }  from '@angular/core';
+import { Component, OnInit, OnChanges}  from '@angular/core';
 import * as $ from 'jquery';
-import {CochangedService} from '../../../services/cochangedFiles.service';
+import {HttpService} from '../../../services/http.service';
 import * as d3 from 'd3/build/d3.js';
 import {ProjectService} from "../../../services/Projects.services";
-import {AuthorsService} from "../../../services/authors.service";
 import {Project} from "../../../shared/Project";
 import {ReleaseService} from "../../../services/releases.service";
 import {serverPort} from "../../../config/server-info";
 @Component({
     selector: 'development-chart',
-    //template: `<ng-content></ng-content>`,
     templateUrl: './development-style.html',
-    //styleUrls: ['./change-breakdown.style.css'],
-    providers: [CochangedService, AuthorsService]
+
 })
 
 export class DevelopmentChart implements OnInit, OnChanges {
@@ -25,7 +22,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
     private authors;
 
 
-    constructor(private coChangedFilesService:CochangedService, private projectService:ProjectService, private authorsService:AuthorsService,private releaseChanges:ReleaseService){}
+    constructor(private httpService:HttpService, private projectService:ProjectService, private releaseChanges:ReleaseService){}
 
     ngOnInit(): void {
 
@@ -178,7 +175,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
     getTables(){
         let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             this.selectedProject.projectId + "/releases?group_by=tables";
-        this.coChangedFilesService.getCochangedFiles(url)
+        this.httpService.get(url)
             .subscribe(releases => {
 
                     console.log(releases);
@@ -193,7 +190,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
     getCochangedFiles(){
         let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             this.selectedProject.projectId + "/files_affected";
-        this.coChangedFilesService.getCochangedFiles(url)
+        this.httpService.get(url)
             .subscribe(releases => {
                     this.cochangedFiles = releases;
                     //console.log(this.cochangedFiles);
@@ -209,7 +206,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
             this.selectedProject.projectId + "/authors";
         //console.log(url);
         if( this.selectedProject.projectId != -1){
-            this.authorsService.getAuthors(url)
+            this.httpService.get(url)
                 .subscribe(authors => {
                         this.authors = authors;
 
@@ -226,7 +223,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
             this.selectedProject.projectId + "/authors?group_by=release";
         d3.select(".development-style svg").remove();
         if( this.selectedProject.projectId != -1){
-            this.authorsService.getAuthors(url)
+            this.httpService.get(url)
                 .subscribe(releases => {
                         this.constructChordDiagramData(releases);
                     },

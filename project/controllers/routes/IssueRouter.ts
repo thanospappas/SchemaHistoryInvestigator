@@ -23,7 +23,7 @@ export class IssueRouter implements ApiRouter{
      * GET all builds.
      */
     public getAll(req: Request, res: Response, next: NextFunction) {
-        let query = parseInt(req.params.id);
+        //let query = parseInt(req.params.id);
         let databaseController:DatabaseController = new IssueController();
         databaseController.getAllData(req.params.id)
             .then((result) => {

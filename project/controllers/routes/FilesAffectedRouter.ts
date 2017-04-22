@@ -20,8 +20,7 @@ export class FilesAffectedRouter implements ApiRouter{
      * GET all projects.
      */
     public getAll(req: Request, res: Response, next: NextFunction) {
-        let query = parseInt(req.params.id);
-
+        //let query = parseInt(req.params.id);
         let prjManager = new SManager();
 
         prjManager.getFilesAffected(req.params.id)

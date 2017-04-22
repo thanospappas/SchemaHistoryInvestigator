@@ -74,6 +74,10 @@ export class ProjectService {
         return this.projects;
     }
 
+    getSelectedProjectData(){
+        return this.selProject;
+    }
+
     setSelectedProject(project:Project){
         this.selProject = project;
         //this.selectedProject.next(this.selProject);

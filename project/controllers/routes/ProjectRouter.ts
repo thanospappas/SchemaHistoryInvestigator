@@ -26,11 +26,9 @@ export class ProjectRouter implements ApiRouter{
      */
     public getAll(req: Request, res: Response, next: NextFunction) {
         let prjManager = new SManager();
-        //var pCust: Promise<any>;
+
         prjManager.getProjects()
             .then((result) => {
-                console.log("I got your answer");
-                console.log(result);
                 res.json(result);
             });
 
@@ -43,7 +41,6 @@ export class ProjectRouter implements ApiRouter{
     getPath(): string {
         return "/api/v1/projects";
     }
-
 
 
     /**

@@ -1,7 +1,7 @@
   <div class="col-md-3 left_col menu_fixed">
   <div class="left_col scroll-view">
     <div class="navbar nav_title" style="border: 0;">
-      <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Hello again!</span></a>
+      <a [routerLink]="['/']" class="site_title"><i class="fa fa-database" aria-hidden="true"></i><span>Repo Life Story</span></a>
     </div>
     <div class="clearfix"></div>
 
@@ -12,7 +12,7 @@
         <ul class="nav side-menu">
           <li><a id="homeli1"></a></li>
 
-          <li>
+          <li class="active active-sm">
             <a [routerLink]="['/']">
               <i class="fa fa-bar-chart" aria-hidden="true"></i>
               Summary <span id="homechevron" class="fa fa-chevron-down"></span>

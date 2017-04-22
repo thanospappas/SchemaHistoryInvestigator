@@ -3,12 +3,8 @@
  */
 
 import {Router, Request, Response, NextFunction} from 'express';
-import * as Promise from "bluebird";
 import * as express from 'express';
-import {SManager} from "../../models/project/Project";
-import {ReleaseManager} from "../../models/project/ReleaseManager";
 import {ApiRouter} from "./ApiRouter";
-import {DatabaseController} from "../../models/DatabaseController";
 import {ReleaseController} from "../../models/db-controllers/ReleaseController";
 import {ReleaseCommitRouter} from "./ReleaseCommitRouter";
 
@@ -24,7 +20,6 @@ export class ReleaseRouter implements ApiRouter{
         this.router = express.Router({mergeParams: true});
         this.releaseBasedRouters = new Array<ApiRouter>();
     }
-
 
     /**
      * GET all projects.
@@ -47,18 +42,15 @@ export class ReleaseRouter implements ApiRouter{
                 });
         }
 
-
     }
 
     getSingle(req: Request, res: Response, next: NextFunction) {
-        console.log("release single id: " + req.params.release_id);
+
         let databaseController:ReleaseController = new ReleaseController();
         databaseController.getReleaseById(req.params.release_id)
             .then((result) => {
                 res.json(result);
             });
-
-        //throw new Error('Method not implemented.');
     }
 
     getPath(): string {

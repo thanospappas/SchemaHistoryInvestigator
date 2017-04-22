@@ -7,29 +7,18 @@ import {isUndefined} from "util";
 import {promise} from "selenium-webdriver";
 
 
-export interface StorageManager {
-    //init(force?:boolean):Promise<any>;
-    //register(name:string, email:string, rawPassword:string):Promise<any>;
-    //getAccountById(id:number):Promise<any>;
-    //getAccountByEmail(email:string):Promise<any>;
 
-}
 
-export class SManager implements StorageManager {
+export class SManager {
 
     public db;
 
     constructor() {
 
-        //var env 	  = process.env.NODE_ENV || "development";
-        var path 	  = require("path");
-        //let config 	  = require(path.join(__dirname, '../../config/config.json'))[env];
-
+        var path = require("path");
         var sqlite3 = require('sqlite3').verbose();
         var file = path.join(__dirname, '../database/schemaEvolutionDB_new.db') ;
         this.db = new sqlite3.Database(file);
-
-
 
     }
 
@@ -38,7 +27,6 @@ export class SManager implements StorageManager {
         return new Promise((resolve) => {
             this.db.all("SELECT * FROM Projects", function (err, rows) {
                 for (let row of rows) {
-                    console.log(row.PRJ_ID, row.PRJ_NAME);
                     projects.push({ID: row.PRJ_ID, Name: row.PRJ_NAME});
                 }
                 resolve(projects);
@@ -93,7 +81,5 @@ export class SManager implements StorageManager {
     closeDB(){
         this.db.close();
     }
-
-
 
 }

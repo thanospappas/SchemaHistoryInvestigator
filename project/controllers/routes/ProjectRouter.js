@@ -19,11 +19,8 @@ var ProjectRouter = (function () {
      */
     ProjectRouter.prototype.getAll = function (req, res, next) {
         var prjManager = new Project_1.SManager();
-        //var pCust: Promise<any>;
         prjManager.getProjects()
             .then(function (result) {
-            console.log("I got your answer");
-            console.log(result);
             res.json(result);
         });
     };

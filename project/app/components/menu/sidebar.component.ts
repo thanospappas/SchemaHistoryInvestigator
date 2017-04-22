@@ -28,7 +28,7 @@ export class Sidebar {
     }
 
     ngAfterViewInit(): void {
-       // this.plot();
+       // this.initMenuListeners();
     }
 
     anchorClicked(event: MouseEvent)
@@ -58,8 +58,7 @@ export class Sidebar {
             }
     }
 
-    plot()
-    {     
+    initMenuListeners() {
 
         this.$BODY = $('body');
         this.$MENU_TOGGLE = $('#menu_toggle');
@@ -73,46 +72,16 @@ export class Sidebar {
         var $a = this.$SIDEBAR_MENU.find('a');
         this.$SIDEBAR_MENU.find('a').on('click', function(ev) {
             var $li = $(this).parent();
-
-            if ($li.is('.active')) {
-                $li.removeClass('active active-sm');
-                $('ul:first', $li).slideUp(function() {
-                    this.setContentHeight();
-                });
-            } else {
-                // prevent closing menu if we are on child menu
-                if (!$li.parent().is('.child_menu')) {
-                    this.$SIDEBAR_MENU.find('li').removeClass('active active-sm');
-                    this.$SIDEBAR_MENU.find('li ul').slideUp();
-                }
-                
-                $li.addClass('active');
-
-                $('ul:first', $li).slideDown(function() {
-                    this.setContentHeight();
-                });
-            }
+            var $currentli = $('#sidebar-menu').find('li.active-sm');
+            $currentli.removeClass('active active-sm');
+             $li.addClass('active active-sm');
         });
 
-        // toggle small or large menu
-        this.$MENU_TOGGLE.on('click', function() {
-            if (this.$BODY.hasClass('nav-md')) {
-                this.$SIDEBAR_MENU.find('li.active ul').hide();
-                this.$SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
-            } else {
-                this.$SIDEBAR_MENU.find('li.active-sm ul').show();
-                this.$SIDEBAR_MENU.find('li.active-sm').addClass('active').removeClass('active-sm');
-            }
-
-            this.$BODY.toggleClass('nav-md nav-sm');
-
-            this.setContentHeight();
-        });
-
+        this.setContentHeight();
     }   
 
     ngOnInit() {
-        //console.log('hello `sidebar` component');
+        this.initMenuListeners();
     }
 
     setContentHeight() {

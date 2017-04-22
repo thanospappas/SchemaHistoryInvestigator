@@ -149,7 +149,7 @@ export class AreaChart implements OnInit, OnChanges {
             .attr('width', this.width + this.margin.left + this.margin.right)//element.offsetWidth)
             .attr('height', this.height + this.margin.top + this.margin.bottom + this.legendHeight);//element.offsetHeight);
 
-        // chart plot area
+        // chart initMenuListeners area
         this.chart = this.svg.append('g')
             .attr('class', 'bars1')
             .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);

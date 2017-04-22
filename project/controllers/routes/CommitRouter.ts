@@ -31,10 +31,9 @@ export class CommitRouter implements ApiRouter{
      */
     public getAll(req: Request, res: Response, next: NextFunction) {
         let databaseController:DatabaseController = new CommitController();
-        let query = parseInt(req.params.id);
+
         databaseController.getAllData(req.params.id)
             .then((result) => {
-            console.log(result);
                 res.json(result);
             });
 

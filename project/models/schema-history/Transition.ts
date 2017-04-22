@@ -38,8 +38,7 @@ export class Transition{
     }
 
     setHumanDate(date:number){
-
-        //this.humanDate = date;
+        this.humanDate = new Date(date*1000);
     }
 
     getOldVersion(){

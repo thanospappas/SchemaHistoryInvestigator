@@ -91,11 +91,9 @@ export class TransitionController extends DatabaseController{
         return new Promise((resolve) => {
             this.database.DB.all("SELECT * FROM Phases WHERE BR_PRJ_ID = " + projectID + "  AND RE_ID = " + releaseID +
                 " ORDER BY(TR_TRANSITION_ID) ASC", function (err, transitions) {
-                console.log(transitions);
                 resolve(currentPointer.createTransitions(transitions));
             });
         });
-
 
     }
 

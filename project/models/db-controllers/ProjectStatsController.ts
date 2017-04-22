@@ -55,7 +55,6 @@ export class AuthorsController extends DatabaseController{
                     auth.email = row.AU_EMAIL;
 
                     addedRel.authors.push(auth);
-                    console.log(addedRel.authors);
                     found = true;
                 }
             }

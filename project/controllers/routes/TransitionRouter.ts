@@ -33,8 +33,6 @@ export class TransitionRouter implements ApiRouter{
      */
     public getAll(req: Request, res: Response, next: NextFunction) {
 
-        let query = parseInt(req.params.id);
-        console.log();
         let databaseController:TransitionController = new TransitionController();
         if(req.query.release_id){
             databaseController.getTransitionsFromRelease(req.params.id,req.query.release_id)

@@ -11,6 +11,10 @@ export class Commit{
     private author:Author;
     private stats:ReleaseStats;
 
+    constructor(){
+        this.stats = new ReleaseStats();
+    }
+
     setText(text:string){
         this.text = text;
     }
@@ -24,7 +28,7 @@ export class Commit{
     }
 
     setDate(date:number){
-
+        this.date = new Date(date*1000);
     }
 
     getAuthor():Author{
