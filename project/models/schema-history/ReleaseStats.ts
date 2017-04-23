@@ -2,7 +2,7 @@
  * Created by thanosp on 11/4/2017.
  */
 
-export class ReleaseStats{
+export class Stats{
     private tableInsertions:number;
     private tableDeletions:number;
     private attributeInsertionsAtExistingTables:number;

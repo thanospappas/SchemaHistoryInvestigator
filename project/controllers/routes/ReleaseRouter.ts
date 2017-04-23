@@ -47,7 +47,8 @@ export class ReleaseRouter implements ApiRouter{
     getSingle(req: Request, res: Response, next: NextFunction) {
 
         let databaseController:ReleaseController = new ReleaseController();
-        databaseController.getReleaseById(req.params.release_id)
+
+        databaseController.getReleaseById(req.params.release_id, req.params.id)
             .then((result) => {
                 res.json(result);
             });

@@ -48,6 +48,10 @@ export class ReleaseService {
 
     }
 
+    getReleaseData(){
+        return this.releases;
+    }
+
     getReleaseChanges(){
         return this.releasesChanged$;
     }

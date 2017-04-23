@@ -4,13 +4,14 @@
 
 // Imports
 import { Component, OnInit } from '@angular/core';
-
+import * as $ from 'jquery';
 import { Observable } from 'rxjs/Observable';
 import {ReleaseService} from "../../services/releases.service";
 import {ActivatedRoute} from "@angular/router";
 import {HttpService} from "../../services/http.service";
 import {serverPort} from "../../config/server-info";
 import {ProjectService} from "../../services/Projects.services";
+import {BreakdownChart} from "../../shared/BreakdownChart";
 
 
 @Component({
@@ -24,9 +25,10 @@ export class ReleaseComponent implements OnInit {
     private selectedReleaseId:number = -1;
     private releases;
     private commits;
-
+    private commitChangesChart;
+    private $SIDEBAR_MENU;
     constructor(private route:ActivatedRoute, private releaseChanges:ReleaseService, private httpService:HttpService, private projectService:ProjectService) {
-
+        this.commitChangesChart = new BreakdownChart(".release-summary");
     }
 
     // Load data ones componet is ready
@@ -38,6 +40,16 @@ export class ReleaseComponent implements OnInit {
             console.log(id);
             if(id){
                 this.selectedReleaseId = id;
+
+                this.$SIDEBAR_MENU = $('#sidebar-menu');
+
+
+                var $li = $('.releases-menu-item');
+                var $currentli = $('#sidebar-menu').find('li.active-sm');
+                $currentli.removeClass('active active-sm');
+                $li.addClass('active active-sm');
+
+
             }
             // Retrieve Pet with Id route param
             //this.petService.findPetById(id).subscribe(dog => this.dog = dog);
@@ -53,6 +65,8 @@ export class ReleaseComponent implements OnInit {
                 this.retrieveCommits();
             });
 
+
+
     }
 
     retrieveCommits(){
@@ -62,6 +76,8 @@ export class ReleaseComponent implements OnInit {
             .subscribe(commits => {
                     this.commits = commits;
                     console.log(this.commits);
+                    this.commitChangesChart.setReleases(this.commits);
+                    this.commitChangesChart.createChart();
 
                 },
                 err => {

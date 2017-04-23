@@ -4,7 +4,7 @@
 
 import * as Promise from "bluebird";
 import {Release} from "../project/Release";
-import {ReleaseStats} from "../schema-history/ReleaseStats";
+import {Stats} from "../schema-history/ReleaseStats";
 import {DatabaseController} from "../DatabaseController";
 import {Commit} from "../project/Commit";
 
@@ -22,7 +22,7 @@ export class ReleaseController extends DatabaseController{
         });
     }
 
-    private assignStatsValue(stats:ReleaseStats, type:string, value:number) {
+    private assignStatsValue(stats:Stats, type:string, value:number) {
         if (type==("tDel")) {
             stats.setTableDeletions(value + stats.getTableDeletions());
         } else if (type==("tIns")) {
@@ -62,9 +62,9 @@ export class ReleaseController extends DatabaseController{
                     break;
                 }
             }
-            releases[i].releaseMetrics.setSchemaSizeTable(1.0*releases[i].releaseMetrics.getSchemaSizeTable()/releases[i].commitNumber);
-            releases[i].releaseMetrics.setSchemaSizeAttribute(1.0*releases[i].releaseMetrics.getSchemaSizeAttribute()/releases[i].commitNumber);
-            releases[i].releaseMetrics.computeAttributeUpdates();
+            releases[i].stats.setSchemaSizeTable(1.0*releases[i].stats.getSchemaSizeTable()/releases[i].commitNumber);
+            releases[i].stats.setSchemaSizeAttribute(1.0*releases[i].stats.getSchemaSizeAttribute()/releases[i].commitNumber);
+            releases[i].stats.computeAttributeUpdates();
             releases[i].commitDuration = Math.ceil((releases[i].newestCommitDate * 1000 - releases[i].oldestCommitDate * 1000) / (1000 * 3600 * 24));
         }
     }
@@ -86,7 +86,7 @@ export class ReleaseController extends DatabaseController{
     private populateReleases(rows){
         let releases:Array<Release> = new Array;
         let i =0;
-        //let releaseStats:ReleaseStats = new ReleaseStats();
+        //let releaseStats:Stats = new Stats();
         let contributors= [];
 
         for(let row of rows){
@@ -107,7 +107,7 @@ export class ReleaseController extends DatabaseController{
             if(i % 12 == 0){
 
                 if(found){
-                    this.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                    this.assignStatsValue(rel.stats,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
                     rel.commitNumber++;
 
                     let authFound = false;
@@ -134,9 +134,17 @@ export class ReleaseController extends DatabaseController{
                         release.startDate = row.RE_DATE;
                     }
                     release.oldestCommitDate = row.CO_DATE;
-                    release.startDateHuman = new Date(parseInt(row.RE_DATE)*1000);
-                    release.releaseID = row.RE_ID;
-                    this.assignStatsValue(release.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                    release.dateHuman = new Date(parseInt(row.RE_DATE)*1000);
+                    console.log(row.CO_PREV_RELEASE_ID);
+                    if(row.CO_PREV_RELEASE_ID == null){
+                        release.releaseID = -1;
+                    }
+                    else{
+                        release.releaseID = row.CO_PREV_RELEASE_ID;
+                    }
+
+                    //release.releaseID = row.RE_ID;
+                    this.assignStatsValue(release.stats,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
                     release.commitNumber = 1;
                     contributors.push(row.AU_NAME);
                     release.contributorNumber = 1;
@@ -146,14 +154,14 @@ export class ReleaseController extends DatabaseController{
 
                 }
 
-                //releaseStats = new ReleaseStats();
+                //releaseStats = new Stats();
             }
             else if(i % 12 == 11){
                 rel.newestCommitDate = row.CO_DATE;
-                this.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                this.assignStatsValue(rel.stats,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
             }
             else{
-                this.assignStatsValue(rel.releaseMetrics,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                this.assignStatsValue(rel.stats,row.ME_TYPE_OF_METRIC,row.ME_VALUE);
             }
             i++;
         }
@@ -295,13 +303,14 @@ export class ReleaseController extends DatabaseController{
                     release.name = row.RE_NAME;
                     release.startDate = row.RE_DATE;
                 }*/
-                if (i > 0){ commits.push(commit); }
+                if (i > 0){ commit.getStats().computeAttributeUpdates(); }
                 commit = new Commit();
                 commit.setDate(row.CO_DATE);
                 commit.setText(row.CO_TEXT);
                 commit.setAuthor(row.AU_NAME, row.AU_EMAIL);
 
                 this.assignStatsValue(commit.getStats(),row.ME_TYPE_OF_METRIC,row.ME_VALUE);
+                commits.push(commit);
             }
             else{
                 this.assignStatsValue(commit.getStats(),row.ME_TYPE_OF_METRIC,row.ME_VALUE);
@@ -311,11 +320,21 @@ export class ReleaseController extends DatabaseController{
         return commits;
     }
 
-    getReleaseById(releaseID){
+    getReleaseById(releaseID, projectID){
 
+        let query = "";
+        if(-1 == parseInt(releaseID)){
+            query = "SELECT * FROM Phases, Authors WHERE CO_PREV_RELEASE_ID IS NULL AND BR_PRJ_ID= " +
+                projectID + " AND Authors.AU_ID = CO_AUTHOR_ID ORDER BY CO_DATE ASC;"
+        }
+        else{
+            query ="SELECT * FROM Phases, Authors WHERE CO_PREV_RELEASE_ID = " + releaseID
+                + " AND Authors.AU_ID = CO_AUTHOR_ID ORDER BY CO_DATE ASC;"
+        }
+
+        console.log(query);
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Phases, Authors WHERE RE_ID = " + releaseID
-                + " AND Authors.AU_ID = CO_AUTHOR_ID ORDER BY CO_DATE ASC;",  (err, rows) => {
+            this.database.DB.all(query,  (err, rows) => {
 
                 resolve(this.populateReleasesWithCommits(rows));
             });

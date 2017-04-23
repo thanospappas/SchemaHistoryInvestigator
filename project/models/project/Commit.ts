@@ -1,5 +1,5 @@
 import {Author} from "./Author";
-import {ReleaseStats} from "../schema-history/ReleaseStats";
+import {Stats} from "../schema-history/ReleaseStats";
 /**
  * Created by thanosp on 21/4/2017.
  */
@@ -7,12 +7,12 @@ import {ReleaseStats} from "../schema-history/ReleaseStats";
 export class Commit{
 
     private text:string;
-    private date:Date;
+    private dateHuman:Date;
     private author:Author;
-    private stats:ReleaseStats;
+    stats:Stats;
 
     constructor(){
-        this.stats = new ReleaseStats();
+        this.stats = new Stats();
     }
 
     setText(text:string){
@@ -24,11 +24,11 @@ export class Commit{
     }
 
     getDate():Date{
-        return this.date;
+        return this.dateHuman;
     }
 
     setDate(date:number){
-        this.date = new Date(date*1000);
+        this.dateHuman = new Date(date*1000);
     }
 
     getAuthor():Author{
@@ -41,11 +41,11 @@ export class Commit{
         this.author.setEmail(email);
     }
 
-    setStats(stats:ReleaseStats){
+    setStats(stats:Stats){
         this.stats = stats;
     }
 
-    getStats():ReleaseStats{
+    getStats():Stats{
         return this.stats;
     }
 
