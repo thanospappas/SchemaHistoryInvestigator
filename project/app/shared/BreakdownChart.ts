@@ -639,10 +639,20 @@ export class BreakdownChart {
 
         var parseTime = D3.timeParse("%Y-%m-%d");
 
-        var x = D3.scaleTime().range([0, width]),
-            x2 = D3.scaleTime().range([0, width]),
+        var x = D3.scaleTime().range([0, width-margin.left]),
+            x2 = D3.scaleTime().range([0, width-margin.left]),
             y = D3.scaleLinear().range([height, 0]),
             y2 = D3.scaleLinear().range([height2, 0]);
+
+        let yDomainRight = [0, D3.max(this.releases, d => d.stats.averageSchemaSizeTables)];
+
+        // create scales
+
+        var yScaleRight = D3.scaleLinear().domain(yDomainRight).range([this.height, 0]);
+
+
+
+
 
         var xAxis = D3.axisBottom(x).tickSize(0),
             xAxis2 = D3.axisBottom(x2).tickSize(0),
@@ -667,6 +677,14 @@ export class BreakdownChart {
             .append("rect")
             .attr("width", width)
             .attr("height", height);
+
+        var yAxisRight = svg.append('g')
+            .attr('class', 'axis axis-y-right')
+            .attr('transform', `translate(${width  }, ${ margin.top})`)
+            .call(D3.axisRight(yScaleRight));
+
+
+        yAxisRight.call(D3.axisRight(yScaleRight));
 
         var focus = svg.append("g")
             .attr("class", "focus")
@@ -883,11 +901,54 @@ export class BreakdownChart {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
             .call(zoom);*/
 
+
+        /*var focusLine = D3.line()
+            .x(function(d) {
+                console.log("-----------------------------------------------");
+                console.log(d);
+                return x(d.humanDate); })
+            .y(function(d) { return y(d.stats.averageSchemaSizeTables); })
+            .defined(function(d) { return d.stats.averageSchemaSizeTables; });*/
+
+        var focusLine = D3.line()
+
+            .x(function(d) {
+                console.log("-----------------------------------------------");
+                console.log(x(d.dateHuman));
+                return x(new Date(d.dateHuman)); })
+            .y(function(d) { console.log(d); return yScaleRight(d.stats.averageSchemaSizeTables)});
+
+        focusLine.curve(D3.curveStepAfter);
+
+        svg.selectAll('path.line')
+            .datum(this.releases)
+            .attr("class", "line")
+            .attr("d", focusLine);
+
+       // var line = svg.selectAll('path.line').append("path").attr("class", "line")
+            //.data(data)
+        //    .attr("d",this.releases);
+
+        //line.enter().append('path')
+        //    .attr("class", "line");
+
+
+        //line.transition()
+        //    .attr('d', function(d) { return focusLine(d); });
+
+        //line.exit().remove();
+
+
+
+
+
 //create brush function redraw scatterplot with selection
         function brushed() {
             if (D3.event.sourceEvent && D3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
             var s = D3.event.selection || x2.range();
             x.domain(s.map(x2.invert, x2));
+
+            //console.log(s.map(x2.invert, x2))
             focus.selectAll("rect")
                 .attr('x', d => {
                     //console.log(d.x);
@@ -904,17 +965,16 @@ export class BreakdownChart {
                     return (y(d.y));
                 })
 
-            x.domain(s.map(x2.invert, x2));
 
 
-            console.log(myline);
-            console.log(s);
-            focus.select(".line").attr("d", myline);
+
+            focus.selectAll("path.line").attr("d", focusLine);
+            //focus.select(".line").attr("d", myline);
             //focus.select(".x-axis").call(xAxis);
-            focus.selectAll("path.line").attr("d",  d => {
-                console.log(d);
-                return myline(d.values)
-            });
+            //focus.selectAll("path.line").attr("d",  d => {
+             //   console.log(d.values);
+             //   return myline
+            //});
             svg.select(".zoom").call(zoom.transform, D3.zoomIdentity
                 .scale(width / (s[1] - s[0]))
                 .translate(-s[0], 0));
