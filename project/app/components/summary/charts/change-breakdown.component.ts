@@ -11,6 +11,7 @@ import {ProjectService} from "../../../services/Projects.services";
 import {Project} from "../../../shared/Project";
 import {serverPort} from "../../../config/server-info";
 import {BreakdownChart} from "../../../shared/BreakdownChart";
+import {release} from "os";
 
 @Component({
     selector: 'area-chart',
@@ -45,8 +46,10 @@ export class AreaChart implements OnInit, OnChanges {
     private isDataAvailable:boolean = true;
     private selectedProject:Project = {selectedPrj: '', projectId: -1};
     loading = false;
-    tooltip;
+    private tooltip;
     private changebreakdownCart;
+
+    private selectedReleases;
 
     // Input properties
     //@Input() listId: string;
@@ -68,7 +71,7 @@ export class AreaChart implements OnInit, OnChanges {
         this.heightOverview= this.height - this.marginOverview.top - this.marginOverview.bottom;
         this.margin.top = this.legendHeight;
 
-        this.changebreakdownCart = new BreakdownChart(".summary-chart");
+        this.changebreakdownCart = new BreakdownChart(".summary-chart",this.releaseService);
 
         this.projectService.getSelectedProject().subscribe(
             project => {
@@ -78,6 +81,14 @@ export class AreaChart implements OnInit, OnChanges {
                 this.getReleases();
             });
 
+        this.releaseService.getSelectedReleases().subscribe(
+            releases => {
+                //console.log("In breakdown...");
+                //console.log(releases);
+                this.selectedReleases = releases;
+                //this.test();
+
+            });
 
         $('.collapse-link').on('click', function() {
             var $BOX_PANEL = $(this).closest('.x_panel'),
@@ -103,6 +114,11 @@ export class AreaChart implements OnInit, OnChanges {
             $BOX_PANEL.remove();
         });
 
+        this.tooltip = D3.select("body")
+            .append("div")
+            .attr("class", "releaseTooltip");
+
+
     }
 
     getReleases(){
@@ -124,27 +140,54 @@ export class AreaChart implements OnInit, OnChanges {
         else */if(this.selectedProject.projectId != -1) {
             this.loading = true;
             D3.select(".summary-chart svg").remove();
+            D3.select(".overview-chart svg").remove();
             this.releaseService.getReleases(url)
                 .subscribe(releases => {
                         this.releases = releases;
                         this.isDataAvailable = true;
                         this.loading = false;
-                        console.log(this.releases);
+                        //console.log(this.releases);
                         this.changebreakdownCart.setReleases(this.releases);
-
                         this.changebreakdownCart.createChart();
                     },
                     err => {
                         console.log(err);
                     }
                 );
+
         }
     }
 
     ngOnChanges() {    }
 
-    highlighRelease(isHighlight:boolean, index:number){
+    highlighRelease(isHighlight:boolean, index:number, event, release){
         D3.selectAll(".barpos-" + index).classed("hovered-bar", isHighlight);
+
+        /**
+         * Display / Hide  the tooltip for the releases
+         */
+        if(event.type == "mouseover"){
+            D3.select(".releaseTooltip")
+                .style("opacity", "1")
+                .style("position","absolute")
+                .style("left", (event.clientX+20) +'px')
+                .style("top", event.clientY+'px')
+                .html("<div class='release-tooltip-section'><div class='' style=''> " +
+                        "<p><b style='font-size: 1em'>Restructuring</b></p>" +
+                        "<p><b>Category of release</b><br>Schema growth: High | Attributes *jected: Moderate" +
+                    " | Attributes Updated: Zero"+ "</p></div>" +
+                    "<div class=''><p style='padding-top:10px;'><b>More stats</b> <br>Commits:" + release.commitNumber + " | " +
+                    "Contributors:" + release.contributorNumber + " | " +
+                    "Duration:" + release.duration + " days</p></div> </div>");
+
+            this.changebreakdownCart.fadeStackedBarChart(0.02,release.dateHuman);
+        }
+        else{
+            D3.select(".releaseTooltip")
+                .style("opacity", "0");
+            this.changebreakdownCart.fadeStackedBarChart(1,release.dateHuman);
+        }
+
 
     }
 

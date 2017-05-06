@@ -1,5 +1,7 @@
 
-<div class="row">
+
+
+<div class="row" style="margin-top: 120px">
 
     <div class="col-md-12">
 
@@ -45,23 +47,32 @@
                     </div>
                     <div *ngIf="!loading">
                         <div class="x_title">
+                            <h2>Text Summary</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <p> Text describing the selected period.</p>
+                        <p> Text describing the selected period.</p>
+                        <p> Text describing the selected period.</p>
+
+                        <div class="x_title">
                             <h2>Releases</h2>
                             <div class="clearfix"></div>
                         </div>
 
 
-                        <ul class="list-unstyled top_profiles scroll-view1" style="overflow-y: scroll;height:500px;">
+                        <ul class="list-unstyled top_profiles scroll-view1" style="overflow-y: scroll;height:350px;">
 
-                            <li class="media event" *ngFor='let release of this.releases;let i = index;' (mouseover)='highlighRelease(true,i)' (mouseout)="highlighRelease(false,i)">
+                            <li class="media event" *ngFor='let release of this.selectedReleases;let i = index;'
+                                (mouseover)='highlighRelease(true,i,$event,release)' (mouseout)="highlighRelease(false,i,$event,release)">
+
                                 <a class="pull-left border-aero profile_thumb">
                                     <i class="fa fa-user aero"></i>
                                 </a>
                                 <div class="media-body">
+
                                     <a [routerLink]="['/releases',release.releaseID]" class="title">{{ release.name }}</a>
-                                    <p><strong>{{release.startDateHuman}} </strong> </p>
-                                    <p> <small>{{release.commitNumber}} commits</small>
-                                    <p> <small>{{release.contributorNumber}} contributors</small>
-                                    </p>
+                                    <p><strong>{{release.dateHuman}} </strong> </p>
+
                                 </div>
 
 

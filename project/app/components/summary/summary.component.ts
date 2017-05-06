@@ -7,6 +7,7 @@
  */
 import {Component, OnInit, OnChanges, SimpleChanges}  from '@angular/core';
 
+
 @Component({
     selector: 'summary-section',
     templateUrl: './summary.html',
