@@ -10,6 +10,7 @@ import {Observable, ReplaySubject} from 'rxjs/Rx';
 // Import RxJs required methods
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {ReleaseFilter} from "../shared/ReleaseFilter";
 
 @Injectable()
 export class ReleaseService {
@@ -17,8 +18,13 @@ export class ReleaseService {
     private releases;
     releasesChanged$ = new ReplaySubject(1);
 
+    private selectedReleases;
+    selectedReleases$ = new ReplaySubject(1);
+
+
+
     // Resolve HTTP using the constructor
-    constructor (private http: Http) {}
+    constructor (private http: Http, private releaseFilter:ReleaseFilter) {}
 
 
     // Fetch all existing comments
@@ -31,6 +37,7 @@ export class ReleaseService {
                 this.releases = res.json();
 
                 this.setReleases(this.releases);
+                this.setSelectedReleases(this.releases);
                 return res.json();
 
             })
@@ -56,4 +63,14 @@ export class ReleaseService {
         return this.releasesChanged$;
     }
 
+    setSelectedReleases(releases){
+        let xx = this.releaseFilter.transform(this.releases,releases);
+        //console.log(xx);
+        this.selectedReleases = xx;
+        this.selectedReleases$.next(this.selectedReleases);
+    }
+
+    getSelectedReleases(){
+        return this.selectedReleases$;
+    }
 }

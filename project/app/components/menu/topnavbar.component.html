@@ -1,22 +1,32 @@
 <!-- top navigation -->
-<div class="top_nav">
+<div class="top_nav" style="position: fixed;top:0;width:100%">
   <div class="nav_menu">
     <nav>
       <div class="nav toggle">
         <!--<a id="menu_toggle" (click)="toggleClicked($event)"><i class="fa fa-bars" aria-hidden="true"></i></a>-->
       </div>
 
-      <ul class="nav navbar-nav navbar-right">
+        <div class="col-md-8">
+          <div class="overview-chart"></div>
+          <p>Some text here telling a  small summary in two lines.</p>
+        </div>
+        <div class="col-md-3">
+          <h1 style="text-align: right;color:#313232;font-weight: bold">Overview</h1>
+          <ul class="nav navbar-nav navbar-right">
 
-        <li role="presentation" class="dropdown">
+            <li role="presentation" class="dropdown">
 
-          <select id="drop5" role="presentation" class="dropdown-toggle project-selection " (change)="projectSelection($event.target.value)">
-            <option *ngFor='let project of projects' value="{{project.ID}}" ng-selected="classifier.value==selection">{{project.Name}}</option>
-          </select>
+              <select id="drop5" role="presentation" class="dropdown-toggle project-selection " (change)="projectSelection($event.target.value)">
+                <option *ngFor='let project of projects' value="{{project.ID}}" ng-selected="classifier.value==selection">{{project.Name}}</option>
+              </select>
 
-        </li>
-        <li role="presentation" style="padding-top:20px;color:#313232;margin-right:10px;"><b>Selected Dataset</b></li>
-      </ul>
+            </li>
+            <li role="presentation" style="padding-top:20px;color:#313232;margin-right:10px;"><b>Selected Dataset</b></li>
+          </ul>
+        </div>
+
+
+
     </nav>
   </div>
 </div>
