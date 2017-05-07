@@ -34,6 +34,8 @@ export class Sidebar {
     anchorClicked(event: MouseEvent)
     {
 
+        console.log(event);
+
         var target = event.srcElement.id;
 
         var $li = $('#' + target.replace("chevron","li")).parent(); 
@@ -56,6 +58,8 @@ export class Sidebar {
                     //this.setContentHeight();
                 });
             }
+
+
     }
 
     initMenuListeners() {
@@ -75,6 +79,11 @@ export class Sidebar {
             var $currentli = $('#sidebar-menu').find('li.active-sm');
             $currentli.removeClass('active active-sm');
              $li.addClass('active active-sm');
+
+            $('.right_col').find('.sidebar-tab-pane').removeClass('active');
+            var $selectedTab = $('.right_col').find(ev.currentTarget.attributes.href.nodeValue);
+
+            $selectedTab.addClass('active');
         });
 
         this.setContentHeight();

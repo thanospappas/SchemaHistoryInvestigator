@@ -66,7 +66,7 @@ export class BreakdownChart {
         // bar colors
         this.colors = ["#468966","#B9121B","#FFD34E"];
 
-        this.lala4();
+        this.createSummaryChart();
 
     }
 
@@ -106,7 +106,6 @@ export class BreakdownChart {
             height2 = 300 - margin2.top - margin2.bottom;
 
 
-
         width = $('.x_content ' + this.chartSection).width() - margin.left - margin.right;
 
         var parseTime = D3.timeParse("%Y-%m-%d");
@@ -125,9 +124,6 @@ export class BreakdownChart {
         var yScaleRight2 = D3.scaleLinear().domain(yDomainRight).range([40, 0]);
 
 
-
-
-
         var xAxis = D3.axisBottom(x).tickSize(0),
             xAxis2 = D3.axisBottom(x2).tickSize(0),
             yAxis = D3.axisLeft(y).tickSize(0);
@@ -136,11 +132,11 @@ export class BreakdownChart {
             .extent([[0, 0], [width, height2]])
             .on("brush", brushed);
 
-        var zoom = D3.zoom()
+        /*var zoom = D3.zoom()
             .scaleExtent([1, Infinity])
             .translateExtent([[0, 0], [width, height]])
             .extent([[0, 0], [width, height]])
-            .on("zoom", zoomed);
+            .on("zoom", zoomed);*/
 
         var svg = D3.select(".x_content " + this.chartSection).append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -227,7 +223,6 @@ export class BreakdownChart {
             .append("rect")
             //.transition()
             .attr('x', d => {
-                console.log(d.x);
                 return x(new Date(d.x))
             })
             .attr('y', (d,i) =>  {
@@ -286,13 +281,12 @@ export class BreakdownChart {
             .attr("x",0 - (height / 2))
             .attr("dy", "1em")
             .style("text-anchor", "middle")
-            .text("Messages (in the day)");
+            .text("#attributes  ");
 
         focus.append("text")
             .attr("x", width - margin.right)
             .attr("dy", "1em")
-            .attr("text-anchor", "end")
-        //.text("Messages: " + num_messages(data, x));
+            .attr("text-anchor", "end");
 
         svg.append("text")
             .attr("transform",
@@ -419,12 +413,9 @@ export class BreakdownChart {
             .attr("d", focusLine);
 
         var contextLine = D3.line()
-
             .x(function(d) {
-                console.log("-----------------------------------------------");
-                console.log(x2(d.dateHuman));
                 return x2(new Date(d.dateHuman)); })
-            .y(function(d) { console.log(d); return yScaleRight2(d.stats.averageSchemaSizeTables)});
+            .y(function(d) { return yScaleRight2(d.stats.averageSchemaSizeTables)});
 
         contextOverview.append("path")
             .datum(this.releases)
@@ -460,8 +451,385 @@ export class BreakdownChart {
             if (D3.event.sourceEvent && D3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
             var s = D3.event.selection || x2.range();
             x.domain(s.map(x2.invert, x2));
-            var extenttt = brush.extent();
-            var rangeExtent = [x( extenttt ) ];
+            //var extenttt = brush.extent();
+            //var rangeExtent = [x( extenttt ) ];
+
+            releaseService.setSelectedReleases(s.map(x2.invert, x2));
+            focus.selectAll("rect")
+                .attr('x', d => {
+                    return x(new Date(d.x))
+                })
+                .attr('y', (d,i) =>  {
+                    if(d.catID > 0){
+                        let yminus:number = 0;
+                        for(let iter=0;iter<d.catID;iter++){
+                            yminus += height - y(remapped[d.catID-(iter+1)][i%remapped[0].length].y);
+                        }
+                        return (y(d.y) -yminus);
+                    }
+                    return (y(d.y));
+                });
+
+            focus.selectAll(".dot1")
+                .attr("cx", d => x(new Date(d.dateHuman))+2.5 )
+                .attr("cy", d => height+2);
+
+            focus.selectAll("path.line").attr("d", focusLine);
+            /*svg.select(".zoom").call(zoom.transform, D3.zoomIdentity
+                .scale(width / (s[1] - s[0]))
+                .translate(-s[0], 0));
+
+            focus.select(".x-axis").call(xAxis);
+            svg.select(".zoom").call(zoom.transform, D3.zoomIdentity
+                .scale(width / (s[1] - s[0]))
+                .translate(-s[0], 0));*/
+        }
+
+        /*function zoomed() {
+            if (D3.event.sourceEvent && D3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+            var t = D3.event.transform;
+            x.domain(t.rescaleX(x2).domain());
+            focus.selectAll("rect")
+                .attr('x', d => {
+                    return x(new Date(d.x))
+                })
+                .attr('y', (d,i) =>  {
+
+                    if(d.catID > 0){
+                        let yminus:number = 0;
+                        for(let iter=0;iter<d.catID;iter++){
+                            yminus += height - y(remapped[d.catID-(iter+1)][i].y);
+                        }
+                        return (y(d.y) -yminus);
+                    }
+                    return (y(d.y));
+                })
+            //.attr("cx", function(d) { return x(d.sent_time); })
+            //.attr("cy", function(d) { return y(d.messages_sent_in_day); });
+            focus.select(".x-axis").call(xAxis);
+            context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+        }*/
+    }
+
+    createSummaryChart(){
+
+        // update existing bars
+        var causes = ["attributeInsertionsAtExistingTables", "attributesDeletedAtDeletedTables", "attributesUpdates"];
+        let dd = this.releases;
+
+        var remapped =causes.map(function(dat,i){
+            let xx =  dd.map(function(d,ii){
+                let yData:number;
+                let cat:string;
+                if(i == 0){
+                    yData = d.stats.attributesInsertedAtNewTables;
+                    cat = "attributesInsertedAtNewTables";
+                }
+                else if(i == 1){
+                    yData = d.stats.attributesDeletedAtDeletedTables;
+                    cat = "attributesDeletedAtDeletedTables";
+                }
+                else{
+                    yData = d.stats.attributesUpdates;
+                    cat = "attributesUpdates";
+                }
+                return {x: d.dateHuman, y: yData, cat: cat, catID: i };
+            });
+            return xx
+        });
+        console.log(remapped);
+        let releaseService = this.releaseService;
+
+        var margin = {top: 20, right: 20, bottom: 90, left: 50},
+            margin2 = {top: 230, right: 20, bottom: 30, left: 50},
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom,
+            height2 = 300 - margin2.top - margin2.bottom;
+
+
+        width = $('.x_content ' + this.chartSection).width() - margin.left - margin.right;
+
+        var parseTime = D3.timeParse("%Y-%m-%d");
+
+        var x = D3.scaleTime().range([0, width-margin.left]),
+            x2 = D3.scaleTime().range([0, width-margin.left]),
+            y = D3.scaleLinear().range([height, 0]),
+            y2 = D3.scaleLinear().range([height2, 0]);
+
+        let yDomainRight = [0, D3.max(this.releases, d => d.stats.averageSchemaSizeTables)];
+
+        // create scales
+
+        var yScaleRight = D3.scaleLinear().domain(yDomainRight).range([this.height, 0]);
+
+        var yScaleRight2 = D3.scaleLinear().domain(yDomainRight).range([40, 0]);
+
+
+        var xAxis = D3.axisBottom(x).tickSize(0),
+            xAxis2 = D3.axisBottom(x2).tickSize(0),
+            yAxis = D3.axisLeft(y).tickSize(0);
+
+        var brush = D3.brushX()
+            .extent([[0, 0], [width, height2]])
+            .on("brush", brushed);
+
+        var zoom = D3.zoom()
+         .scaleExtent([1, Infinity])
+         .translateExtent([[0, 0], [width, height]])
+         .extent([[0, 0], [width, height]])
+         .on("zoom", zoomed);
+
+        var svg = D3.select(".x_content " + this.chartSection).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+
+        this.svg = svg;
+
+        /*Overview SVG */
+        var svgOverview = D3.select(".overview-chart ").append("svg")
+            .attr("width", width /* + margin.left + margin.right*/)
+            .attr("height", 70/*height + margin.top + margin.bottom*/);
+
+        svg.append("defs").append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+            .attr("width", width)
+            .attr("height", height);
+
+        var yAxisRight = svg.append('g')
+            .attr('class', 'axis axis-y-right')
+            .attr('transform', `translate(${width  }, ${ margin.top})`)
+            .call(D3.axisRight(yScaleRight));
+
+
+        yAxisRight.call(D3.axisRight(yScaleRight));
+
+        var focus = svg.append("g")
+            .attr("class", "focus")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+        var contextOverview = svgOverview.append("g")
+            .attr("class", "context")
+            .attr("transform", "translate(" + margin2.left + "," + 0 /*(margin2.top+200)*/ + ")");
+
+
+
+        var xMin = D3.min(remapped, (d) =>{ return new Date(d.x); });
+        var xMax = D3.max(remapped, (d) =>{ return new Date(d.x); });
+        var dateRange = [];
+        dateRange.push(xMin);
+        dateRange.push(xMax);
+        console.log(dateRange);
+        releaseService.setSelectedReleases(dateRange);
+        var yMax = Math.max(20, D3.max(remapped, function(d) { return d.y; }));
+
+
+        x.domain([new Date(this.releases[0].dateHuman),
+            new Date(this.releases[this.releases.length - 1].dateHuman)]);
+        y.domain([0, yMax]);
+        y.domain([0, D3.max(this.releases, d => (d.stats.attributeInsertionsAtExistingTables +
+        d.stats.attributesDeletedAtDeletedTables + d.stats.attributesUpdates))]);
+        x2.domain([new Date(this.releases[0].dateHuman),
+            new Date(this.releases[this.releases.length - 1].dateHuman)]);
+
+        y2.domain(y.domain());
+
+
+        let update = focus.selectAll('.layer')
+            .data(remapped);
+        update.exit().remove();
+
+        let layer = focus.selectAll(".layer")
+            .data(remapped)
+            .enter().append("g")
+            .attr("class", "layer")
+            .style("fill", (d, i) => this.colors[i] ) ;
+
+
+        let rects = layer.selectAll('rect')
+            .data(d => {
+                return d;
+            })
+            .enter()
+            .append("rect")
+            .attr('x', d => {
+                return x(new Date(d.x))
+            })
+            .attr('y', (d,i) =>  {
+
+                if(d.catID > 0){
+                    let yminus:number = 0;
+                    for(let iter=0;iter<d.catID;iter++){
+                        yminus += height - y(remapped[d.catID-(iter+1)][i].y);
+                    }
+                    return (y(d.y) -yminus);
+                }
+                return (y(d.y));
+            })
+            .attr("class", (d,i) => {return "barpos-" + i;})
+            .attr('width', d => this.barWidth)//this.width / this.data.length - this.barPadding)
+            .attr('height', (d,i) => {
+                return (height - y(d.y) )
+            } );
+
+        //let currentPointer = this;
+        layer.selectAll('rect')
+            .on("mouseover", function() {
+                D3.select(this)
+                    .classed("hovered-bar", true);
+
+            });
+
+        layer.selectAll('rect')
+            .on("mouseout", function (d, i) {
+                D3.select(this)
+                    .classed("hovered-bar", false)
+            })  ;
+
+        rects
+            .on("mouseover", this.mouseoverFunc)
+            .on("mousemove", this.mousemoveFunc)
+            .on("mouseout", this.mouseoutFunc);
+
+
+        focus.append("g")
+            .attr("class", "axis x-axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        focus.append("g")
+            .attr("class", "axis axis--y")
+            .call(yAxis);
+
+        // Summary Stats
+        focus.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x",0 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("#attributes  ");
+
+        focus.append("text")
+            .attr("x", width - margin.right)
+            .attr("dy", "1em")
+            .attr("text-anchor", "end");
+
+        svg.append("text")
+            .attr("transform",
+                "translate(" + ((width + margin.right + margin.left)/2) + " ," +
+                (height + margin.top + margin.bottom) + ")")
+            .style("text-anchor", "middle")
+            .text("Date");
+
+
+        let layerOverview = contextOverview.selectAll(".layerOverview")
+            .data(remapped)
+            .enter().append("g")
+            .attr("class", "layer1")
+            .style("fill", (d, i) => this.colors[i] ) ;
+
+
+        let rectsOverview = layerOverview.selectAll('rect')
+            .data(d => {
+                return d;
+            })
+            .enter()
+            .append("rect")
+            .attr("clip-path", "url(#clip)")
+            .attr('x', d => {
+                return x2(new Date(d.x))
+            })
+            .attr('y', (d,i) =>  {
+
+                if(d.catID > 0){
+                    let yminus:number = 0;
+                    for(let iter=0;iter<d.catID;iter++){
+                        yminus += height2 - y2(remapped[d.catID-(iter+1)][i].y);
+                    }
+                    return (y2(d.y) -yminus);
+                }
+                return (y2(d.y));
+            })
+            .attr("class", (d,i) => {return "barpos-" + i;})
+            .attr('width', d => this.barWidth)
+            .attr('height', (d,i) => {
+                return (height2 - y2(d.y) )
+            } );
+
+        contextOverview.append("g")
+            .attr("class", "axis x-axis")
+            .attr("transform", "translate(0," + 40 + ")")
+            .call(xAxis2);
+
+        contextOverview.append("g")
+            .attr("class", "brush")
+            .call(brush)
+            .call(brush.move, x.range());
+
+
+        var focusLine = D3.line()
+
+            .x(function(d) {
+                return x(new Date(d.dateHuman)); })
+            .y(function(d) { return yScaleRight(d.stats.averageSchemaSizeTables)});
+
+        focus.append("path")
+            .datum(this.releases)
+            .attr("class", "line")
+            .attr("fill", "none")
+            .attr("stroke", "#5E5A59")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", focusLine);
+
+        focusLine.curve(D3.curveStepAfter);
+
+        svg.selectAll('path.line')
+            .datum(this.releases)
+            .attr("class", "line")
+            .attr("d", focusLine);
+
+        var contextLine = D3.line()
+            .x(function(d) {
+                return x2(new Date(d.dateHuman)); })
+            .y(function(d) { return yScaleRight2(d.stats.averageSchemaSizeTables)});
+
+        contextOverview.append("path")
+            .datum(this.releases)
+            .attr("class", "lineOverview")
+            .attr("fill", "none")
+            .attr("stroke", "#5E5A59")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", contextLine);
+
+        contextLine.curve(D3.curveStepAfter);
+
+        focus.selectAll(".dot1")
+            .data(this.releases)
+            .enter().append("circle")
+            .attr("class", "dot1")
+            .attr("r", 4)
+            .attr("cx", d => x(new Date(d.dateHuman))+2.5 )
+            .attr("cy", d => height+2)
+            .attr("stroke", "#bb19c4")
+            .attr("stroke-width", 1)
+            .style("fill", "#313232");
+
+
+        this.createLegend();
+
+
+        //create brush function redraw scatterplot with selection
+        function brushed() {
+            if (D3.event.sourceEvent && D3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+            var s = D3.event.selection || x2.range();
+            x.domain(s.map(x2.invert, x2));
+
 
             releaseService.setSelectedReleases(s.map(x2.invert, x2));
             focus.selectAll("rect")
@@ -485,40 +853,68 @@ export class BreakdownChart {
 
             focus.selectAll("path.line").attr("d", focusLine);
             svg.select(".zoom").call(zoom.transform, D3.zoomIdentity
-                .scale(width / (s[1] - s[0]))
-                .translate(-s[0], 0));
+             .scale(width / (s[1] - s[0]))
+             .translate(-s[0], 0));
 
-            focus.select(".x-axis").call(xAxis);
-            svg.select(".zoom").call(zoom.transform, D3.zoomIdentity
-                .scale(width / (s[1] - s[0]))
-                .translate(-s[0], 0));
+             focus.select(".x-axis").call(xAxis);
+             svg.select(".zoom").call(zoom.transform, D3.zoomIdentity
+             .scale(width / (s[1] - s[0]))
+             .translate(-s[0], 0));
         }
 
         function zoomed() {
-            if (D3.event.sourceEvent && D3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
-            var t = D3.event.transform;
-            x.domain(t.rescaleX(x2).domain());
-            focus.selectAll("rect")
-                .attr('x', d => {
-                    return x(new Date(d.x))
-                })
-                .attr('y', (d,i) =>  {
+         if (D3.event.sourceEvent && D3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+         var t = D3.event.transform;
+         x.domain(t.rescaleX(x2).domain());
+         focus.selectAll("rect")
+         .attr('x', d => {
+         return x(new Date(d.x))
+         })
+         .attr('y', (d,i) =>  {
 
-                    if(d.catID > 0){
-                        let yminus:number = 0;
-                        for(let iter=0;iter<d.catID;iter++){
-                            yminus += height - y(remapped[d.catID-(iter+1)][i].y);
-                        }
-                        return (y(d.y) -yminus);
-                    }
-                    return (y(d.y));
-                })
-            //.attr("cx", function(d) { return x(d.sent_time); })
-            //.attr("cy", function(d) { return y(d.messages_sent_in_day); });
-            focus.select(".x-axis").call(xAxis);
-            context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
-        }
+         if(d.catID > 0){
+         let yminus:number = 0;
+         for(let iter=0;iter<d.catID;iter++){
+         yminus += height - y(remapped[d.catID-(iter+1)][i].y);
+         }
+         return (y(d.y) -yminus);
+         }
+         return (y(d.y));
+         })
+         //.attr("cx", function(d) { return x(d.sent_time); })
+         //.attr("cy", function(d) { return y(d.messages_sent_in_day); });
+         focus.select(".x-axis").call(xAxis);
+         //context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+         }
     }
+
+    /*brushed() {
+        if (D3.event.sourceEvent && D3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+        var s = D3.event.selection || x2.range();
+        x.domain(s.map(x2.invert, x2));
+
+        this.releaseService.setSelectedReleases(s.map(x2.invert, x2));
+        focus.selectAll("rect")
+            .attr('x', d => {
+                return x(new Date(d.x))
+            })
+            .attr('y', (d,i) =>  {
+                if(d.catID > 0){
+                    let yminus:number = 0;
+                    for(let iter=0;iter<d.catID;iter++){
+                        yminus += height - y(remapped[d.catID-(iter+1)][i%remapped[0].length].y);
+                    }
+                    return (y(d.y) -yminus);
+                }
+                return (y(d.y));
+            });
+
+        focus.selectAll(".dot1")
+            .attr("cx", d => x(new Date(d.dateHuman))+2.5 )
+            .attr("cy", d => height+2);
+
+        focus.selectAll("path.line").attr("d", focusLine);
+    }*/
 
 
 
@@ -584,7 +980,7 @@ export class BreakdownChart {
             .style("fill-opacity", opacity);
 
         this.svg.selectAll(".dot1")
-            .filter(function(d) { console.log(d); return d.dateHuman != humanDate; /*d.source.index != i && d.target.index != i; */})
+            .filter(function(d) { return d.dateHuman != humanDate; /*d.source.index != i && d.target.index != i; */})
             .transition()
             .style("stroke-opacity", opacity)
             .style("fill-opacity", opacity);

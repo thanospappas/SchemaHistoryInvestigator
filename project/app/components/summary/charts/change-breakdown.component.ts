@@ -180,7 +180,7 @@ export class AreaChart implements OnInit, OnChanges {
                     "Contributors:" + release.contributorNumber + " | " +
                     "Duration:" + release.duration + " days</p></div> </div>");
 
-            this.changebreakdownCart.fadeStackedBarChart(0.02,release.dateHuman);
+            this.changebreakdownCart.fadeStackedBarChart(0.2,release.dateHuman);
         }
         else{
             D3.select(".releaseTooltip")

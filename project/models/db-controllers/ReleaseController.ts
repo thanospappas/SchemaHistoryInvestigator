@@ -320,12 +320,35 @@ export class ReleaseController extends DatabaseController{
         return commits;
     }
 
+    getReleaseByDateRange(projectID, range){
+        let rangeList = range.split(",");
+        let query = "SELECT * FROM Phases, Authors WHERE RE_DATE BETWEEN " +
+            rangeList[0] + " AND " + rangeList[1] + " AND Authors.AU_ID = CO_AUTHOR_ID AND BR_PRJ_ID = "+
+            projectID + " ORDER BY CO_DATE ASC;";
+        return new Promise((resolve) => {
+            this.database.DB.all(query,  (err, rows) => {
+
+                resolve(this.populateReleasesWithCommits(rows));
+            });
+        });
+    }
+
     getReleaseById(releaseID, projectID){
 
+        let releaseIds = releaseID.split(",");
         let query = "";
         if(-1 == parseInt(releaseID)){
             query = "SELECT * FROM Phases, Authors WHERE CO_PREV_RELEASE_ID IS NULL AND BR_PRJ_ID= " +
                 projectID + " AND Authors.AU_ID = CO_AUTHOR_ID ORDER BY CO_DATE ASC;"
+        }
+        else if(releaseIds.length > 1){
+            query ="SELECT * FROM Phases, Authors WHERE ";
+            for(let i= 0; i< releaseIds.length;i++){
+                query += "CO_PREV_RELEASE_ID = " + releaseIds[i];
+                if(i < releaseIds.length -1 )
+                    query += " OR ";
+            }
+            query += " AND Authors.AU_ID = CO_AUTHOR_ID ORDER BY CO_DATE ASC;"
         }
         else{
             query ="SELECT * FROM Phases, Authors WHERE CO_PREV_RELEASE_ID = " + releaseID

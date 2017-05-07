@@ -35,6 +35,12 @@ export class ReleaseRouter implements ApiRouter{
                     res.json(result);
                 });
         }
+        else if(req.query.in_range){
+            databaseController.getReleaseByDateRange(req.params.id, req.query.in_range)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
         else{
             databaseController.getAllData(req.params.id)
                 .then((result) => {
@@ -45,13 +51,17 @@ export class ReleaseRouter implements ApiRouter{
     }
 
     getSingle(req: Request, res: Response, next: NextFunction) {
-
+        //console.log(req.params.release_id);
         let databaseController:ReleaseController = new ReleaseController();
+        console.log("yooooo ahha");
+
 
         databaseController.getReleaseById(req.params.release_id, req.params.id)
             .then((result) => {
                 res.json(result);
             });
+
+
     }
 
     getPath(): string {
