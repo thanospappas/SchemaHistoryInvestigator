@@ -1,8 +1,21 @@
 
 <div class="row" style="margin-top: 120px">
+<div class="col-md-8">
+    <div class="commit-overview">
 
+    </div>
+
+</div>
 
 <div class="col-md-3 col-sm-4 col-xs-12 form-group pull-right top_search">
+
+    <form>
+        <label class="radio-inline">
+            <input type="radio" name="optradio">Commits inside selected period</label>
+        <label class="radio-inline">
+            <input type="radio" name="optradio">Specific Release </label>
+    </form>
+
     <div class="input-group">
         <div class="form-group">
             <label for="sel1">Select list:</label>
@@ -73,7 +86,16 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                <ul class="list-unstyled timeline scroll-view1" style="overflow-y: scroll;height:500px;">
+
+                <div class="x_title">
+                    <h2>Text Summary</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <p> Text describing the selected period.</p>
+                <p> Text describing the selected period.</p>
+                <p> Text describing the selected period.</p>
+
+                <ul class="list-unstyled timeline scroll-view1" style="overflow-y: scroll;height:350px;">
 
                     <li *ngFor="let commit of commits">
                         <div class="block">
@@ -84,13 +106,13 @@
                             </div>
                             <div class="block_content">
                                 <h2 class="title">
-                                    <a>{{commit.text.substring(0,30)}}</a>
+                                    <a>{{commit.text.substring(0,30)}} ... Read&nbsp;More</a>
                                 </h2>
                                 <div class="byline">
                                     <span>{{commit.date}}</span> by <a>{{commit.author.name}}</a>
                                 </div>
-                                <p class="excerpt">{{commit.text}} <a>Read&nbsp;More</a>
-                                </p>
+                                <!--<p class="excerpt">{{commit.text}}<a>Read&nbsp;More</a>
+                                </p>-->
                             </div>
                         </div>
                     </li>

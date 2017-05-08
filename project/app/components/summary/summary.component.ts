@@ -6,7 +6,7 @@
  * Created by thanosp on 17/4/2017.
  */
 import {Component, OnInit, OnChanges, SimpleChanges}  from '@angular/core';
-
+import * as $ from 'jquery';
 
 @Component({
     selector: 'summary-section',
@@ -16,7 +16,11 @@ import {Component, OnInit, OnChanges, SimpleChanges}  from '@angular/core';
 
 export class SummarySection implements OnInit, OnChanges {
 
-    ngOnInit(): void {
+    ngOnInit() {
+
+            let x = $(".loader-container").css("display","none");
+
+
     }
 
     ngOnChanges(changes: SimpleChanges): void {

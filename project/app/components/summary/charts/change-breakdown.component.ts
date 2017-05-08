@@ -71,7 +71,7 @@ export class AreaChart implements OnInit, OnChanges {
         this.heightOverview= this.height - this.marginOverview.top - this.marginOverview.bottom;
         this.margin.top = this.legendHeight;
 
-        this.changebreakdownCart = new BreakdownChart(".summary-chart",this.releaseService);
+        this.changebreakdownCart = new BreakdownChart(".summary-chart",".overview-chart",this.releaseService);
 
         this.projectService.getSelectedProject().subscribe(
             project => {
@@ -139,8 +139,7 @@ export class AreaChart implements OnInit, OnChanges {
 
         else */if(this.selectedProject.projectId != -1) {
             this.loading = true;
-            D3.select(".summary-chart svg").remove();
-            D3.select(".overview-chart svg").remove();
+
             this.releaseService.getReleases(url)
                 .subscribe(releases => {
                         this.releases = releases;

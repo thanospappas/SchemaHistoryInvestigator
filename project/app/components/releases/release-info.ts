@@ -27,65 +27,34 @@ export class ReleaseComponent implements OnInit {
     private selectedReleases;
     private commits;
     private commitChangesChart;
-    private $SIDEBAR_MENU;
-    constructor(/*private route:ActivatedRoute,*/ private releaseChanges:ReleaseService, private httpService:HttpService, private projectService:ProjectService) {
-        this.commitChangesChart = new BreakdownChart(".release-summary",releaseChanges);
+
+    constructor(private releaseChanges:ReleaseService, private httpService:HttpService, private projectService:ProjectService) {
+        this.commitChangesChart = new BreakdownChart(".release-summary",".commit-overview",releaseChanges);
     }
 
     // Load data ones componet is ready
     ngOnInit() {
-        // Pass retreived pets to the property
-       // this.dogs = this.petService.findPets('dog');
-        /*this.route.params.subscribe(params => {
-            let id = params['id'];
-            console.log(id);
-            if(id){
-                this.selectedReleaseId = id;
 
-                this.$SIDEBAR_MENU = $('#sidebar-menu');
-
-
-                var $li = $('.releases-menu-item');
-                var $currentli = $('#sidebar-menu').find('li.active-sm');
-                $currentli.removeClass('active active-sm');
-                $li.addClass('active active-sm');
-
-
-            }
-            // Retrieve Pet with Id route param
-            //this.petService.findPetById(id).subscribe(dog => this.dog = dog);
-        });*/
-
-        this.releaseChanges.getReleaseChanges().subscribe(
+        /*this.releaseChanges.getReleaseChanges().subscribe(
             releases => {
                 this.releases = releases;
                 console.log(releases);
                 if(!this.isReleaseSet()){
                     this.selectedReleaseId = releases[0].releaseID;
                 }
-                console.log("Selected id: " + this.selectedReleaseId);
-                //this.retrieveCommits();
-            });
+            });*/
 
         this.releaseChanges.getSelectedReleases().subscribe(
             releases => {
                 this.commits = [];
                 this.selectedReleases = releases;
-
-                    console.log(this.selectedReleases);
-                    if(this.selectedReleases.length > 0){
-                        this.retrieveSelectedCommits(this.selectedReleases[0].startDate,
-                            this.selectedReleases[this.selectedReleases.length-1].startDate);
-                    }
-
-
+                if(this.selectedReleases.length > 0){
+                    this.retrieveSelectedCommits(this.selectedReleases[0].startDate,
+                        this.selectedReleases[this.selectedReleases.length-1].startDate);
+                }
 
             });
-
-
         this.setEventListeners();
-
-
     }
 
     retrieveSelectedCommits(minDate,maxDate){
@@ -94,11 +63,9 @@ export class ReleaseComponent implements OnInit {
         this.httpService.get(url)
             .subscribe(commits => {
                     this.commits = commits;
-
-                    console.log(this.commits);
+                    console.log(commits);
                     this.commitChangesChart.setReleases(this.commits);
-                    //this.commitChangesChart.createChart();
-
+                    this.commitChangesChart.createChart();
                 },
                 err => {
                     console.log(err);
