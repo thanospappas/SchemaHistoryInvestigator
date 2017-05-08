@@ -178,7 +178,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
         this.httpService.get(url)
             .subscribe(releases => {
 
-                    console.log(releases);
+                    //console.log(releases);
                     this.test(releases);
                 },
                 err => {
@@ -490,9 +490,8 @@ export class DevelopmentChart implements OnInit, OnChanges {
         var ribbon = d3.ribbon()
             .radius(innerRadius);
 
-        var color = d3.scaleOrdinal(d3.schemeCategory20c)
-            //.domain(d3.range(matrix.length))
-            //.range(["#000000", "#FFDD89", "#957244", "#F26223"]);
+        var color = d3.scaleOrdinal(d3.schemeCategory20c);
+
 
         var g = svg.append("g")
             .attr("transform", "translate(" + ((width) / 2.2 + margin ) + "," + ((height) / 2.2+ margin)  + ")")

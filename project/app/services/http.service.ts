@@ -16,16 +16,11 @@ export class HttpService {
     // Resolve HTTP using the constructor
     constructor (private http: Http) {}
 
-    // Fetch all existing comments
     get(url) : Observable<Release[]>{
-        // ...using get request
         return this.http.get(url)
-        // ...and calling .json() on the response to return data
             .map((res:Response) => {
-                console.log(res);
                 return res.json()
             })
-            //...errors if any
             .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
 
     }

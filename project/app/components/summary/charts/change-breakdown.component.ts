@@ -65,8 +65,8 @@ export class AreaChart implements OnInit, OnChanges {
 
     ngOnInit() {
         this.legendHeight = 28;
-        this.width = $('.x_content .col-md-9').width()//900;//element.offsetWidth - this.margin.left - this.margin.right;
-        this.height = 400;//element.offsetHeight - this.margin.top - this.margin.bottom;
+        this.width = $('.x_content .col-md-9').width()
+        this.height = 400;
         this.marginOverview = { top: this.height - 70, right: this.margin.right, bottom: 20,  left: this.margin.left };
         this.heightOverview= this.height - this.marginOverview.top - this.marginOverview.bottom;
         this.margin.top = this.legendHeight;
@@ -83,10 +83,8 @@ export class AreaChart implements OnInit, OnChanges {
 
         this.releaseService.getSelectedReleases().subscribe(
             releases => {
-                //console.log("In breakdown...");
-                //console.log(releases);
+
                 this.selectedReleases = releases;
-                //this.test();
 
             });
 
@@ -127,7 +125,6 @@ export class AreaChart implements OnInit, OnChanges {
             this.selectedProject.projectId + "/releases";
 
 
-        console.log("getreleases called!!");
         /*if(this.releaseService.getReleaseData()){
             this.changebreakdownCart = new BreakdownChart(".summary-chart");
             this.releases = this.releaseService.getReleaseData();

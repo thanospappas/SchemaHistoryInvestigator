@@ -69,7 +69,7 @@ export class BreakdownChart {
 
     createSummaryChart(){
         this.width = $('.x_content ' + this.chartSection).width() - this.margin.left - this.margin.right;
-        console.log("Width is: " + this.width);
+        console.log("Width is: " +this.chartSection);
         if(this.width < 0)
             this.width = 600;
         D3.select(this.chartSection + " svg").remove();
@@ -321,11 +321,19 @@ export class BreakdownChart {
         currentPointer.focus.select(".x-axis").call(currentPointer.xAxis);
     }
 
+    setSelectedReleases(){
+        let s = D3.event.selection || this.x2.range();
+        if(this.chartSection == ".summary-chart")
+            this.releaseService.setSelectedReleases(s.map(this.x2.invert, this.x2));
+
+    }
+
     createOverviewSection(){
         D3.select(this.chartOverview + " svg").remove();
         let brush = D3.brushX()
             .extent([[0, 0], [this.width, this.height2]])
-            .on("brush", d =>{ this.brushed(this); });
+            .on("brush", d =>{ this.brushed(this); })
+            .on('end', d=>  {this.setSelectedReleases();});
 
         this.zoom = D3.zoom()
             .scaleExtent([1, Infinity])
@@ -408,8 +416,7 @@ export class BreakdownChart {
         let s = D3.event.selection || pointer.x2.range();
         pointer.x.domain(s.map(pointer.x2.invert, pointer.x2));
 
-        if(this.chartSection == ".summary-chart")
-            pointer.releaseService.setSelectedReleases(s.map(pointer.x2.invert, pointer.x2));
+
         pointer.focus.selectAll("rect")
             .attr('x', d => {
                 return this.x(new Date(d.x))
