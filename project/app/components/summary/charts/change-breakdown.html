@@ -29,9 +29,7 @@
                 <div class="col-md-9 col-sm-12 col-xs-12 summary-chart">
 
                     <div class="loading-overlay" *ngIf="loading">
-                        <!-- show something fancy here, here with Angular 2 Material's loading bar or circle -->
                         <div class="loader"></div>
-
                     </div>
                         <!-- chart section -->
                     <br>
@@ -41,7 +39,6 @@
 
                 <div class="col-md-3 col-sm-12 col-xs-12">
                     <div class="loading-overlay" *ngIf="loading">
-                        <!-- show something fancy here, here with Angular 2 Material's loading bar or circle -->
                         <div class="loader"></div>
 
                     </div>
@@ -55,7 +52,7 @@
                         <p> Text describing the selected period.</p>
 
                         <div class="x_title">
-                            <h2>Releases</h2>
+                            <h2>Releases <span *ngIf="this.selectedReleases?.length > 0">({{this.selectedReleases.length}})</span></h2>
                             <div class="clearfix"></div>
                         </div>
 
@@ -63,14 +60,13 @@
                         <ul class="list-unstyled top_profiles scroll-view1" style="overflow-y: scroll;height:350px;">
 
                             <li class="media event" *ngFor='let release of this.selectedReleases;let i = index;'
-                                (mouseover)='highlighRelease(true,i,$event,release)' (mouseout)="highlighRelease(false,i,$event,release)">
+                                (mouseover)='highlighRelease(true,i,$event,release)' (mouseout)="highlighRelease(false,i,$event,release)"
+                                (click)="releaseDrillDown(release)">
 
                                 <a class="pull-left border-aero profile_thumb">
                                     <i class="fa fa-user aero"></i>
                                 </a>
                                 <div class="media-body">
-
-                                    <!--<a [routerLink]="['/releases',release.releaseID]" class="title">{{ release.name }}</a>-->
                                     <a class="title">{{ release.name }}</a>
                                     <p><strong>{{release.dateHuman}} </strong> </p>
 

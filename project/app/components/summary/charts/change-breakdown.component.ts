@@ -187,4 +187,28 @@ export class AreaChart implements OnInit, OnChanges {
 
     }
 
+    releaseDrillDown(selectedRelease){
+        console.log(selectedRelease);
+        this.releaseService.setSelectedRelease(selectedRelease);
+
+        var $li = $(".releases-menu-item");
+        var $currentli = $('#sidebar-menu').find('li.active-sm');
+        $currentli.removeClass('active active-sm');
+        $li.addClass('active active-sm');
+        //$('.right_col').find('.sidebar-tab-pane').removeClass('active');
+
+        $('.right_col').find('.sidebar-tab-pane').fadeOut(400, function () {
+            $('.right_col').find('.sidebar-tab-pane').delay().removeClass('active');
+        });
+
+        var $selectedTab = $('.right_col').find("#releases");
+        //$selectedTab.addClass('active');
+        $selectedTab.delay(400).fadeIn(400, function () {
+            $selectedTab.addClass('active');
+        });
+
+
+
+    }
+
 }

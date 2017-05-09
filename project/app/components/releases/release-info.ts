@@ -21,28 +21,45 @@ import * as d3 from 'd3/build/d3.js';
 export class ReleaseComponent implements OnInit {
 
     private selectedReleaseId:number = -1;
+    private selectedRelease;
     private releases;
     private selectedReleases;
     private commits;
     private commitChangesChart;
 
+    private specificReleaseOn = false;
+
     constructor(private releaseChanges:ReleaseService, private httpService:HttpService, private projectService:ProjectService) {
         this.commitChangesChart = new BreakdownChart(".release-summary",".commit-overview",releaseChanges);
+    }
+
+    isSingleReleaseOn(){
+        return this.specificReleaseOn;
+    }
+
+    onSelectionChange(option){
+        if(option == "release"){
+            this.specificReleaseOn = true;
+            this.selectedRelease = this.selectedReleases[0];
+            this.setSelectedReleaseId();
+            this.retrieveCommits();
+        }
+        else{
+            this.specificReleaseOn = false;
+            this.retrieveSelectedCommits(this.selectedReleases[0].startDate,
+                this.selectedReleases[this.selectedReleases.length-1].startDate);
+        }
+    }
+
+    setSelectedReleaseId(){
+        this.selectedReleaseId = this.selectedRelease.releaseID;
+        this.retrieveCommits();
     }
 
     // Load data ones componet is ready
     ngOnInit() {
 
-        /*this.releaseChanges.getReleaseChanges().subscribe(
-            releases => {
-                this.releases = releases;
-                console.log(releases);
-                if(!this.isReleaseSet()){
-                    this.selectedReleaseId = releases[0].releaseID;
-                }
-            });*/
-
-        this.releaseChanges.getSelectedReleases().subscribe(
+       this.releaseChanges.getSelectedReleases().subscribe(
             releases => {
                 this.commits = [];
                 this.selectedReleases = releases;
@@ -52,7 +69,19 @@ export class ReleaseComponent implements OnInit {
                 }
 
             });
-        this.setEventListeners();
+
+        /**
+         * This is called when a user clicks on a release
+         * in the summary section
+         */
+       this.releaseChanges.getSelectedRelease().subscribe(
+            release => {
+                this.selectedRelease = release;
+                this.specificReleaseOn = true;
+                this.setSelectedReleaseId();
+            });
+
+       this.setEventListeners();
     }
 
     retrieveSelectedCommits(minDate,maxDate){
@@ -79,7 +108,7 @@ export class ReleaseComponent implements OnInit {
                     this.commits = commits;
                     console.log(this.commits);
                     this.commitChangesChart.setReleases(this.commits);
-                    //this.commitChangesChart.createChart();
+                    this.commitChangesChart.createChart();
 
                 },
                 err => {
@@ -122,7 +151,7 @@ export class ReleaseComponent implements OnInit {
         });
     }
 
-    highlighCommit(isHighlight:boolean, index:number, event, release){
+    highlighCommit(isHighlight:boolean, index:number, event, commit){
         d3.selectAll(".barpos-" + index).classed("hovered-bar", isHighlight);
 
         /**
@@ -137,17 +166,14 @@ export class ReleaseComponent implements OnInit {
                 .html("<div class='release-tooltip-section'><div class='' style=''> " +
                     "<p><b style='font-size: 1em'>Restructuring</b></p>" +
                     "<p><b>Category of release</b><br>Schema growth: High | Attributes *jected: Moderate" +
-                    " | Attributes Updated: Zero"+ "</p></div>" +
-                    "<div class=''><p style='padding-top:10px;'><b>More stats</b> <br>Commits:" + release.commitNumber + " | " +
-                    "Contributors:" + release.contributorNumber + " | " +
-                    "Duration:" + release.duration + " days</p></div> </div>");
+                    " | Attributes Updated: Zero"+ "</p></div>" );
 
-            this.commitChangesChart.fadeStackedBarChart(0.2,release.dateHuman);
+            this.commitChangesChart.fadeStackedBarChart(0.2,commit.dateHuman);
         }
         else{
             d3.select(".releaseTooltip")
                 .style("opacity", "0");
-            this.commitChangesChart.fadeStackedBarChart(1,release.dateHuman);
+            this.commitChangesChart.fadeStackedBarChart(1,commit.dateHuman);
         }
 
 

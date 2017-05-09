@@ -80,10 +80,23 @@ export class Sidebar {
             $currentli.removeClass('active active-sm');
              $li.addClass('active active-sm');
 
-            $('.right_col').find('.sidebar-tab-pane').removeClass('active');
-            var $selectedTab = $('.right_col').find(ev.currentTarget.attributes.href.nodeValue);
+            //$('.right_col').find('.sidebar-tab-pane').removeClass('active');
+            //var $selectedTab = $('.right_col').find(ev.currentTarget.attributes.href.nodeValue);
 
-            $selectedTab.addClass('active');
+            //$selectedTab.addClass('active');
+
+            $('.right_col').find('.sidebar-tab-pane').fadeOut(400, function () {
+                $('.right_col').find('.sidebar-tab-pane').delay().removeClass('active');
+            });
+
+            var $selectedTab = $('.right_col').find(ev.currentTarget.attributes.href.nodeValue);
+            //$selectedTab.addClass('active');
+            $selectedTab.delay(400).fadeIn(400, function () {
+                $selectedTab.addClass('active');
+            });
+
+
+
         });
 
         this.setContentHeight();

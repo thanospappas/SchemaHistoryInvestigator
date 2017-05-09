@@ -21,6 +21,9 @@ export class ReleaseService {
     private selectedReleases;
     selectedReleases$ = new ReplaySubject(1);
 
+    private selectedRelease;
+    selectedRelease$ = new ReplaySubject(1);
+
 
 
     // Resolve HTTP using the constructor
@@ -73,4 +76,14 @@ export class ReleaseService {
     getSelectedReleases(){
         return this.selectedReleases$;
     }
+
+    setSelectedRelease(release){
+        this.selectedRelease = release;
+        this.selectedRelease$.next(this.selectedRelease);
+    }
+
+    getSelectedRelease(){
+        return this.selectedRelease$;
+    }
+
 }

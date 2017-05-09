@@ -11,16 +11,15 @@
 
     <form>
         <label class="radio-inline">
-            <input type="radio" name="optradio">Commits inside selected period</label>
+            <input type="radio" name="optradio" [(ngModel)]="specificReleaseOn" [value]="false" (change)="onSelectionChange('period')" checked="true">Commits inside selected period</label>
         <label class="radio-inline">
-            <input type="radio" name="optradio">Specific Release </label>
+            <input type="radio" name="optradio" [(ngModel)]="specificReleaseOn" [value]="true" (change)="onSelectionChange('release')">Specific Release </label>
     </form>
 
-    <div class="input-group">
+    <div *ngIf="isSingleReleaseOn()" class="input-group">
         <div class="form-group">
-            <label for="sel1">Select list:</label>
-            <select class="form-control" id="sel1">
-                <option *ngFor='let release of this.releases;let i = index;'>
+           <select class="form-control" id="sel1" [(ngModel)]="selectedRelease" (ngModelChange)="setSelectedReleaseId()">
+                <option *ngFor='let release of this.selectedReleases;let i = index;' [ngValue]="release">
                         {{ release.name }}
 
                 </option>
