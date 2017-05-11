@@ -12,5 +12,5 @@ export abstract class DatabaseController{
     }
 
     abstract getAllData(projectID:any):Promise<any>;
-    abstract getSingle():Promise<any>;
+    abstract getSingle(projectID:any,id):Promise<any>;
 }

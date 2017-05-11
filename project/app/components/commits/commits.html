@@ -1,1 +1,228 @@
-<h1> Commits yo!</h1>
+<!-- top tiles -->
+<div class="row tile_count" style="margin-top: 120px" *ngIf="this.selectedCommit">
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> # Tables</span>
+        <div class="count">{{this.selectedCommit.newTables}}</div>
+        <span class="count_bottom">
+
+            <i class="green" *ngIf="this.selectedCommit.schemaGrowth > 0"><i class="fa fa-sort-asc"></i>+{{this.selectedCommit.schemaGrowth}}</i>
+            <i class="red" *ngIf="this.selectedCommit.schemaGrowth < 0"><i class="fa fa-sort-desc"></i>{{this.selectedCommit.schemaGrowth}}</i>
+            <i class="" *ngIf="this.selectedCommit.schemaGrowth == 0">0</i>
+
+            From last version</span>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-clock-o"></i> # Attributes</span>
+        <div class="count">{{this.selectedCommit.newAttributes}}</div>
+        <span class="count_bottom">
+
+            <i class="green" *ngIf="this.selectedCommit.schemaGrowthAttribute > 0"><i class="fa fa-sort-asc"></i>+{{this.selectedCommit.schemaGrowthAttribute}}</i>
+            <i class="red" *ngIf="this.selectedCommit.schemaGrowthAttribute < 0"><i class="fa fa-sort-desc"></i>{{this.selectedCommit.schemaGrowthAttribute}}</i>
+            <i class="" *ngIf="this.selectedCommit.schemaGrowthAttribute == 0">0</i>
+             From last version</span>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Total Changes</span>
+        <div class="count green">{{this.selectedCommit.totalChanges}}</div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Versions Affected</span>
+        <div class="" style="padding-top:15px;"><strong>Old:</strong>
+            <span>{{this.selectedCommit.transitionOldVersion}}</span>
+            <br>
+            <strong>New:</strong>
+            <span>{{this.selectedCommit.transitionNewVersion}}</span>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Commit Date</span>
+        <div class="" style="padding-top:15px;">
+            <article class="media event">
+            <a class="pull-left date">
+                <p class="month" style="font-size: 1.3em;">{{this.selectedCommit.commitDate.split("T")[0]}} {{this.selectedCommit.commitDate.split("T")[1].replace("Z","")}}</p>
+
+                </a></article>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" *ngIf="this.commitsRelease">
+        <span class="count_top"><i class="fa fa-user"></i> Release Info</span>
+        <div class="" style="padding-top:10px;"><strong>Release name:</strong> {{commitsRelease.RE_NAME}}<br>
+            <strong>Release date: </strong> {{commitsRelease.RE_DATE | date:'yMMMd'}}
+        </div>
+    </div>
+</div>
+<!-- /top tiles -->
+
+<div class="row">
+    <div class="col-md-7 col-sm-6 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Commit Summary</h2>
+                <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Settings 1</a>
+                            </li>
+                            <li><a href="#">Settings 2</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                </ul>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="release-summary">
+
+                    <p>This commit was done May 10, 2017 and it was the 34th from the beginning and made by Thanos Pappas.</p>
+                    <p>In this commit there are XX tables. We have XX additions, YY deletions and etc. Along with the sql file XX files changed. </p>
+                        <p>  This commit is characterized by High …, Moderate .. and High …. so we conclude that it is a growth commit. </p>
+                    <p>In this commit we have XX changes affected the schema of the database.</p>
+                    The reasons of the commit is shown below:
+                    <h2>Commit text here.</h2>
+                    <p>Commit text here describing the why</p>
+                    <h2>You may find useful one of the following facts:</h2>
+                    <p>Issue 1:</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div  class="col-md-5 col-sm-6 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2> Useful Stats</h2>
+                <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Settings 1</a>
+                            </li>
+                            <li><a href="#">Settings 2</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                </ul>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+                <table class="countries_list">
+                    <tbody>
+                    <tr>
+                        <td>Table Births</td>
+                        <td class="fs15 fw700 text-right">33%</td>
+                    </tr>
+                    <tr>
+                        <td>Table Deaths</td>
+                        <td class="fs15 fw700 text-right">27%</td>
+                    </tr>
+                    <tr>
+                        <td>Attribute Additions</td>
+                        <td class="fs15 fw700 text-right">16%</td>
+                    </tr>
+                    <tr>
+                        <td>Attribute Deletions</td>
+                        <td class="fs15 fw700 text-right">11%</td>
+                    </tr>
+                    <tr>
+                        <td>Key Changes</td>
+                        <td class="fs15 fw700 text-right">10%</td>
+                    </tr>
+                    <tr>
+                        <td>Type Changes</td>
+                        <td class="fs15 fw700 text-right">10%</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <div class="x_panel">
+            <div class="x_title">
+                <h2><i class="fa fa-align-left"></i> Tables affected <small>Sessions</small></h2>
+                <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Settings 1</a>
+                            </li>
+                            <li><a href="#">Settings 2</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                </ul>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+                <!-- start accordion -->
+                <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel">
+                        <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <h4 class="panel-title">location_qualifier_value</h4>
+                        </a>
+                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                            <div class="panel-body">
+
+                                EventType:Insertion:UpdateTable	attrName:qualifier_int_value	attrType: INT(10)	iskey: FALSE	pkey: 0	fkey:-
+                                EventType:Insertion:UpdateTable	attrName:qualifier_int_value	attrType: INT(10)	iskey: FALSE	pkey: 0	fkey:-
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <a class="panel-heading collapsed" role="tab" id="headingTwo" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <h4 class="panel-title">Collapsible Group Items #2</h4>
+                        </a>
+                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                            <div class="panel-body">
+                                <ul>
+                                    <li><strong>EventType:</strong> Insertion:UpdateTable	| <strong>attrName:</strong>qualifier_int_value	<br>
+                                        <strong>attrType:</strong> INT(10) | <strong>iskey:</strong> FALSE
+                                        <strong>pkey:</strong> 0 | <strong>fkey:</strong>
+                                        -</li>
+                                    <li><strong>EventType:</strong> Insertion:UpdateTable	<strong>attrName:</strong>qualifier_int_value	<strong>attrType:</strong> INT(10)	<strong>iskey:</strong> FALSE
+                                        <strong>pkey:</strong> 0	<strong>fkey:</strong>
+                                        -</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <a class="panel-heading collapsed" role="tab" id="headingThree" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <h4 class="panel-title">Collapsible Group Items #3</h4>
+                        </a>
+                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                            <div class="panel-body">
+                                <p><strong>Collapsible Item 3 data</strong>
+                                </p>
+                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end of accordion -->
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+</div>

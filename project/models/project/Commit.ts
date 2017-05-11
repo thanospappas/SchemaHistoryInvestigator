@@ -9,6 +9,7 @@ export class Commit{
     private text:string;
     private dateHuman:Date;
     private author:Author;
+    private id:number;
     stats:Stats;
 
     constructor(){
@@ -49,6 +50,13 @@ export class Commit{
         return this.stats;
     }
 
+    getId(){
+        return this.id;
+    }
+
+    setId(id:number){
+        this.id = id;
+    }
 
 
 }

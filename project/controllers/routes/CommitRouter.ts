@@ -39,7 +39,28 @@ export class CommitRouter implements ApiRouter{
 
     }
 
-    public getSingle(){
+    public getSingle(req: Request, res: Response, next: NextFunction){
+        let databaseController:CommitController = new CommitController();
+
+        if(req.query.belongs_to == "true"){
+            databaseController.getCommitRelease(req.params.commit_id)
+                .then((result) => {
+                console.log(result);
+                    res.json(result);
+                });
+        }
+        else if(req.query.tables_affected == "true"){
+            databaseController.getTablesChanged(req.params.commit_id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
+        else{
+            databaseController.getSingle(req.params.id,req.params.commit_id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
 
     }
 
@@ -49,7 +70,7 @@ export class CommitRouter implements ApiRouter{
      */
     init() {
         this.router.get('/', this.getAll);
-        this.router.get('/:id', this.getSingle);
+        this.router.get('/:commit_id', this.getSingle);
     }
 
 }

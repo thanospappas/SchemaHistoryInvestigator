@@ -11,6 +11,7 @@ import {serverPort} from "../../config/server-info";
 import {ProjectService} from "../../services/Projects.services";
 import {BreakdownChart} from "../../shared/BreakdownChart";
 import * as d3 from 'd3/build/d3.js';
+import {CommitService} from "../../services/commits.service";
 
 @Component({
     selector: 'releases-comp',
@@ -29,7 +30,10 @@ export class ReleaseComponent implements OnInit {
 
     private specificReleaseOn = false;
 
-    constructor(private releaseChanges:ReleaseService, private httpService:HttpService, private projectService:ProjectService) {
+    constructor(private releaseChanges:ReleaseService,
+                private httpService:HttpService,
+                private projectService:ProjectService,
+    private commitService:CommitService) {
         this.commitChangesChart = new BreakdownChart(".release-summary",".commit-overview",releaseChanges);
     }
 
@@ -175,9 +179,36 @@ export class ReleaseComponent implements OnInit {
                 .style("opacity", "0");
             this.commitChangesChart.fadeStackedBarChart(1,commit.dateHuman);
         }
+    }
+
+    showCommitInfo(id:number){
+
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            + this.projectService.getSelectedProjectData().projectId + "/commits/" + id;
+        console.log(url);
+        this.commitService.getSelectedCommit(url);
+
+
+
+        var $li = $(".commits-menu-item");
+        var $currentli = $('#sidebar-menu').find('li.active-sm');
+        $currentli.removeClass('active active-sm');
+        $li.addClass('active active-sm');
+        //$('.right_col').find('.sidebar-tab-pane').removeClass('active');
+
+        $('.right_col').find('.sidebar-tab-pane').fadeOut(400, function () {
+            $('.right_col').find('.sidebar-tab-pane').delay().removeClass('active');
+        });
+
+        var $selectedTab = $('.right_col').find("#commits");
+        //$selectedTab.addClass('active');
+        $selectedTab.delay(400).fadeIn(400, function () {
+            $selectedTab.addClass('active');
+            });
+
+
 
 
     }
-
 
 }
