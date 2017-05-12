@@ -165,8 +165,8 @@ export class ReleaseComponent implements OnInit {
             d3.select(".releaseTooltip")
                 .style("opacity", "1")
                 .style("position","absolute")
-                .style("left", (event.clientX+20) +'px')
-                .style("top", event.clientY+'px')
+                .style("left", (event.clientX + 20) +'px')
+                .style("top", (event.clientY + 20)+'px')
                 .html("<div class='release-tooltip-section'><div class='' style=''> " +
                     "<p><b style='font-size: 1em'>Restructuring</b></p>" +
                     "<p><b>Category of release</b><br>Schema growth: High | Attributes *jected: Moderate" +

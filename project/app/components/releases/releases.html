@@ -103,7 +103,7 @@
                                     <span>Steady</span>
                                 </a>
                             </div>
-                            <div class="block_content" (mouseover)='highlighCommit(true,i,$event,commit)'
+                            <div class="block_content commit-list-information" (mouseover)='highlighCommit(true,i,$event,commit)'
                                  (mouseout)="highlighCommit(false,i,$event,commit)" (click)="showCommitInfo(commit.id)">
                                 <h2 class="title">
                                     <a>{{commit.text.substring(0,30)}} ... Read&nbsp;More</a>

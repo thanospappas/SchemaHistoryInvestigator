@@ -91,6 +91,140 @@
 
             </div>
         </div>
+
+        <div class="row" *ngIf="this.issues?.length > 0">
+            <div class="col-md-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Issues</h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Settings 1</a>
+                                    </li>
+                                    <li><a href="#">Settings 2</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="row" >
+                            <div class="col-sm-4 mail_list_column" style="overflow-y: scroll;height:400px;">
+                                <a *ngFor="let issue of this.issues;let i = index;" id="{{'issue'+i}}" (click)="setSelectedIssue(issue)">
+                                    <div class="mail_list" [class.issue-active]="issue == this.selectedIssue">
+                                        <div class="left">
+                                            <i class="fa fa-circle"></i> <i class="fa fa-edit"></i>
+                                        </div>
+                                        <div class="right">
+                                            <h3>{{issue.IS_ACTOR}} <small>{{issue.IS_CREATED_AT}}</small></h3>
+                                            <p>{{issue.IS_TITLE}}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <!-- /MAIL LIST -->
+
+                            <!-- CONTENT MAIL -->
+                            <div class="col-sm-8 mail_view" >
+                                <div class="inbox-body" *ngIf="this.selectedIssue">
+                                    <div class="mail_heading row">
+                                        <div class="col-md-8">
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-primary" type="button"><i class="fa fa-reply"></i> Reply</button>
+                                                <button class="btn btn-sm btn-default" type="button"  data-placement="top" data-toggle="tooltip" data-original-title="Forward"><i class="fa fa-share"></i></button>
+                                                <button class="btn btn-sm btn-default" type="button" data-placement="top" data-toggle="tooltip" data-original-title="Print"><i class="fa fa-print"></i></button>
+                                                <button class="btn btn-sm btn-default" type="button" data-placement="top" data-toggle="tooltip" data-original-title="Trash"><i class="fa fa-trash-o"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <p class="date"> 8:02 PM 12 FEB 2014</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h4> {{this.selectedIssue.IS_TITLE}}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="sender-info">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <strong>{{this.selectedIssue.IS_ACTOR}}</strong>
+                                                <span></span> assigned to
+                                                <strong>{{this.selectedIssue.IS_ASSIGNEE}}</strong>
+                                                <p><strong>Status:</strong>{{this.selectedIssue.IS_STATUS}}</p>
+                                                <p><strong>Priority:</strong>{{this.selectedIssue.IS_PRIORITY}}</p>
+                                                <p><strong>Type:</strong>{{this.selectedIssue.IS_TYPE}}</p>
+                                                <p><strong>% Done:</strong>{{this.selectedIssue.IS_PERCENTAGE_DONE}}</p>
+                                                <p><strong>Category:</strong>{{this.selectedIssue.IS_CATEGORY}}</p>
+                                                <p><strong>Closed at:</strong>{{this.selectedIssue.IS_CLOSED_AT}}</p>
+                                                <p><strong>Labels:</strong>{{this.selectedIssue.IS_LABELS}}</p>
+                                                <p><strong>Updated at:</strong>{{this.selectedIssue.IS_UPDATED_AT}}</p>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="view-mail">
+                                        <p [innerHTML]="this.selectedIssue.IS_BODY"></p>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary" type="button"><i class="fa fa-reply"></i> Reply</button>
+                                        <button class="btn btn-sm btn-default" type="button"  data-placement="top" data-toggle="tooltip" data-original-title="Forward"><i class="fa fa-share"></i></button>
+                                        <button class="btn btn-sm btn-default" type="button" data-placement="top" data-toggle="tooltip" data-original-title="Print"><i class="fa fa-print"></i></button>
+                                        <button class="btn btn-sm btn-default" type="button" data-placement="top" data-toggle="tooltip" data-original-title="Trash"><i class="fa fa-trash-o"></i></button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /CONTENT MAIL -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row" *ngIf="this.buildInfo?.length > 0">
+            <div class="col-md-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Build Information</h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Settings 1</a>
+                                    </li>
+                                    <li><a href="#">Settings 2</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                    <div class="">
+                        <p><strong>State:</strong> {{this.buildInfo[0].BU_STATE}} </p>
+                        <p><strong>Started at:</strong> {{this.buildInfo[0].BU_STARTED_AT}} </p>
+                        <p><strong>Finished at:</strong> {{this.buildInfo[0].BU_FINISHED_AT}} </p>
+                        <p><strong>Duration:</strong> {{this.buildInfo[0].BU_DURATION}} </p>
+                        <p><strong>Result:</strong> {{this.buildInfo[0].BU_RESULT}} </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+
     </div>
     <div  class="col-md-5 col-sm-6 col-xs-12">
         <div class="x_panel">
@@ -115,31 +249,31 @@
             </div>
             <div class="x_content">
 
-                <table class="countries_list">
+                <table class="countries_list" *ngIf="this.selectedCommit">
                     <tbody>
                     <tr>
                         <td>Table Births</td>
-                        <td class="fs15 fw700 text-right">33%</td>
+                        <td class="fs15 fw700 text-right">{{this.selectedCommit.tableBirths}}</td>
                     </tr>
                     <tr>
                         <td>Table Deaths</td>
-                        <td class="fs15 fw700 text-right">27%</td>
+                        <td class="fs15 fw700 text-right">{{this.selectedCommit.tableDeaths}}</td>
                     </tr>
                     <tr>
                         <td>Attribute Additions</td>
-                        <td class="fs15 fw700 text-right">16%</td>
+                        <td class="fs15 fw700 text-right">{{this.selectedCommit.attributesInsertedAtSurvivingTables}}</td>
                     </tr>
                     <tr>
                         <td>Attribute Deletions</td>
-                        <td class="fs15 fw700 text-right">11%</td>
+                        <td class="fs15 fw700 text-right">{{this.selectedCommit.attributesDeletedAtSurvivingTables}}</td>
                     </tr>
                     <tr>
                         <td>Key Changes</td>
-                        <td class="fs15 fw700 text-right">10%</td>
+                        <td class="fs15 fw700 text-right">{{this.selectedCommit.keyChanges}}</td>
                     </tr>
                     <tr>
                         <td>Type Changes</td>
-                        <td class="fs15 fw700 text-right">10%</td>
+                        <td class="fs15 fw700 text-right">{{this.selectedCommit.typeChanges}}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -170,51 +304,29 @@
             <div class="x_content">
 
                 <!-- start accordion -->
-                <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel">
-                        <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            <h4 class="panel-title">location_qualifier_value</h4>
-                        </a>
-                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                            <div class="panel-body">
+                <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true" *ngIf="this.tablesChanged?.length > 0">
 
-                                EventType:Insertion:UpdateTable	attrName:qualifier_int_value	attrType: INT(10)	iskey: FALSE	pkey: 0	fkey:-
-                                EventType:Insertion:UpdateTable	attrName:qualifier_int_value	attrType: INT(10)	iskey: FALSE	pkey: 0	fkey:-
 
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <a class="panel-heading collapsed" role="tab" id="headingTwo" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            <h4 class="panel-title">Collapsible Group Items #2</h4>
+                    <div class="panel" *ngFor='let table of this.tablesChanged;let i = index;'>
+                        <a class="panel-heading" role="tab" id="{{'heading' + i}}" data-toggle="collapse" data-parent="#accordion" href="{{'#collapse' + i}}" aria-expanded="false"
+                           [attr.aria-controls] ="'collapse' + i">
+                            <h4 class="panel-title">{{table.tableName}} ({{table.changes.length}} changes)</h4>
                         </a>
-                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        <div id="{{'collapse' + i}}" class="panel-collapse collapse" role="tabpanel" [attr.aria-labelledby]="'heading' + i">
                             <div class="panel-body">
                                 <ul>
-                                    <li><strong>EventType:</strong> Insertion:UpdateTable	| <strong>attrName:</strong>qualifier_int_value	<br>
-                                        <strong>attrType:</strong> INT(10) | <strong>iskey:</strong> FALSE
-                                        <strong>pkey:</strong> 0 | <strong>fkey:</strong>
-                                        -</li>
-                                    <li><strong>EventType:</strong> Insertion:UpdateTable	<strong>attrName:</strong>qualifier_int_value	<strong>attrType:</strong> INT(10)	<strong>iskey:</strong> FALSE
-                                        <strong>pkey:</strong> 0	<strong>fkey:</strong>
-                                        -</li>
+                                    <li *ngFor='let change of table.changes;'>
+                                        <strong>EventType:</strong> {{change.eventType}}	| <strong>attrName:</strong>{{change.attributeName}}	<br>
+                                        <strong>attrType:</strong> {{change.attributeType}} | <strong>iskey:</strong> {{change.isKey}}
+                                        <strong>pkey:</strong> {{change.primaryKey}} | <strong>fkey:</strong>
+                                        {{change.foreignKey}}</li>
+
                                 </ul>
+
                             </div>
                         </div>
                     </div>
-                    <div class="panel">
-                        <a class="panel-heading collapsed" role="tab" id="headingThree" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                            <h4 class="panel-title">Collapsible Group Items #3</h4>
-                        </a>
-                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                            <div class="panel-body">
-                                <p><strong>Collapsible Item 3 data</strong>
-                                </p>
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <!-- end of accordion -->
 
 

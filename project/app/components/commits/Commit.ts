@@ -11,6 +11,8 @@ import {CommitService} from "../../services/commits.service";
 import {HttpService} from "../../services/http.service";
 import {serverPort} from "../../config/server-info";
 import {ProjectService} from "../../services/Projects.services";
+import {NewlinesFilter} from "../../shared/NewlinesFilter";
+import * as $ from 'jquery';
 
 
 @Component({
@@ -24,8 +26,14 @@ export class CommitComponent implements OnInit {
 
     private selectedCommit;
     private commitsRelease;
+    private tablesChanged;
 
-    constructor(private commitService: CommitService, private httpService:HttpService,private projectService:ProjectService) {
+    private issues;
+    private selectedIssue;
+    private buildInfo;
+
+    constructor(private commitService: CommitService, private httpService:HttpService,private projectService:ProjectService,
+                private newLineFilter:NewlinesFilter) {
 
     }
 
@@ -36,6 +44,9 @@ export class CommitComponent implements OnInit {
                 this.selectedCommit = commit;
                 console.log(this.selectedCommit);
                 this.getRelease();
+                this.getTablesChanged();
+                this.getBuildInfo();
+                this.getIssuesInfo();
             });
     }
 
@@ -53,6 +64,60 @@ export class CommitComponent implements OnInit {
                     console.log(err);
                 }
             );
+    }
+
+    private getTablesChanged(){
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            + this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId +"?tables_affected=true";
+        console.log("url: " + url);
+        this.httpService.get(url)
+            .subscribe(tables => {
+                    this.tablesChanged =tables;
+                    console.log(this.tablesChanged);
+                },
+                err => {
+                    console.log(err);
+                }
+            );
+    }
+
+    private getBuildInfo(){
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            + this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId +"?build_info=true";
+        console.log("url: " + url);
+        this.httpService.get(url)
+            .subscribe(build => {
+                    this.buildInfo = build;
+                    console.log(this.buildInfo);
+                },
+                err => {
+                    console.log(err);
+                }
+            );
+    }
+
+    private getIssuesInfo(){
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            + this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId +"?issues_info=true";
+        console.log("url: " + url);
+        this.httpService.get(url)
+            .subscribe(issues => {
+                    this.issues = issues;
+                    for(let issue of this.issues){
+                        issue.IS_BODY = issue.IS_BODY.substring(2).replace(/\\n/g,'<br/>');
+                    }
+                    this.selectedIssue = this.issues[0];
+                    console.log(this.issues);
+                },
+                err => {
+                    console.log(err);
+                }
+            );
+    }
+
+
+    setSelectedIssue(issue){
+        this.selectedIssue = issue;
     }
 
 }
