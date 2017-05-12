@@ -1,5 +1,6 @@
 import {DatabaseController} from "../DatabaseController";
 import {TableChange} from "../schema-history/TableChange";
+import {AtomicSchemaChange} from "../schema-history/AtomicSchemaChange";
 
 /**
  * Created by thanosp on 17/4/2017.
@@ -130,29 +131,72 @@ export class CommitController extends DatabaseController{
         return true;//el.getTable() === rows[i].TA_NAME;
     }
 
-    createTableChangeList(rows){
+    private createTableChangeList(rows){
 
         let tableChanges: Array<TableChange> = new Array<TableChange>();
-        let t:TableChange = new TableChange;
-        t.setTable("bioentry");
-        tableChanges.push(t);
+
         for(let i = 0; i < rows.length; i++){
+            console.log(rows[i]);
+            let acc:AtomicSchemaChange = new AtomicSchemaChange;
+            acc.setAttributeName(rows[i].CH_ATTRIBUTE_NAME);
+            acc.setAttributeType(rows[i].CH_ATTRIBUTE_TYPE);
+            acc.setEventType(rows[i].CH_EVENT_TYPE);
+            acc.setForeignKey(rows[i].CH_FOREIGN_KEY);
+            acc.setIskey(rows[i].CH_IS_KEY);
+            acc.setPrimaryKey(rows[i].CH_PRIMARY_KEY);
+
             //Check if the TA_NAME from db's already added to array
-            console.log(tableChanges.findIndex((p) => p.getTable() == rows[i].TA_NAME) );
+            let index = tableChanges.findIndex((p) => p.getTable() == rows[i].TA_NAME);
+            if(index == -1){
+                let tableChange:TableChange = new TableChange();
+                tableChange.setTable(rows[i].TA_NAME);
+                tableChange.addChange(acc);
+                tableChanges.push(tableChange);
+            }
+            else{
+                tableChanges[index].addChange(acc);
+            }
         }
+
+        return tableChanges;
+
     }
 
     getTablesChanged(commitId):Promise<any>{
 
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT CH_EVENT_TYPE, CH_ATTRIBUTE_TYPE, CH_IS_KEY, CH_PRIMARY_KEY, CH_FOREIGN_KEY, TA_NAME " +
+            this.database.DB.all("SELECT CH_EVENT_TYPE, CH_ATTRIBUTE_TYPE, CH_IS_KEY, CH_PRIMARY_KEY, CH_FOREIGN_KEY, TA_NAME, CH_ATTRIBUTE_NAME " +
                 " FROM Commits, Transitions, Changes, Tables WHERE Commits.CO_ID = " + commitId + " AND Commits.CO_TRANSITION_ID = " +
                 " Transitions.TR_ID AND Transitions.TR_ID = Changes.CH_TR_ID AND Changes.CH_TA_ID = Tables.TA_ID;",  (err, tables) => {
-                this.createTableChangeList(tables);
-                resolve(tables);
+                //console.log(this.createTableChangeList(tables));
+                resolve(this.createTableChangeList(tables));
             });
         });
+    }
 
+    getBuildInfo(commitId){
+
+        return new Promise((resolve) => {
+            this.database.DB.all("SELECT BU_ID, BU_REPO_ID, BU_EVENT_TYPE, BU_FINISHED_AT, BU_NUMBER, BU_STATE, BU_RESULT," +
+                " BU_DURATION, BU_MESSAGE, BU_STARTED_AT FROM Commits, Builds, Branches WHERE Commits.CO_ID = " +
+                commitId + " AND Commits.CO_BRANCH_ID = Branches.BR_ID AND Commits.CO_SHA = Builds.BU_COMMIT_ID",  (err, build) => {
+
+                resolve(build);
+            });
+        });
+    }
+
+    getIssues(commitId){
+
+
+        return new Promise((resolve) => {
+            this.database.DB.all("SELECT * FROM Issues, Commits WHERE (Commits.CO_ID = " +
+                commitId + " AND Commits.CO_ID = Issues.IS_NEXT_CREATED_COMMIT_ID) OR " +
+                "(Commits.CO_ID = " + commitId + " AND Commits.CO_ID = Issues.IS_PREV_CREATED_COMMIT_ID) GROUP BY IS_TITLE;",  (err, issues) => {
+
+                resolve(issues);
+            });
+        });
 
     }
 

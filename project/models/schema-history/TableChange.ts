@@ -8,6 +8,10 @@ export class TableChange{
     private tableName:string;
     private changes:Array<AtomicSchemaChange>;
 
+    public constructor(){
+        this.changes = new Array<AtomicSchemaChange>();
+    }
+
     public setTable(table:string){
         this.tableName = table;
     }

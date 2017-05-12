@@ -55,6 +55,18 @@ export class CommitRouter implements ApiRouter{
                     res.json(result);
                 });
         }
+        else if(req.query.build_info == "true"){
+            databaseController.getBuildInfo(req.params.commit_id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
+        else if(req.query.issues_info == "true"){
+            databaseController.getIssues(req.params.commit_id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
         else{
             databaseController.getSingle(req.params.id,req.params.commit_id)
                 .then((result) => {
