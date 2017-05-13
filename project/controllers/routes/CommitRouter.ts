@@ -30,12 +30,20 @@ export class CommitRouter implements ApiRouter{
      * GET all commits.
      */
     public getAll(req: Request, res: Response, next: NextFunction) {
-        let databaseController:DatabaseController = new CommitController();
+        let databaseController:CommitController = new CommitController();
 
-        databaseController.getAllData(req.params.id)
-            .then((result) => {
-                res.json(result);
-            });
+        if(req.query.generate_summary == "true"){
+            databaseController.generateSummary(req.params.id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
+        else{
+            databaseController.getAllData(req.params.id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
 
     }
 

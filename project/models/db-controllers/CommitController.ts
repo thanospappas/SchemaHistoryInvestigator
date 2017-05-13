@@ -53,11 +53,18 @@ export class CommitController extends DatabaseController{
             attributesDeletedAtSurvivingTables:-1, attributesInsertedAtSurvivingTables:-1,
             attributesInjectedEjected:-1, attributesUpdated:-1, schemaGrowth:-1, totalChanges: -1, schemaGrowthAttribute:-1};
 
+        if(!rows[0]){
+            let tmpRows = rows;
+            rows = [];
+            rows.push(tmpRows);
+        }
+
         finalCommit.author = rows[0].AU_NAME;
         finalCommit.commitId = rows[0].CO_ID;
         finalCommit.commitDate = rows[0].CO_HUMAN_DATE;
         finalCommit.transitionOldVersion = rows[0].TR_OLD_VERSION;
         finalCommit.transitionNewVersion = rows[0].TR_NEW_VERSION;
+        finalCommit.commitText = rows[0].CO_TEXT;
         for(let i = 0;i<rows.length;i++){
             this.assignMetrics(rows[i],rows[i].ME_VALUE,finalCommit);
         }
@@ -94,6 +101,8 @@ export class CommitController extends DatabaseController{
             this.database.DB.all("SELECT * FROM Commits, Transitions, Metrics, Authors WHERE Commits.CO_ID = " + id +
             " AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
                 "AND Authors.AU_ID = Commits.CO_AUTHOR_ID", (err, commit) => {
+                console.log("Inside get single");
+                console.log(commit);
                     resolve(this.createCommitInfo(commit));
             });
         });
@@ -121,14 +130,6 @@ export class CommitController extends DatabaseController{
                 resolve(release);
             });
         });
-    }
-
-    isTableAdded(element, index, selectedTable,ll){
-        console.log(element);
-        console.log(index);
-        console.log(selectedTable);
-
-        return true;//el.getTable() === rows[i].TA_NAME;
     }
 
     private createTableChangeList(rows){
@@ -168,7 +169,6 @@ export class CommitController extends DatabaseController{
             this.database.DB.all("SELECT CH_EVENT_TYPE, CH_ATTRIBUTE_TYPE, CH_IS_KEY, CH_PRIMARY_KEY, CH_FOREIGN_KEY, TA_NAME, CH_ATTRIBUTE_NAME " +
                 " FROM Commits, Transitions, Changes, Tables WHERE Commits.CO_ID = " + commitId + " AND Commits.CO_TRANSITION_ID = " +
                 " Transitions.TR_ID AND Transitions.TR_ID = Changes.CH_TR_ID AND Changes.CH_TA_ID = Tables.TA_ID;",  (err, tables) => {
-                //console.log(this.createTableChangeList(tables));
                 resolve(this.createTableChangeList(tables));
             });
         });
@@ -188,7 +188,6 @@ export class CommitController extends DatabaseController{
 
     getIssues(commitId){
 
-
         return new Promise((resolve) => {
             this.database.DB.all("SELECT * FROM Issues, Commits WHERE (Commits.CO_ID = " +
                 commitId + " AND Commits.CO_ID = Issues.IS_NEXT_CREATED_COMMIT_ID) OR " +
@@ -199,6 +198,53 @@ export class CommitController extends DatabaseController{
         });
 
     }
+
+    generateSummary(projectId) {
+
+        let finalCommits = [];
+        let releasePromises = [];
+
+            this.database.DB.all("SELECT * FROM Branches, Commits, Transitions, Metrics, Authors WHERE Commits.CO_BRANCH_ID = Branches.BR_ID AND " +
+                "Branches.BR_PRJ_ID =" + projectId + " AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
+                "AND Authors.AU_ID = Commits.CO_AUTHOR_ID ORDER BY CO_DATE ASC", (err, commits) => {
+
+                let singleCommitInfo = [];
+                for(let i=0; i< commits.length; i++){
+                     let textSummary = "This commit was done in ";
+                     //console.log("Project here:");
+
+                    if (i % 12 == 0){
+                        //console.log(this.createCommitInfo(singleCommitInfo));
+                        finalCommits.push(this.createCommitInfo(singleCommitInfo));
+                        singleCommitInfo = [];
+                    }
+                    else{
+                        singleCommitInfo.push(commits[i]);
+                    }
+                 }
+                finalCommits.push(this.createCommitInfo(singleCommitInfo));
+
+                for(let commit of finalCommits){
+                    let releasePromise = this.getCommitRelease(commit.commitId);
+                    releasePromises.push(releasePromise);
+                }
+
+                //Promise.all(releasePromises).then()
+                Promise.all(releasePromises)
+                    .then(result=>{
+                        console.log(result);
+                    });
+
+                //resolve("success");
+
+            });
+        return Promise.all(releasePromises)
+            .then(result=>{
+                //console.log(result);
+        });
+    }
+
+
 
 }
 

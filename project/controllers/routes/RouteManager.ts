@@ -9,6 +9,7 @@ import * as express from 'express';
 import {IssueRouter} from "./IssueRouter";
 import {AuthorsRouter} from "./ProjectStatsRouter";
 import {TransitionRouter} from "./TransitionRouter";
+import {AdminDashboardRouter} from "./AdminDashboardRouter";
 /**
  * Created by thanosp on 17/4/2017.
  */
@@ -25,6 +26,7 @@ export class RouteManager{
     createRoutes(expressApp: express.Application){
         let prouter = new ProjectRouter();
         let irouter = new IndexRouter();
+        let arouter = new AdminDashboardRouter();
 
         this.routes.push(new BuildRouter());
         this.routes.push(new ReleaseRouter());
@@ -36,6 +38,7 @@ export class RouteManager{
 
         prouter.init();
         irouter.init();
+        arouter.init();
 
         for(let r of this.routes) {
             prouter.router.use(r.getPath(), r.router);
@@ -43,6 +46,7 @@ export class RouteManager{
         }
 
         expressApp.use('/', irouter.irouter);
+        expressApp.use('/admin', arouter.irouter);
         expressApp.use('/api/v1/projects', prouter.router);
 
 

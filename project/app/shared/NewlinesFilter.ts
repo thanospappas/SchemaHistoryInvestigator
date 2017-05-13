@@ -24,7 +24,7 @@ export class NewlinesFilter implements PipeTransform {
         console.log(text.replace('\n','<br/>'));
         //console.log(filter);
 
-        return text.replace(/(?:\r\n|\r|\n)/g,'<br/>');
+        return text.replace(/\\n/g,'<br/>');
         // filter items array, items which match and return true will be kept, false will be filtered out
       //  return releases.filter((item) => this.applyFilter(item, filter));
     }

@@ -84,7 +84,7 @@
                     <p>In this commit we have XX changes affected the schema of the database.</p>
                     The reasons of the commit is shown below:
                     <h2>Commit text here.</h2>
-                    <p>Commit text here describing the why</p>
+                    <p *ngIf="this.selectedCommit">{{this.selectedCommit.commitText | newLineFilter}}</p>
                     <h2>You may find useful one of the following facts:</h2>
                     <p>Issue 1:</p>
                 </div>

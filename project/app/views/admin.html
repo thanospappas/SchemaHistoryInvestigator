@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Repo Life Story</title>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon"  type="image/png"  href="../public/favicon.ico">
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.css">
+    <link href="../bower_components/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <!-- Polyfill(s) for older browsers -->
+    <script src="./mod/core-js/client/shim.min.js"></script>
+
+    <script src="./mod/zone.js/dist/zone.js"></script>
+    <script src="./mod/systemjs/dist/system.src.js"></script>
+
+    <script src="../public/js/systemjs.config.js"></script>
+    <script>
+        System.import('/ngapp/admin.app.js').catch(function(err){ console.error(err); });
+    </script>
+</head>
+
+<body class="login">
+<admin-section></admin-section>
+
+<!--<script src="../public/js/custom.js"></script>-->
+<script src="./mod/jquery/dist/jquery.js"></script>
+<script src="bootstrap/dist/js/bootstrap.js"></script>
+</body>
+</html>

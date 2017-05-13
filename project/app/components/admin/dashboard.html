@@ -1,0 +1,88 @@
+
+<div *ngIf="this.loginScreenOn">
+    <a class="hiddenanchor" id="signup"></a>
+    <a class="hiddenanchor" id="signin"></a>
+
+    <div class="login_wrapper">
+        <div class="animate form login_form">
+            <section class="login_content">
+                <form>
+                    <h1>Login Form</h1>
+                    <div>
+                        <input #username type="text" class="form-control" placeholder="Username" required="" />
+                    </div>
+                    <div>
+                        <input #pass type="password" class="form-control" placeholder="Password" required="" />
+                    </div>
+                    <div>
+                        <a class="btn btn-default submit" (click)="login(username.value, pass.value)">Log in</a>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    <div class="separator">
+                       <div class="clearfix"></div>
+                        <br />
+
+                        <div>
+                            <h1><i class="fa fa-paw"></i>App name here!...</h1>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>
+
+
+<!-- page content -->
+<div class="" *ngIf="!this.loginScreenOn">
+
+        <div class="row" style="">
+
+            <div class="col-md-8 col-sm-12 col-xs-12 col-md-offset-2" style="background-color: #FFFFFF;height: 100%">
+
+                <h3 style="text-align: center;">Generate summary for a selected commit/release</h3>
+
+
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_content">
+                                <section class="login_content">
+                                    <h2>Selected dataset</h2>
+                                    <select id="drop5" role="presentation" class="dropdown-toggle project-selection ">
+                                        <option *ngFor='let project of projects' value="{{project.ID}}" ng-selected="classifier.value==selection">{{project.Name}}</option>
+                                    </select>
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" class="flat" checked="checked"> Commit Level Summary
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" class="flat"> Release Level Summary
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <a class="btn btn-default submit" (click)="login(username.value, pass.value)">Generate Text</a>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+            </div>
+        </div>
+</div>
