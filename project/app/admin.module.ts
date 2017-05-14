@@ -37,6 +37,6 @@ import {AdminComponent} from "./admin.component";
     ],
     declarations: [ AdminComponent, AdminDashboardSection ],
     bootstrap:    [ AdminComponent  ],
-    providers: []
+    providers: [HttpService]
 })
 export class AdminDashboardModule { }

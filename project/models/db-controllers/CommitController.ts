@@ -1,6 +1,8 @@
 import {DatabaseController} from "../DatabaseController";
 import {TableChange} from "../schema-history/TableChange";
 import {AtomicSchemaChange} from "../schema-history/AtomicSchemaChange";
+import {CommitSummary} from "../project/CommitSummary";
+import {ReleaseController} from "./ReleaseController";
 
 /**
  * Created by thanosp on 17/4/2017.
@@ -13,6 +15,7 @@ export class CommitController extends DatabaseController{
     }
 
     assignMetrics(row,value,commit:CommitInformation){
+
             if (row.ME_TYPE_OF_METRIC==("tDel")) {
                 commit.tableDeaths=value;
             } else if (row.ME_TYPE_OF_METRIC==("tIns")) {
@@ -51,7 +54,8 @@ export class CommitController extends DatabaseController{
             attributeInsertionAtBirth:-1,tableBirths:-1, tableDeaths:-1,  oldTables:-1,
             newTables:-1, oldAttributes:-1,  newAttributes:-1,  keyChanges:-1, typeChanges:-1,
             attributesDeletedAtSurvivingTables:-1, attributesInsertedAtSurvivingTables:-1,
-            attributesInjectedEjected:-1, attributesUpdated:-1, schemaGrowth:-1, totalChanges: -1, schemaGrowthAttribute:-1};
+            attributesInjectedEjected:-1, attributesUpdated:-1, schemaGrowth:-1, totalChanges: 0,
+            schemaGrowthAttribute:-1, release:'',releaseDate: -1, filesAffected: -1, commitSummary: ''};
 
         if(!rows[0]){
             let tmpRows = rows;
@@ -59,12 +63,23 @@ export class CommitController extends DatabaseController{
             rows.push(tmpRows);
         }
 
+        //console.log(rows);
+
         finalCommit.author = rows[0].AU_NAME;
         finalCommit.commitId = rows[0].CO_ID;
         finalCommit.commitDate = rows[0].CO_HUMAN_DATE;
         finalCommit.transitionOldVersion = rows[0].TR_OLD_VERSION;
         finalCommit.transitionNewVersion = rows[0].TR_NEW_VERSION;
         finalCommit.commitText = rows[0].CO_TEXT;
+        finalCommit.commitSummary = rows[0].CO_TEXT_SUMMARY;
+
+        if (rows[0].RE_NAME) {
+            finalCommit.release = rows[0].RE_NAME;
+            finalCommit.releaseDate = rows[0].RE_DATE;
+        } else {
+            finalCommit.release = "Start_Of_Project";
+            finalCommit.releaseDate = rows[0].CO_DATE;
+        }
         for(let i = 0;i<rows.length;i++){
             this.assignMetrics(rows[i],rows[i].ME_VALUE,finalCommit);
         }
@@ -78,6 +93,7 @@ export class CommitController extends DatabaseController{
 
         finalCommit.totalChanges = finalCommit.attributesUpdated + finalCommit.attributesInjectedEjected
             + finalCommit.attributeDeletionAtDeath + finalCommit.attributeInsertionAtBirth;
+
 
         return finalCommit;
 
@@ -98,11 +114,18 @@ export class CommitController extends DatabaseController{
     getSingle(projectID,id):Promise<any> {
         console.log(id)
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Commits, Transitions, Metrics, Authors WHERE Commits.CO_ID = " + id +
-            " AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
-                "AND Authors.AU_ID = Commits.CO_AUTHOR_ID", (err, commit) => {
-                console.log("Inside get single");
-                console.log(commit);
+            this.database.DB.all(/*"SELECT * FROM Releases, Commits, Transitions, Metrics, Authors WHERE (Commits.CO_ID = " + id +
+            " AND Releases.RE_ID = Commits.CO_PREV_RELEASE_ID AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
+                "AND Authors.AU_ID = Commits.CO_AUTHOR_ID) OR Commits.CO_ID = " + id +
+                " AND Commits.CO_PREV_RELEASE_ID IS NULL AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
+                "AND Authors.AU_ID = Commits.CO_AUTHOR_ID",*/
+                "SELECT DISTINCT * FROM Commits LEFT OUTER JOIN Releases ON Commits.CO_PREV_RELEASE_ID = Releases.RE_ID, Transitions, Metrics, Authors WHERE" +
+                "  (Commits.CO_ID = " + id +" AND Commits.CO_TRANSITION_ID = Transitions.TR_ID " +
+                "AND Transitions.TR_ID = Metrics.ME_TR_ID AND Authors.AU_ID = Commits.CO_AUTHOR_ID) ",
+
+
+                (err, commit) => {
+
                     resolve(this.createCommitInfo(commit));
             });
         });
@@ -124,7 +147,7 @@ export class CommitController extends DatabaseController{
 
     getCommitRelease(commitId):Promise<any>{
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT RE_DATE, RE_NAME FROM Commits, Releases WHERE Commits.CO_ID = " + commitId
+            this.database.DB.all("SELECT RE_DATE, RE_NAME FROM, CO_ID Commits, Releases WHERE Commits.CO_ID = " + commitId
             +" AND Commits.CO_PREV_RELEASE_ID = Releases.RE_ID;", function (err, release) {
 
                 resolve(release);
@@ -137,7 +160,7 @@ export class CommitController extends DatabaseController{
         let tableChanges: Array<TableChange> = new Array<TableChange>();
 
         for(let i = 0; i < rows.length; i++){
-            console.log(rows[i]);
+
             let acc:AtomicSchemaChange = new AtomicSchemaChange;
             acc.setAttributeName(rows[i].CH_ATTRIBUTE_NAME);
             acc.setAttributeType(rows[i].CH_ATTRIBUTE_TYPE);
@@ -199,48 +222,109 @@ export class CommitController extends DatabaseController{
 
     }
 
+    getFilesAffected(commitId):Promise<any>{
+        return new Promise((resolve) => {
+            this.database.DB.all("SELECT * FROM Files_Affected WHERE FA_COMMIT_ID = " + commitId, (err, files) => {
+                resolve(files);
+            });
+        });
+    }
+
+    getAllInfo(projectID):Promise<any> {
+
+        return new Promise((resolve) => {
+            this.database.DB.all("SELECT * FROM Branches, Commits LEFT OUTER JOIN Releases ON Commits.CO_PREV_RELEASE_ID = Releases.RE_ID, " +
+                "Transitions, Metrics, Authors WHERE Commits.CO_BRANCH_ID = Branches.BR_ID" +
+                " AND Branches.BR_PRJ_ID = " + projectID  +
+                " AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
+                "AND Authors.AU_ID = Commits.CO_AUTHOR_ID ORDER BY CO_DATE ASC", (err, commits) => {
+                let finalCommits= [];
+                let singleCommitInfo = [];
+                for(let i= 0; i <commits.length;i++){
+
+                    if (i % 12 == 0 && i > 0){
+                        finalCommits.push(this.createCommitInfo(singleCommitInfo));
+                        singleCommitInfo = [];
+                        singleCommitInfo.push(commits[i]);
+                    }
+                    else{
+                        singleCommitInfo.push(commits[i]);
+                    }
+                }
+                finalCommits.push(this.createCommitInfo(singleCommitInfo));
+                resolve(finalCommits);
+            });
+        });
+    }
+
     generateSummary(projectId) {
 
         let finalCommits = [];
         let releasePromises = [];
 
-            this.database.DB.all("SELECT * FROM Branches, Commits, Transitions, Metrics, Authors WHERE Commits.CO_BRANCH_ID = Branches.BR_ID AND " +
-                "Branches.BR_PRJ_ID =" + projectId + " AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
-                "AND Authors.AU_ID = Commits.CO_AUTHOR_ID ORDER BY CO_DATE ASC", (err, commits) => {
-
-                let singleCommitInfo = [];
-                for(let i=0; i< commits.length; i++){
-                     let textSummary = "This commit was done in ";
-                     //console.log("Project here:");
-
-                    if (i % 12 == 0){
-                        //console.log(this.createCommitInfo(singleCommitInfo));
-                        finalCommits.push(this.createCommitInfo(singleCommitInfo));
-                        singleCommitInfo = [];
-                    }
-                    else{
-                        singleCommitInfo.push(commits[i]);
-                    }
-                 }
-                finalCommits.push(this.createCommitInfo(singleCommitInfo));
-
-                for(let commit of finalCommits){
-                    let releasePromise = this.getCommitRelease(commit.commitId);
+        return new Promise((resolve) => {
+            this.getAllInfo(projectId)
+            .then(commits =>{
+                for(let commit of commits){
+                    console.log(commit);
+                    let releasePromise = this.getFilesAffected(commit.commitId);
                     releasePromises.push(releasePromise);
                 }
-
-                //Promise.all(releasePromises).then()
                 Promise.all(releasePromises)
-                    .then(result=>{
-                        console.log(result);
+                    .then(allFiles=>{
+
+                        let commitSummaries:Array<CommitSummary> = new Array<CommitSummary>();
+
+                        for(let files of allFiles){
+                            console.log("--------------");
+                            console.log(files);
+                            if(files.length == 0)
+                                continue;
+                            let index = commits.findIndex((p) => {
+                                return p.commitId == parseInt(files[0].FA_COMMIT_ID);
+                            });
+
+                            commits[index].filesAffected = files.length;
+                            let commitSummary = new CommitSummary();
+                            commitSummary.setCommitInfo(commits[index]);
+                            commitSummary.setPosition(index);
+                            commitSummaries.push(commitSummary);
+                        }
+
+                        let storePromises = [];
+                        for(let c of commitSummaries){
+                            c.generateParagraphs();
+                        }
+
+                        for(let c of commitSummaries){
+                            let storePromise = this.storeSummary(c.getCommitInformation().commitId, c.getFinalSummary());
+                            storePromises.push(storePromise);
+                        }
+
+                        Promise.all(storePromises)
+                            .then(aa=>{
+
+                                   resolve("Success");
+
+                            });
+
+
                     });
-
-                //resolve("success");
-
             });
-        return Promise.all(releasePromises)
-            .then(result=>{
-                //console.log(result);
+
+        });
+
+    }
+
+    storeSummary(commitId,text:string):Promise<any>{
+        console.log("UPDATE Commits SET CO_TEXT_SUMMARY = '" +
+            text + "' WHERE Commits.CO_ID=" + commitId + ";");
+        return new Promise((resolve) => {
+            this.database.DB.all("UPDATE Commits SET CO_TEXT_SUMMARY = '" +
+                text + "' WHERE Commits.CO_ID=" + commitId + ";", (err, commits) => {
+                console.log(commits);
+                resolve();
+            });
         });
     }
 
@@ -258,6 +342,10 @@ export interface CommitInformation{
     commitId:number;
     commitDate:string;
     author:string;
+    release:string;
+    releaseDate:number;
+    filesAffected:number;
+    commitSummary:string;
 
     transitionOldVersion:string;
     transitionNewVersion:string;

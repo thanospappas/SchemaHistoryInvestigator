@@ -21,7 +21,11 @@ export class HttpService {
             .map((res:Response) => {
                 return res.json()
             })
-            .catch((error:any) => Observable.throw(error.json().error || 'Server error'));
+            .catch((error:any) => {
+                console.log(error);
+                return Observable.throw(error.json().error || 'Server error');
+
+            });
 
     }
 

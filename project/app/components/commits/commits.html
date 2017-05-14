@@ -44,10 +44,10 @@
                 </a></article>
         </div>
     </div>
-    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" *ngIf="this.commitsRelease">
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" >
         <span class="count_top"><i class="fa fa-user"></i> Release Info</span>
-        <div class="" style="padding-top:10px;"><strong>Release name:</strong> {{commitsRelease.RE_NAME}}<br>
-            <strong>Release date: </strong> {{commitsRelease.RE_DATE | date:'yMMMd'}}
+        <div class="" style="padding-top:10px;"><strong>Release name:</strong> {{this.selectedCommit.release}}<br>
+            <strong>Release date: </strong> {{this.selectedCommit.releaseDate | date:'yMMMd'}}
         </div>
     </div>
 </div>

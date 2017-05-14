@@ -51,27 +51,53 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_content">
-                                <section class="login_content">
+                                <h2 *ngIf="showSuccessfulMessage" style="color:#20d83f;font-weight: bold;text-align: center">Summaries were generated sucessfully...</h2>
+                                <section class="login_content" *ngIf="!textGeneratingCommit && !textGeneratingRelease">
                                     <h2>Selected dataset</h2>
-                                    <select id="drop5" role="presentation" class="dropdown-toggle project-selection ">
+                                    <select id="drop5" role="presentation" class="dropdown-toggle project-selection " [(ngModel)]="selectedProject">
                                         <option *ngFor='let project of projects' value="{{project.ID}}" ng-selected="classifier.value==selection">{{project.Name}}</option>
                                     </select>
                                     <div class="form-group">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" class="flat" checked="checked"> Commit Level Summary
+                                                <input  [(ngModel)]="commitOn" type="checkbox" class="flat" checked="checked"> Commit Level Summary
                                             </label>
                                         </div>
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" class="flat"> Release Level Summary
+                                                <input  [(ngModel)]="releaseOn" type="checkbox" class="flat"> Release Level Summary
                                             </label>
                                         </div>
                                     </div>
                                     <div>
-                                        <a class="btn btn-default submit" (click)="login(username.value, pass.value)">Generate Text</a>
+                                        <a class="btn btn-default submit" (click)="generateText()">Generate Text</a>
                                     </div>
                                 </section>
+
+                                <div class="store-loader" *ngIf="textGeneratingCommit || textGeneratingRelease">
+                                    <div class="body-loading-text-generator">
+                                      <span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                      </span>
+                                        <div class="base">
+                                            <span></span>
+                                            <div class="face"></div>
+                                        </div>
+                                    </div>
+                                    <div class="longfazers">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                    <div class="loading-text">
+                                        <h2 style="text-align: center">We are working hard to generate the summaries...</h2><br><br>
+                                        <h2 style="text-align: center">Please sit tight and wait while our super heroes are working for you...</h2>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

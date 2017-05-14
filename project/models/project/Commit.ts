@@ -10,6 +10,7 @@ export class Commit{
     private dateHuman:Date;
     private author:Author;
     private id:number;
+    private release:string;
     stats:Stats;
 
     constructor(){
@@ -56,6 +57,14 @@ export class Commit{
 
     setId(id:number){
         this.id = id;
+    }
+
+    getRelease(){
+        return this.release;
+    }
+
+    setRelease(release:string){
+        this.release = release;
     }
 
 

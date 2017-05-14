@@ -42,8 +42,9 @@ export class CommitComponent implements OnInit {
         this.commitService.getSelectedCommitChanges().subscribe(
             commit => {
                 this.selectedCommit = commit;
+                this.selectedCommit.releaseDate = new Date(parseInt(this.selectedCommit.releaseDate)*1000)
                 console.log(this.selectedCommit);
-                this.getRelease();
+                //this.getRelease();
                 this.getTablesChanged();
                 this.getBuildInfo();
                 this.getIssuesInfo();

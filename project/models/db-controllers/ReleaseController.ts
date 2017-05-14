@@ -309,6 +309,7 @@ export class ReleaseController extends DatabaseController{
                 commit.setText(row.CO_TEXT);
                 commit.setAuthor(row.AU_NAME, row.AU_EMAIL);
                 commit.setId(row.CO_ID);
+                commit.setRelease(row.RE_NAME);
 
                 this.assignStatsValue(commit.getStats(),row.ME_TYPE_OF_METRIC,row.ME_VALUE);
                 commits.push(commit);
@@ -328,7 +329,7 @@ export class ReleaseController extends DatabaseController{
             projectID + " ORDER BY CO_DATE ASC;";
         return new Promise((resolve) => {
             this.database.DB.all(query,  (err, rows) => {
-
+                console.log(rangeList);
                 resolve(this.populateReleasesWithCommits(rows));
             });
         });
