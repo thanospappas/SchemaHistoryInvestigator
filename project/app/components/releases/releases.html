@@ -58,6 +58,18 @@
 
                 </div>
 
+                <div>
+                    <p *ngIf="this.selectedRelease && isSingleReleaseOn()" [innerHTML]="this.selectedRelease.releaseSummary | newLineFilter"> </p>
+                </div>
+
+                <div *ngIf="this.selectedReleases?.length && !isSingleReleaseOn()">
+                    <div *ngFor="let release of selectedReleases">
+                        <h2>{{release.name}}</h2>
+                        <p [innerHTML]="release.releaseSummary | newLineFilter"> </p>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </div>

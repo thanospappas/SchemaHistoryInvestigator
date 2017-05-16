@@ -12,6 +12,7 @@ import {ProjectService} from "../../services/Projects.services";
 import {BreakdownChart} from "../../shared/BreakdownChart";
 import * as d3 from 'd3/build/d3.js';
 import {CommitService} from "../../services/commits.service";
+import {NewlinesFilter} from "../../shared/NewlinesFilter";
 
 @Component({
     selector: 'releases-comp',
@@ -27,13 +28,14 @@ export class ReleaseComponent implements OnInit {
     private selectedReleases;
     private commits;
     private commitChangesChart;
+    private pageMode = "viewMode";
 
     private specificReleaseOn = false;
 
     constructor(private releaseChanges:ReleaseService,
                 private httpService:HttpService,
                 private projectService:ProjectService,
-    private commitService:CommitService) {
+    private commitService:CommitService, private newlinesFilter:NewlinesFilter) {
         this.commitChangesChart = new BreakdownChart(".release-summary",".commit-overview",releaseChanges);
     }
 
@@ -45,6 +47,7 @@ export class ReleaseComponent implements OnInit {
         if(option == "release"){
             this.specificReleaseOn = true;
             this.selectedRelease = this.selectedReleases[0];
+            console.log(this.selectedRelease);
             this.setSelectedReleaseId();
             this.retrieveCommits();
         }

@@ -41,6 +41,12 @@ export class ReleaseRouter implements ApiRouter{
                     res.json(result);
                 });
         }
+        else if(req.query.generate_summary == "true"){
+            databaseController.generateSummary(req.params.id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
         else{
             databaseController.getAllData(req.params.id)
                 .then((result) => {

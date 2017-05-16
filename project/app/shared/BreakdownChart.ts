@@ -248,6 +248,17 @@ export class BreakdownChart {
             .text("#attributes  ");
 
         this.focus.append("text")
+
+            .attr("transform","translate(" + ((this.width + this.margin.left)) + " ," +
+                (0) + "), rotate(-90)")
+            //.attr("transform", "rotate(-90)")
+            .attr("y", 0 - this.margin.left)
+            .attr("x",0 - (this.height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("schema size  ");
+
+        this.focus.append("text")
             .attr("x", this.width - this.margin.right)
             .attr("dy", "1em")
             .attr("text-anchor", "end");

@@ -14,7 +14,7 @@ import {ProjectService} from "../../services/Projects.services";
 import {NewlinesFilter} from "../../shared/NewlinesFilter";
 import * as $ from 'jquery';
 
-
+declare var tinymce: any;
 @Component({
     selector: 'commits',
     templateUrl: './commits.html',
@@ -31,6 +31,8 @@ export class CommitComponent implements OnInit {
     private issues;
     private selectedIssue;
     private buildInfo;
+    private editor;
+    private editorContent;
 
     constructor(private commitService: CommitService, private httpService:HttpService,private projectService:ProjectService,
                 private newLineFilter:NewlinesFilter) {
@@ -42,13 +44,56 @@ export class CommitComponent implements OnInit {
         this.commitService.getSelectedCommitChanges().subscribe(
             commit => {
                 this.selectedCommit = commit;
-                this.selectedCommit.releaseDate = new Date(parseInt(this.selectedCommit.releaseDate)*1000)
-                console.log(this.selectedCommit);
+                this.selectedCommit.releaseDate = new Date(parseInt(this.selectedCommit.releaseDate)*1000);
+                this.selectedCommit.commitText = this.selectedCommit.commitText.replace(/\\n/g,'<br/>');
+
+                //this.selectedCommit.commitSummary = this.selectedCommit.commitSummary.replace(/\\n/g,'<br/>');
+
                 //this.getRelease();
                 this.getTablesChanged();
                 this.getBuildInfo();
                 this.getIssuesInfo();
+               // this.initEditor();
+
+
+                tinymce.activeEditor.setContent(this.newLineFilter.transform(this.selectedCommit.commitSummary));
+
             });
+    }
+
+    initEditor(){
+        tinymce.init({
+            selector: '#' + 111,
+            plugins: ['paste'],
+            skin_url: '../public/assets/skins/lightgray',
+            setup: editor => {
+                this.editor = editor;
+                editor.on('keyup', () => {
+                    const content = editor.getContent();
+                    console.log(content);
+                    //this.onEditorKeyup.emit(content);
+                });
+            },
+        });
+    }
+
+    ngAfterViewInit() {
+        tinymce.init({
+            selector: '#' + 111,
+            plugins: ['paste'],
+            skin_url: '../public/assets/skins/lightgray',
+            height : "480",
+            setup: editor => {
+                this.editor = editor;
+                    editor.on('keyup', () => {
+                    const content = editor.getContent();
+                    console.log(content);
+                    //this.onEditorKeyup.emit(content);
+                });
+            },
+        });
+
+
     }
 
     private getRelease(){

@@ -64,8 +64,11 @@ export class AdminDashboardSection implements OnInit {
         if(this.releaseOn){
             this.textGeneratingRelease =true;
             this.httpService.get(url + "/releases?generate_summary=true")
-                .subscribe(commits => {
+                .subscribe(res => {
                         this.textGeneratingRelease =false;
+                        if(res){
+                            this.showSuccessfulMessage = true;
+                        }
                     },
                     err => {
                         console.log(err);

@@ -14,7 +14,10 @@ import * as $ from 'jquery';
 
 })
 
+
 export class SummarySection implements OnInit, OnChanges {
+
+    editor;
 
     ngOnInit() {
 
@@ -22,6 +25,7 @@ export class SummarySection implements OnInit, OnChanges {
 
 
     }
+
 
     ngOnChanges(changes: SimpleChanges): void {
     }

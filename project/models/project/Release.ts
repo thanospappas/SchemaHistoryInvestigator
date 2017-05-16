@@ -21,6 +21,8 @@ export class Release{
     oldestCommitDate:number;
     newestCommitDate:number;
 
+    releaseSummary:string;
+
     constructor(){
         this.stats = new Stats();
     }

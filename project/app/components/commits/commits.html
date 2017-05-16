@@ -77,16 +77,37 @@
             </div>
             <div class="x_content">
                 <div class="release-summary">
+                    <p *ngIf="this.selectedCommit" [innerHTML]="this.selectedCommit.commitSummary | newLineFilter"> </p>
+                    <!-- Small modal -->
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Edit Summary</button>
 
-                    <p>This commit was done May 10, 2017 and it was the 34th from the beginning and made by Thanos Pappas.</p>
-                    <p>In this commit there are XX tables. We have XX additions, YY deletions and etc. Along with the sql file XX files changed. </p>
-                        <p>  This commit is characterized by High …, Moderate .. and High …. so we conclude that it is a growth commit. </p>
-                    <p>In this commit we have XX changes affected the schema of the database.</p>
-                    The reasons of the commit is shown below:
-                    <h2>Commit text here.</h2>
-                    <p *ngIf="this.selectedCommit">{{this.selectedCommit.commitText | newLineFilter}}</p>
-                    <h2>You may find useful one of the following facts:</h2>
-                    <p>Issue 1:</p>
+                    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">Edit Summary</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <textarea id="111">
+                                    <p *ngIf="this.selectedCommit" [innerHTML]="this.selectedCommit.commitSummary | newLineFilter"> </p>
+                                        </textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary">Save changes</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /modals -->
+
+                    <h2 style="padding-top:20px;">The reasons of the commit is shown below:</h2>
+                    <p *ngIf="this.selectedCommit" [innerHTML]="this.selectedCommit.commitText"></p>
+
                 </div>
 
             </div>
@@ -136,11 +157,9 @@
                                 <div class="inbox-body" *ngIf="this.selectedIssue">
                                     <div class="mail_heading row">
                                         <div class="col-md-8">
+                                            <p>Is this helpful?</p>
                                             <div class="btn-group">
-                                                <button class="btn btn-sm btn-primary" type="button"><i class="fa fa-reply"></i> Reply</button>
-                                                <button class="btn btn-sm btn-default" type="button"  data-placement="top" data-toggle="tooltip" data-original-title="Forward"><i class="fa fa-share"></i></button>
-                                                <button class="btn btn-sm btn-default" type="button" data-placement="top" data-toggle="tooltip" data-original-title="Print"><i class="fa fa-print"></i></button>
-                                                <button class="btn btn-sm btn-default" type="button" data-placement="top" data-toggle="tooltip" data-original-title="Trash"><i class="fa fa-trash-o"></i></button>
+                                                <button class="btn btn-sm btn-primary" type="button"><i class="fa fa-chevron-up"></i> Upvote</button>
                                             </div>
                                         </div>
                                         <div class="col-md-4 text-right">
@@ -171,11 +190,10 @@
                                     <div class="view-mail">
                                         <p [innerHTML]="this.selectedIssue.IS_BODY"></p>
                                     </div>
+                                    <p>Is this helpful?</p>
                                     <div class="btn-group">
-                                        <button class="btn btn-sm btn-primary" type="button"><i class="fa fa-reply"></i> Reply</button>
-                                        <button class="btn btn-sm btn-default" type="button"  data-placement="top" data-toggle="tooltip" data-original-title="Forward"><i class="fa fa-share"></i></button>
-                                        <button class="btn btn-sm btn-default" type="button" data-placement="top" data-toggle="tooltip" data-original-title="Print"><i class="fa fa-print"></i></button>
-                                        <button class="btn btn-sm btn-default" type="button" data-placement="top" data-toggle="tooltip" data-original-title="Trash"><i class="fa fa-trash-o"></i></button>
+
+                                        <button class="btn btn-sm btn-primary" type="button"><i class="fa fa-chevron-up"></i> Upvote</button>
                                     </div>
                                 </div>
 

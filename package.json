@@ -46,6 +46,7 @@
     "@angular/router": "~4.0.0",
     "angular-in-memory-web-api": "~0.3.0",
     "angular2-fontawesome": "^0.9.0",
+    "angular2-froala-wysiwyg": "^2.6.0",
     "body-parser": "^1.17.1",
     "cookie-parser": "^1.4.3",
     "core-js": "^2.4.1",
@@ -62,6 +63,7 @@
     "serve-static": "^1.12.1",
     "sqlite3": "^3.1.8",
     "systemjs": "0.19.40",
+    "tinymce": "^4.5.3",
     "typings": "^2.1.0",
     "zone.js": "^0.8.4"
   }

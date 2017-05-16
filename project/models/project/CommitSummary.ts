@@ -62,17 +62,17 @@ export class CommitSummary{
         let sentence5 = " Also, " + this.commitInfo.attributesUpdated + " attributes updated.";
         let sentence6 = " The sum of the above changes is" + this.commitInfo.totalChanges + " changes.";
 
-        this.finalSummary = sentence1 + sentence2 + sentence3 + sentence4 + sentence5 + sentence6 + "\n";
+        this.finalSummary = sentence1 + sentence2 + sentence3 + sentence4 + sentence5 + sentence6 + "\\n";
     }
 
     private generateSecondParagraph(){
         let sentence1 = "Along with the sql file " + this.commitInfo.filesAffected + " other files changed.";
-        this.finalSummary += sentence1 + "\n";
+        this.finalSummary += sentence1 + "\\n";
     }
 
     private generateThirdParagraph(){
         let sentence1 = "This commit is characterized by High …, Moderate .. and High …. so we conclude that it is a growth commit.";
-        this.finalSummary += sentence1 + "\n";
+        this.finalSummary += sentence1 + "\\n";
     }
 
 

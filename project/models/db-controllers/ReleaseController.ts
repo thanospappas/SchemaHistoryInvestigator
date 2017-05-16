@@ -7,6 +7,7 @@ import {Release} from "../project/Release";
 import {Stats} from "../schema-history/ReleaseStats";
 import {DatabaseController} from "../DatabaseController";
 import {Commit} from "../project/Commit";
+import {ReleaseSummary} from "../project/ReleaseSummary";
 
 export class ReleaseController extends DatabaseController{
 
@@ -135,7 +136,8 @@ export class ReleaseController extends DatabaseController{
                     }
                     release.oldestCommitDate = row.CO_DATE;
                     release.dateHuman = new Date(parseInt(row.RE_DATE)*1000);
-                    console.log(row.CO_PREV_RELEASE_ID);
+                    release.releaseSummary = row.RE_TEXT_SUMMARY;
+
                     if(row.CO_PREV_RELEASE_ID == null){
                         release.releaseID = -1;
                     }
@@ -230,7 +232,7 @@ export class ReleaseController extends DatabaseController{
 
             let index;
             if(rNames.indexOf(r.RE_NAME) == -1)
-                index = rNames.indexOf("Start_Of_Project")
+                index = rNames.indexOf("Start_Of_Project");
             else
                 index = rNames.indexOf(r.RE_NAME);
 
@@ -258,7 +260,7 @@ export class ReleaseController extends DatabaseController{
             }
 
             if(!found){
-                let tableInfo = {changes:[], tableName: ''}
+                let tableInfo = {changes:[], tableName: ''};
                 let tmpArr = [];
                 tmpArr.push(index);
                 let ch = parseInt(r.CM_DELETIONS) + parseInt(r.CM_INSERTIONS) + parseInt(r.CM_TYPE_ALT) + parseInt(r.CM_KEY)
@@ -366,6 +368,53 @@ export class ReleaseController extends DatabaseController{
 
     }
 
+    generateSummary(projectId){
+
+        return new Promise((resolve) => {
+
+            this.getAllData(projectId).then(releases => {
+
+                let releaseSummaries:Array<ReleaseSummary> = new Array<ReleaseSummary>();
+                for(let i = 0; i < releases.length; i++){
+                    let releaseSummary = new ReleaseSummary();
+                    releaseSummary.setReleaseInfo(releases[i]);
+                    releaseSummary.setPosition(i);
+                    releaseSummary.generateParagraphs();
+                    releaseSummaries.push(releaseSummary);
+                    //console.log(releaseSummary.getFinalSummary());
+                }
+
+                let storePromises = [];
+
+                for(let r of releaseSummaries){
+                    let storePromise = this.storeSummary(r.getReleaseInformation().releaseID, r.getFinalSummary());
+                    storePromises.push(storePromise);
+                }
+
+                Promise.all(storePromises)
+                    .then(aa=>{
+
+                        resolve("Success");
+
+                    });
+
+                //resolve("Success");
+            });
+
+        });
+    }
+
+    storeSummary(releaseId,text:string):Promise<any>{
+        console.log("UPDATE Releases SET RE_TEXT_SUMMARY = '" +
+            text + "' WHERE Releases.RE_ID=" + releaseId + ";");
+        return new Promise((resolve) => {
+            this.database.DB.all("UPDATE Releases SET RE_TEXT_SUMMARY = '" +
+                text + "' WHERE Releases.RE_ID=" + releaseId + ";", (err, commits) => {
+                console.log(commits);
+                resolve();
+            });
+        });
+    }
 
 
 
