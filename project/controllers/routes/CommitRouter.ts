@@ -84,6 +84,16 @@ export class CommitRouter implements ApiRouter{
 
     }
 
+    updatedSummary(req: Request, res: Response, next: NextFunction){
+        console.log("Commit id:" + req.params.commit_id);
+        console.log(req.body);
+        console.log("===================================");
+        console.log(req);
+
+        res.json("Success");
+    }
+
+
     /**
      * Take each handler, and attach to one of the Express.Router's
      * endpoints.
@@ -91,6 +101,7 @@ export class CommitRouter implements ApiRouter{
     init() {
         this.router.get('/', this.getAll);
         this.router.get('/:commit_id', this.getSingle);
+        this.router.put('/:commit_id',this.updatedSummary);
     }
 
 }

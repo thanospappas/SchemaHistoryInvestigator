@@ -276,8 +276,7 @@ export class CommitController extends DatabaseController{
                         let commitSummaries:Array<CommitSummary> = new Array<CommitSummary>();
 
                         for(let files of allFiles){
-                            console.log("--------------");
-                            console.log(files);
+
                             if(files.length == 0)
                                 continue;
                             let index = commits.findIndex((p) => {

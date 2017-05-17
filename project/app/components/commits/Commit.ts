@@ -92,8 +92,6 @@ export class CommitComponent implements OnInit {
                 });
             },
         });
-
-
     }
 
     private getRelease(){
@@ -164,6 +162,14 @@ export class CommitComponent implements OnInit {
 
     setSelectedIssue(issue){
         this.selectedIssue = issue;
+    }
+
+    updateCommitSummary(){
+        console.log(tinymce.activeEditor.getContent());
+        const url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId;
+        console.log(url);
+        this.httpService.update(url,{commitSummary: tinymce.activeEditor.getContent()});
     }
 
 }
