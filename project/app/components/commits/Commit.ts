@@ -33,6 +33,7 @@ export class CommitComponent implements OnInit {
     private buildInfo;
     private editor;
     private editorContent;
+    private summarySaved = false;
 
     constructor(private commitService: CommitService, private httpService:HttpService,private projectService:ProjectService,
                 private newLineFilter:NewlinesFilter) {
@@ -46,14 +47,13 @@ export class CommitComponent implements OnInit {
                 this.selectedCommit = commit;
                 this.selectedCommit.releaseDate = new Date(parseInt(this.selectedCommit.releaseDate)*1000);
                 this.selectedCommit.commitText = this.selectedCommit.commitText.replace(/\\n/g,'<br/>');
-
+                console.log(this.selectedCommit);
                 //this.selectedCommit.commitSummary = this.selectedCommit.commitSummary.replace(/\\n/g,'<br/>');
 
                 //this.getRelease();
                 this.getTablesChanged();
                 this.getBuildInfo();
                 this.getIssuesInfo();
-               // this.initEditor();
 
 
                 tinymce.activeEditor.setContent(this.newLineFilter.transform(this.selectedCommit.commitSummary));
@@ -61,11 +61,20 @@ export class CommitComponent implements OnInit {
             });
     }
 
-    initEditor(){
+
+    ngAfterViewInit() {
+        $("body").scroll(function(){
+            console.log("))))))))))))))))))))))))))))))))))")
+        });
+        console.log("yoooooooooo");
+
+
+
         tinymce.init({
             selector: '#' + 111,
             plugins: ['paste'],
             skin_url: '../public/assets/skins/lightgray',
+            height : "380",
             setup: editor => {
                 this.editor = editor;
                 editor.on('keyup', () => {
@@ -73,24 +82,9 @@ export class CommitComponent implements OnInit {
                     console.log(content);
                     //this.onEditorKeyup.emit(content);
                 });
+                editor.fire('ScrollWindow', function(){console.log("-------------")});
             },
-        });
-    }
 
-    ngAfterViewInit() {
-        tinymce.init({
-            selector: '#' + 111,
-            plugins: ['paste'],
-            skin_url: '../public/assets/skins/lightgray',
-            height : "480",
-            setup: editor => {
-                this.editor = editor;
-                    editor.on('keyup', () => {
-                    const content = editor.getContent();
-                    console.log(content);
-                    //this.onEditorKeyup.emit(content);
-                });
-            },
         });
     }
 
@@ -170,6 +164,26 @@ export class CommitComponent implements OnInit {
             this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId;
         console.log(url);
         this.httpService.update(url,{commitSummary: tinymce.activeEditor.getContent()});
+        this.summarySaved = true;
+
     }
+
+    getNewInfo(){
+        this.summarySaved = false;
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            + this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId;
+        console.log("url: " + url);
+        this.httpService.get(url)
+            .subscribe(commit => {
+                    this.selectedCommit = commit;
+                    this.selectedCommit.releaseDate = new Date(parseInt(this.selectedCommit.releaseDate)*1000);
+                    this.selectedCommit.commitText = this.selectedCommit.commitText.replace(/\\n/g,'<br/>');
+                },
+                err => {
+                    console.log(err);
+                }
+            );
+    }
+
 
 }

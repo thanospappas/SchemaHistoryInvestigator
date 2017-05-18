@@ -16,13 +16,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class NewlinesFilter implements PipeTransform {
 
     transform(text:string) {
-        //if (!releases || !filter) {
-        //    return releases;
-        //}
-
-        console.log(text.replace(/(?:\r\n|\r|\n)/g,'<br/>'));
-        console.log(text.replace('\n','<br/>'));
-        //console.log(filter);
 
         return text.replace(/\\n/g,'<p></p>');
         // filter items array, items which match and return true will be kept, false will be filtered out

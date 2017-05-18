@@ -73,6 +73,7 @@ export class ReleaseComponent implements OnInit {
                 if(this.selectedReleases.length > 0){
                     this.retrieveSelectedCommits(this.selectedReleases[0].startDate,
                         this.selectedReleases[this.selectedReleases.length-1].startDate);
+                    console.log(this.selectedReleases);
                 }
 
             });
@@ -97,7 +98,6 @@ export class ReleaseComponent implements OnInit {
         this.httpService.get(url)
             .subscribe(commits => {
                     this.commits = commits;
-                    console.log(commits);
                     this.commitChangesChart.setReleases(this.commits);
                     this.commitChangesChart.createChart();
                 },

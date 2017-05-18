@@ -85,12 +85,14 @@ export class CommitRouter implements ApiRouter{
     }
 
     updatedSummary(req: Request, res: Response, next: NextFunction){
-        console.log("Commit id:" + req.params.commit_id);
-        console.log(req.body);
-        console.log("===================================");
-        console.log(req);
 
-        res.json("Success");
+        let databaseController:CommitController = new CommitController();
+        databaseController.storeSummary(req.params.commit_id,req.body.commitSummary)
+            .then((result) => {
+                res.json(result);
+            });
+
+        //res.json("Success");
     }
 
 

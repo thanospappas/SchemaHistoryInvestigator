@@ -96,7 +96,8 @@
                                         </textarea>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <p *ngIf="summarySaved" style="color:#6dce0c">Summary was saved successfully ... </p>
+                                    <button (click)="getNewInfo()" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                     <button (click)="updateCommitSummary()" type="button" class="btn btn-primary">Save changes</button>
                                 </div>
 

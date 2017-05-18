@@ -18,18 +18,9 @@ import {HttpService} from "../../services/http.service";
 
 export class SummarySection implements OnInit, OnChanges {
 
-    editor;
-
-    constructor(private httpService:HttpService){}
-
     ngOnInit() {
 
         let x = $(".loader-container").css("display","none");
-
-        const url = "http://localhost:3000/api/v1/projects/1/commits/58437";
-        console.log(url);
-        this.httpService.update(url,{"commitSummary": "oooooooooooooooooooooooooooooooooo"});
-
     }
 
 
