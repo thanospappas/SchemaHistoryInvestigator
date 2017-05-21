@@ -15,6 +15,11 @@ export class Stats{
     private averageSchemaSizeTables:number;
     private averageSchemaSizeAttributes:number;
 
+    private tablesAtStart:number;
+    private tablesAtEnd:number;
+    private attributesAtStart:number;
+    private attributesAtEnd:number;
+
     private attributesUpdates:number;
 
     constructor(){
@@ -23,6 +28,9 @@ export class Stats{
         = this.attributeTypeAlternations = this.keyAlternations = this.attributesInsertedAtNewTables
         = this.attributesDeletedAtDeletedTables = this.averageSchemaSizeAttributes
         = this.averageSchemaSizeTables = 0;
+
+        this.tablesAtStart = this.tablesAtEnd =
+            this.attributesAtStart = this.attributesAtEnd = -1;
     }
 
     public getTableInsertions():number {
@@ -113,4 +121,38 @@ export class Stats{
     public getAttributesUpdates(){
         return this.attributesUpdates;
     }
+
+    public setTablesAtStart(tables:number){
+        this.tablesAtStart = tables;
+    }
+
+    public getTablesAtStart(){
+        return this.tablesAtStart;
+    }
+
+    public setAttributesAtStart(attributes:number){
+        this.attributesAtStart = attributes;
+    }
+
+    public getAttributesAtStart(){
+        return this.attributesAtStart;
+    }
+
+    public setTablesAtEnd(tables:number){
+        this.tablesAtEnd = tables;
+    }
+
+    public getTablesAtEnd(){
+        return this.tablesAtEnd;
+    }
+
+    public setAttributesAtEnd(attributes:number){
+        this.attributesAtEnd = attributes;
+    }
+
+    public getAttributesAtEnd(){
+        return this.attributesAtEnd;
+    }
+
+
 }

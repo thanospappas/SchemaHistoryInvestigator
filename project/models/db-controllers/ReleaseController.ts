@@ -13,7 +13,7 @@ export class ReleaseController extends DatabaseController{
 
    constructor(){
         super();
-    }
+   }
 
     public getBranchId(projectID:number):Promise<any>{
         return new Promise((resolve) => {
@@ -42,8 +42,16 @@ export class ReleaseController extends DatabaseController{
             stats.setKeyAlternations(value + stats.getKeyAlternations());
         } else if (type==("newT")){
             stats.setSchemaSizeTable(value + stats.getSchemaSizeTable());
+            stats.setTablesAtEnd(value);
+            if(stats.getTablesAtStart() == -1){
+                stats.setTablesAtStart(value);
+            }
         } else if (type==("newA")){
             stats.setSchemaSizeAttribute(value + stats.getSchemaSizeAttribute());
+            stats.setAttributesAtEnd(value);
+            if(stats.getAttributesAtStart() == -1){
+                stats.setAttributesAtStart(value);
+            }
         }
     }
 
@@ -65,16 +73,23 @@ export class ReleaseController extends DatabaseController{
             }
             releases[i].stats.setSchemaSizeTable(1.0*releases[i].stats.getSchemaSizeTable()/releases[i].commitNumber);
             releases[i].stats.setSchemaSizeAttribute(1.0*releases[i].stats.getSchemaSizeAttribute()/releases[i].commitNumber);
+
+            if (i > 0){
+                releases[i].stats.setTablesAtStart(releases[i-1].stats.getTablesAtEnd());
+                releases[i].stats.setAttributesAtStart(releases[i-1].stats.getAttributesAtEnd());
+            }
+
             releases[i].stats.computeAttributeUpdates();
             releases[i].commitDuration = Math.ceil((releases[i].newestCommitDate * 1000 - releases[i].oldestCommitDate * 1000) / (1000 * 3600 * 24));
         }
     }
 
     private getReleasesOnly(projectID:number):Promise<any>{
+        console.log("SELECT * FROM Releases WHERE " + " Releases.RE_BRANCH_ID =" + projectID + " ORDER BY RE_DATE ASC");
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Releases, Projects, Branches WHERE Projects.PRJ_ID = Branches.BR_PRJ_ID"
-                + " AND Branches.BR_ID =" + projectID + " AND Releases.RE_BRANCH_ID = Projects.PRJ_ID ORDER BY RE_DATE ASC", function (err, rows) {
-
+            this.database.DB.all(/*"SELECT * FROM Releases, Projects, Branches WHERE Projects.PRJ_ID = Branches.BR_PRJ_ID"
+                + " AND Branches.BR_ID =" + projectID + " AND Releases.RE_BRANCH_ID = Projects.PRJ_ID ORDER BY RE_DATE ASC"*/
+            "SELECT * FROM Releases WHERE " + " Releases.RE_BRANCH_ID =" + projectID + " ORDER BY RE_DATE ASC", function (err, rows) {
                 let releases:Array<any> = new Array();
                 for(let row of rows){
                     releases.push({name: row.RE_NAME, startDate: row.RE_DATE});
@@ -89,7 +104,7 @@ export class ReleaseController extends DatabaseController{
         let i =0;
         //let releaseStats:Stats = new Stats();
         let contributors= [];
-
+        console.log(rows);
         for(let row of rows){
             let found = false;
             let rel:Release = new Release();
@@ -174,7 +189,7 @@ export class ReleaseController extends DatabaseController{
         let releases:Array<Release> = new Array;
         //let currentPointer = this;
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Phases,Authors  WHERE BR_ID=" + projectID + " AND CO_AUTHOR_ID=Authors.AU_ID ORDER BY CO_DATE ASC;", (err, rows) => {
+            this.database.DB.all("SELECT * FROM Phases,Authors  WHERE BR_PRJ_ID=" + projectID + " AND CO_AUTHOR_ID=Authors.AU_ID ORDER BY CO_DATE ASC;", (err, rows) => {
 
                 releases = this.populateReleases(rows);
                 releases.sort((release1:any, release2:any) => release1.startDate - release2.startDate);
@@ -189,7 +204,7 @@ export class ReleaseController extends DatabaseController{
     getAllData(projectID):Promise<any>{
        let selectedBranchId;
         return new Promise((resolve) => {
-       this.getBranchId(projectID)
+       /*this.getBranchId(projectID)
             .then((res) =>{
                 selectedBranchId = res[0].BR_ID;
                 return this.getReleasesOnly(res[0].BR_ID);
@@ -200,7 +215,17 @@ export class ReleaseController extends DatabaseController{
             .then((result) => {
                 resolve (result);
             });
-        });
+        });*/
+
+        this.getReleasesOnly(projectID)
+            .then((releases) =>{
+                console.log(releases);
+                return this.getReleases(projectID,releases);
+            })
+            .then((result) => {
+                resolve (result);
+            });
+    });
     }
 
     getSingle(): Promise<any> {

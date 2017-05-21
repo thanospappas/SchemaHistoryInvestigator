@@ -1,45 +1,31 @@
 /**
  * Created by thanosp on 13/4/2017.
  */
-import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation }  from '@angular/core';
+import { Component, OnInit, OnChanges, ElementRef, style }  from '@angular/core';
 import * as D3 from 'd3/build/d3.js';
 import * as $ from 'jquery';
-import * as d3Axis from 'd3-axis';
-import { Release } from '../../../../models/project/release';
 import {ReleaseService} from '../../../services/releases.service';
 import {ProjectService} from "../../../services/Projects.services";
 import {Project} from "../../../shared/Project";
 import {serverPort} from "../../../config/server-info";
 import {BreakdownChart} from "../../../shared/BreakdownChart";
-import {release} from "os";
+import {DescriptiveStatsService} from "../../../services/story-level1-service";
 
 @Component({
     selector: 'area-chart',
     templateUrl: './change-breakdown.html',
     styleUrls: ['./change-breakdown.style.css'],
-    //providers: [ReleaseService]
 })
 
 export class AreaChart implements OnInit, OnChanges {
-    //@ViewChild('chart')
-    private chartContainer: ElementRef;
-    @Input() private data: Array<any>;
+
     private margin: any = { top: 20, bottom: 90, left: 40, right: 40};
     marginOverview:any;
     heightOverview:any;
     private chart: any;
     private width: number;
     private height: number;
-    private xScale: any;
-    private yScale: any;
-    private colors: any;
-    private xAxis: any;
-    private yAxis: any;
-    private barWidth = 5;
-    private yAxisRight: any;
-    private yScaleRight:any;
-    private xOverview:any;
-    private brush:any;
+
     private svg;
     private releases ;
     private legendHeight:number;
@@ -51,21 +37,18 @@ export class AreaChart implements OnInit, OnChanges {
 
     private selectedReleases;
 
-    // Input properties
-    //@Input() listId: string;
-    //@Input() editId: string;
+    private showSuccess = false;
 
-    constructor(private element: ElementRef, private releaseService:ReleaseService, private projectService:ProjectService) {
-        this.chartContainer = element;
+
+    constructor(private releaseService:ReleaseService, private projectService:ProjectService,
+        private descriptiveStatsService:DescriptiveStatsService) {
         this.getReleases();
-        console.log($('.x_content .col-md-9').width());
-
     }
 
 
     ngOnInit() {
         this.legendHeight = 28;
-        this.width = $('.x_content .col-md-9').width()
+        this.width = $('.x_content .col-md-9').width();
         this.height = 400;
         this.marginOverview = { top: this.height - 70, right: this.margin.right, bottom: 20,  left: this.margin.left };
         this.heightOverview= this.height - this.marginOverview.top - this.marginOverview.bottom;
@@ -190,8 +173,8 @@ export class AreaChart implements OnInit, OnChanges {
         console.log(selectedRelease);
         this.releaseService.setSelectedRelease(selectedRelease);
 
-        var $li = $(".releases-menu-item");
-        var $currentli = $('#sidebar-menu').find('li.active-sm');
+        let $li = $(".releases-menu-item");
+        let $currentli = $('#sidebar-menu').find('li.active-sm');
         $currentli.removeClass('active active-sm');
         $li.addClass('active active-sm');
         //$('.right_col').find('.sidebar-tab-pane').removeClass('active');
@@ -200,13 +183,27 @@ export class AreaChart implements OnInit, OnChanges {
             $('.right_col').find('.sidebar-tab-pane').delay().removeClass('active');
         });
 
-        var $selectedTab = $('.right_col').find("#releases");
+        let $selectedTab = $('.right_col').find("#releases");
         //$selectedTab.addClass('active');
         $selectedTab.delay(400).fadeIn(400, function () {
             $selectedTab.addClass('active');
         });
 
 
+
+    }
+
+    addSelectedChart(){
+        let svg = D3.select(".summary-chart svg");
+        let s = new XMLSerializer();
+        let XMLS = new XMLSerializer();
+        let inp_xmls = XMLS.serializeToString(svg._groups[0][0]);
+
+        this.descriptiveStatsService.addSelectedChart(inp_xmls);
+        this.showSuccess = true;
+        setTimeout(() => {
+            this.showSuccess = false;
+        }, 4000);
 
     }
 

@@ -48,25 +48,27 @@ export class CommitSummary{
             sentence1+= this.commitPositionFromStart + "rd ";
 
         sentence1 += "from the beginning, belongs to " + this.commitInfo.release +
-                " release and made by " + this.commitInfo.author + ".";
+                " release and was made by " + this.commitInfo.author + ".";
 
-        let sentence2 = " In this commit there are " + this.commitInfo.newTables + " tables and "
-            + this.commitInfo.newAttributes + " attributes.";
-        let sentence3 = " In this transition " + this.commitInfo.tableBirths + " table births took place resulting a total of "
+        let sentence2 = " After this commit the schema includes " + this.commitInfo.newTables + " tables and "
+            + this.commitInfo.newAttributes + " attributes (as opposed to " + this.commitInfo.oldTables + " tables and " +
+            this.commitInfo.oldAttributes + " attributes before it).";
+        let sentence3 = " Within the transition incurred by this commit " + this.commitInfo.tableBirths +
+            " table births took place resulting in a total of "
             + this.commitInfo.attributeInsertionAtBirth + " attribute insertions along with them and "
-            + this.commitInfo.tableDeaths + " table deaths took place resulting a total of " + this.commitInfo.attributeDeletionAtDeath
+            + this.commitInfo.tableDeaths + " table deaths took place resulting in a total of " + this.commitInfo.attributeDeletionAtDeath
             + " attribute deletions along with them.";
         let sentence4 = " In addition, " + this.commitInfo.attributesInsertedAtSurvivingTables + " attributes were added and "
             + this.commitInfo.attributesDeletedAtSurvivingTables + " attributes were deleted at existing tables.";
 
         let sentence5 = " Also, " + this.commitInfo.attributesUpdated + " attributes updated.";
-        let sentence6 = " The sum of the above changes is" + this.commitInfo.totalChanges + " changes.";
+        let sentence6 = " The sum of the above changes is " + this.commitInfo.totalChanges + " changes.";
 
         this.finalSummary = sentence1 + sentence2 + sentence3 + sentence4 + sentence5 + sentence6 + "\\n";
     }
 
     private generateSecondParagraph(){
-        let sentence1 = "Along with the sql file " + this.commitInfo.filesAffected + " other files changed.";
+        let sentence1 = "Along with the SQL data definition file " + this.commitInfo.filesAffected + " other files changed.";
         this.finalSummary += sentence1 + "\\n";
     }
 

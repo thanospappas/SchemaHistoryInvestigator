@@ -38,7 +38,7 @@ export class ReleaseSummary{
 
     private generateFirstParagraph(){
 
-        let sentence1 = "This release was done on " +this.releaseInfo.dateHuman
+        let sentence1 = "This release was released on " +this.releaseInfo.dateHuman
             + ", it was the ";
 
         if( (this.commitPositionFromStart) > 3)
@@ -51,19 +51,20 @@ export class ReleaseSummary{
             sentence1+= this.commitPositionFromStart + "rd ";
 
         sentence1 += "from the beginning, it lasted " + this.releaseInfo.duration +
-            " days and have " + this.releaseInfo.contributorNumber + " contributors.";
+            " days and includes " + this.releaseInfo.contributorNumber + " contributors.";
 
-        let sentence2 = " In this release there are " + this.releaseInfo.stats.getSchemaSizeTable() + " tables on average and "
-            + this.releaseInfo.stats.getSchemaSizeAttribute() + " attributes.";
+        let sentence2 = " In this release there are " + this.releaseInfo.stats.getTablesAtEnd() + " and "
+            + this.releaseInfo.stats.getAttributesAtEnd() + " (compared to " + this.releaseInfo.stats.getTablesAtStart() +
+            + " and " + this.releaseInfo.stats.getAttributesAtStart() + "  attributes that the schema had at its beginning).";
 
-        let sentence3 = " In this transition " + this.releaseInfo.stats.getTableInsertions()
-            + " table births took place resulting a total of "
+        let sentence3 = " Within this release, " + this.releaseInfo.stats.getTableInsertions()
+            + " table births took place resulting in a total of "
             + this.releaseInfo.stats.getAttributesInsertedAtNewTables() + " attribute insertions along with them and "
-            + this.releaseInfo.stats.getTableDeletions() + " table deaths took place resulting a total of "
+            + this.releaseInfo.stats.getTableDeletions() + " table deaths took place resulting in a total of "
             + this.releaseInfo.stats.getAttributesDeletedAtDeletedTables()  + " attribute deletions along with them.";
 
         let sentence4 = " In addition, " + this.releaseInfo.stats.getAttributeInsertionsAtExistingTables() + " attributes were added and "
-            + this.releaseInfo.stats.getAttributeDeletionsAtExistingTables() + " attributes were deleted at existing tables.";
+            + this.releaseInfo.stats.getAttributeDeletionsAtExistingTables() + " attributes were deleted at pre-existing/survivor tables.";
 
         let sentence5 = " Also, " + this.releaseInfo.stats.getAttributesUpdates() + " attributes updated.";
 
