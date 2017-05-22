@@ -9,17 +9,17 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Developers - Chart</a>
+                            <li><a (click)="addDeveloperChartToStory()">Developers - Chart</a>
                             </li>
-                            <li><a href="#">Developers - List</a>
+                            <li><a (click)="addDeveloperListToStory()">Developers - List</a>
                             </li>
-                            <li><a href="#">Files - Top co-changed files</a>
+                            <li><a (click)="addTopFilesToStory()">Files - Top co-changed files</a>
                             </li>
-                            <li><a href="#">Files - commit chart</a>
+                            <li><a (click)="addCommitChartToStory()">Files - commit chart</a>
                             </li>
-                            <li><a href="#">Durations - chart</a>
+                            <li><a (click)="addDurationsChartToStory()">Durations - chart</a>
                             </li>
-                            <li><a href="#">Tables - chart</a>
+                            <li><a (click)="addTablesChartToStory()">Tables - chart</a>
                             </li>
                         </ul>
                     </li>
@@ -43,7 +43,7 @@
                     <div id="myTabContent2" class="tab-content">
                         <div role="tabpanel" class="tab-pane fade active in" id="tab_content11" aria-labelledby="home-tab">
                             <p></p>
-                            <div class="col-md-9 col-sm-12 col-xs-12 development-style">
+                            <div class="col-md-9 col-sm-12 col-xs-12 development-style" id="developers-chord-chart">
                                 <svg width="600" height="600"></svg>
                                 <br>
                                 <br>
@@ -87,7 +87,7 @@
                         <div role="tabpanel" class="tab-pane fade" id="tab_content22" aria-labelledby="profile-tab">
                             <p></p>
 
-                            <div class="col-md-9 col-sm-12 col-xs-12 development-style-commits">
+                            <div class="col-md-9 col-sm-12 col-xs-12 development-style-commits" id="development-style-commits">
                                 <svg width="600" height="600"></svg>
                                 <br>
                                 <br>
@@ -129,7 +129,7 @@
                         <div role="tabpanel" class="tab-pane fade" id="tab_content33" aria-labelledby="profile-tab">
                             <p></p>
 
-                            <div class="col-md-9 col-sm-12 col-xs-12 development-style-durations">
+                            <div class="col-md-9 col-sm-12 col-xs-12 development-style-durations" id ="development-style-durations">
                                 <svg width="600" height="600"></svg>
                                 <br>
                                 <br>
@@ -144,7 +144,7 @@
                             <p></p>
 
                             <div class="col-md-9 col-sm-12 col-xs-12 development-style-tables">
-                                <div class="tables-changes" style="overflow: auto;white-space: nowrap;overflow-y: scroll; height: 500px;">
+                                <div class="tables-changes" style="overflow: auto;white-space: nowrap;overflow-y: scroll; height: 500px;" id="development-style-tables">
                                     <svg width="300" height="600"></svg>
                                 </div>
                                 <br>
@@ -159,13 +159,9 @@
                     </div>
                 </div>
 
-
-
-
-
-
-
             </div>
         </div>
     </div>
 </div>
+
+<notifications [showSuccess]="showSuccess"></notifications>

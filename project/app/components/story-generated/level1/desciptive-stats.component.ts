@@ -15,40 +15,141 @@ import {DescriptiveStatsService} from "../../../services/story-level1-service";
 
 export class DescriptiveStatsLevel implements OnInit {
 
-    private selectedCharts;
+    private selectedChart;
+    private selectedSummary;
+    private releases;
+    private authors;
+    private commitNumChart;
+    private durationsChart;
+    private tablesChart;
+    private developersChart;
+    private coChangedFiles;
 
     constructor (private descriptiveStatsService:DescriptiveStatsService) {}
 
     ngOnInit(){
-        this.descriptiveStatsService.getSelectedCharts().subscribe(
-            charts => {
-                this.selectedCharts = charts;
-                console.log("Calleeeeed");
-                console.log(this.selectedCharts );
 
-                for(let i = 0;i < this.selectedCharts.length; i++){
-                    var newSvg = document.getElementById('release-summary-chart');
-                    newSvg.outerHTML += this.selectedCharts[i];
-                }
+        this.waitForChangeBreakdown();
+        this.waitForTextSummary();
+        this.waitForReleases();
+        this.waitForAuthors();
+        this.waitDeveloperChart();
+        this.waitTopCochangedFiles();
+        this.waitCommitNumberChart();
+        this.waitDurationsChart();
+        this.waitTablesChart();
+    }
+
+    private waitForChangeBreakdown(){
+        this.descriptiveStatsService.getChangeBreakdownChart().subscribe(
+            chart => {
+                this.selectedChart = chart;
+
+                let newSvg = document.getElementById('change-breakdown-chart');
+                newSvg.innerHTML = this.selectedChart;
+
 
             });
     }
 
-    /*ngOnInit() {
-        setTimeout(function() {
-            let svg = D3.select(".summary-chart svg");
-            console.log(svg);
-            console.log(svg._groups[0][0]);
-            let s = new XMLSerializer();
-            var XMLS = new XMLSerializer();
-            var inp_xmls = XMLS.serializeToString(svg._groups[0][0]); // First convert DOM node into a string
-            console.log(inp_xmls);
-            var newSvg = document.getElementById('release-summary-chart');
-            newSvg.outerHTML += inp_xmls;
+    private waitForTextSummary(){
+        this.descriptiveStatsService.getTextSummary().subscribe(
+            text => {
+                this.selectedSummary = text;
+            });
+    }
+
+    private waitForReleases(){
+        this.descriptiveStatsService.getSelectedReleases().subscribe(
+            releases => {
+                this.releases = releases;
+            });
+    }
+
+    private waitForAuthors(){
+        this.descriptiveStatsService.getSelectedAuthors().subscribe(
+            authors => {
+                this.authors = authors;
+            });
+    }
+
+    private waitDeveloperChart(){
+        this.descriptiveStatsService.getDevelopersChart().subscribe(
+            chart => {
+                this.developersChart = chart;
+                let newSvg = document.getElementById('developer-chord-chart-story');
+                newSvg.innerHTML = this.developersChart;
+            });
+    }
+
+    private waitTopCochangedFiles(){
+        this.descriptiveStatsService.getCochangedFiles().subscribe(
+            files => {
+                this.coChangedFiles = files;
+                console.log(this.coChangedFiles);
+            });
+    }
+
+    private waitCommitNumberChart(){
+        this.descriptiveStatsService.getCommitNumChart().subscribe(
+            chart => {
+                this.commitNumChart = chart;
+                let newSvg = document.getElementById('commit-num-chart-story');
+                newSvg.innerHTML = this.commitNumChart;
+            });
+    }
+
+    private waitDurationsChart(){
+        this.descriptiveStatsService.getDurationsChart().subscribe(
+            chart => {
+                this.durationsChart = chart;
+                let newSvg = document.getElementById('duration-chart');
+                newSvg.innerHTML = this.durationsChart;
+            });
+    }
+
+    private waitTablesChart(){
+        this.descriptiveStatsService.getTablesChart().subscribe(
+            chart => {
+                this.tablesChart = chart;
+                let newSvg = document.getElementById('tables-chart-story');
+                newSvg.innerHTML = this.tablesChart;
+            });
+    }
 
 
-        }, 3000);
+    removeChangeBreakdownChart(){
+       this.selectedChart = null;
+       let newSvg = document.getElementById('change-breakdown-chart');
+       newSvg.innerHTML = '';
+    }
 
-    }*/
+    removeDevelopersChart(){
+        this.developersChart = null;
+        let newSvg = document.getElementById('developer-chord-chart-story');
+        newSvg.innerHTML = '';
+    }
+
+    removeFiles(){
+        this.coChangedFiles = null;
+    }
+
+    removeCommitNumChart(){
+        this.commitNumChart = null;
+        let newSvg = document.getElementById('commit-num-chart-story');
+        newSvg.innerHTML = '';
+    }
+
+    removeDurationChart(){
+        this.durationsChart = null;
+        let newSvg = document.getElementById('duration-chart');
+        newSvg.innerHTML = '';
+    }
+
+    removeTablesChart(){
+        this.tablesChart = null;
+        let newSvg = document.getElementById('tables-chart-story');
+        newSvg.innerHTML = '';
+    }
 
 }

@@ -193,18 +193,28 @@ export class AreaChart implements OnInit, OnChanges {
 
     }
 
+
+    private showSuccessNotification(){
+        this.showSuccess = true;
+        setTimeout(() => {
+            this.showSuccess = false;
+        }, 4000);
+    }
+
     addSelectedChart(){
         let svg = D3.select(".summary-chart svg");
         let s = new XMLSerializer();
         let XMLS = new XMLSerializer();
         let inp_xmls = XMLS.serializeToString(svg._groups[0][0]);
 
-        this.descriptiveStatsService.addSelectedChart(inp_xmls);
-        this.showSuccess = true;
-        setTimeout(() => {
-            this.showSuccess = false;
-        }, 4000);
+        this.descriptiveStatsService.addChangeBreakdownChart(inp_xmls);
+        this.showSuccessNotification();
 
+    }
+
+    addReleasesToStory(){
+        this.descriptiveStatsService.setSelectedReleases(this.selectedReleases);
+        this.showSuccessNotification();
     }
 
 }

@@ -18,7 +18,7 @@
                             </li>
                             <li><a href="#">Text Summary</a>
                             </li>
-                            <li><a href="#">Releases List</a>
+                            <li><a (click)="addReleasesToStory()">Releases List</a>
                             </li>
                         </ul>
                     </li>
@@ -74,8 +74,6 @@
                                     <p><strong>{{release.dateHuman}} </strong> </p>
 
                                 </div>
-
-
                             </li>
                         </ul>
                     </div>
@@ -86,14 +84,4 @@
     </div>
 </div>
 
-
-<div *ngIf="showSuccess" class="ui-pnotify  ui-pnotify-fade-slow ui-pnotify-in ui-pnotify-fade-in ui-pnotify-move"
-     aria-live="assertive" aria-role="alertdialog" style=" width: 300px; right: 36px; cursor: auto;">
-    <div class="alert ui-pnotify-container alert-success ui-pnotify-shadow" role="alert" style="min-height: 16px;">
-
-        <div class="ui-pnotify-sticker" aria-role="button" aria-pressed="true" tabindex="0" title="Unstick" style="cursor: pointer; visibility: hidden;">
-            <span class="glyphicon glyphicon-play" aria-pressed="true"></span></div><div class="ui-pnotify-icon">
-        <span class="glyphicon glyphicon-ok-sign"></span></div><h4 class="ui-pnotify-title"> Success!</h4>
-        <div class="ui-pnotify-text" aria-role="alert">The selected element has been added to the story.</div>
-    </div>
-</div>
+<notifications [showSuccess]="showSuccess"></notifications>
