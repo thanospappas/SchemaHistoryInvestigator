@@ -13,6 +13,7 @@ import {BreakdownChart} from "../../shared/BreakdownChart";
 import * as d3 from 'd3/build/d3.js';
 import {CommitService} from "../../services/commits.service";
 import {NewlinesFilter} from "../../shared/NewlinesFilter";
+import {HighlightsCharacterizationsService} from "../../services/story-level2-service";
 
 @Component({
     selector: 'releases-comp',
@@ -29,14 +30,18 @@ export class ReleaseComponent implements OnInit {
     private commits;
     private commitChangesChart;
     private pageMode = "viewMode";
-
+    private showSuccess = false;
     private specificReleaseOn = false;
 
     constructor(private releaseChanges:ReleaseService,
                 private httpService:HttpService,
                 private projectService:ProjectService,
-    private commitService:CommitService, private newlinesFilter:NewlinesFilter) {
+                private commitService:CommitService,
+                private newlinesFilter:NewlinesFilter,
+                private highlightService:HighlightsCharacterizationsService) {
+
         this.commitChangesChart = new BreakdownChart(".release-summary",".commit-overview",releaseChanges);
+        this.commitChangesChart.setCommitService(this.commitService);
     }
 
     isSingleReleaseOn(){
@@ -65,6 +70,14 @@ export class ReleaseComponent implements OnInit {
 
     // Load data ones componet is ready
     ngOnInit() {
+        this.projectService.getSelectedProject().subscribe(
+            project => {
+                let selectedProject = {selectedPrj: -1, projectId:-1};
+                selectedProject.selectedPrj = project['selectedPrj'];
+                selectedProject.projectId = project['projectId'];
+                this.commitChangesChart.setProject(selectedProject);
+
+            });
 
        this.releaseChanges.getSelectedReleases().subscribe(
             releases => {
@@ -87,6 +100,12 @@ export class ReleaseComponent implements OnInit {
                 this.selectedRelease = release;
                 this.specificReleaseOn = true;
                 this.setSelectedReleaseId();
+            });
+
+        this.commitService.getSelectedCommits().subscribe(
+            commits => {
+                this.commits = commits;
+                console.log(this.commits);
             });
 
        this.setEventListeners();
@@ -208,10 +227,38 @@ export class ReleaseComponent implements OnInit {
         $selectedTab.delay(400).fadeIn(400, function () {
             $selectedTab.addClass('active');
             });
+    }
+
+    private showSuccessNotification(){
+        this.showSuccess = true;
+        setTimeout(() => {
+            this.showSuccess = false;
+        }, 4000);
+    }
 
 
+    addCommitChartToStory(){
+        let svg = d3.select("#release-summary svg");
+        let s = new XMLSerializer();
+        let XMLS = new XMLSerializer();
+        let inp_xmls = XMLS.serializeToString(svg._groups[0][0]);
+        this.highlightService.addCommitChart(inp_xmls);
+        this.showSuccessNotification();
+    }
 
+    addReleaseDescriptionstToStory(){
+        this.highlightService.addReleaseDescriptions(this.selectedReleases);
+        this.showSuccessNotification();
+    }
 
+    addTextSummaryToStory(){
+        this.highlightService.addTextSummary("TODO");
+        this.showSuccessNotification();
+    }
+
+    addCommitsToStory(){
+        this.highlightService.addSelectedCommits(this.commits);
+        this.showSuccessNotification();
     }
 
 }

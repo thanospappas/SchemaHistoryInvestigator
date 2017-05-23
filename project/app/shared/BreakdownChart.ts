@@ -5,6 +5,7 @@
 import * as D3 from 'd3/build/d3.js';
 import * as $ from 'jquery';
 import {ReleaseService} from "../services/releases.service";
+import {CommitService} from "../services/commits.service";
 
 
 export class BreakdownChart {
@@ -36,12 +37,18 @@ export class BreakdownChart {
     private line;
     private chartOverview:string;
     private releaseService:ReleaseService;
+    private commitService:CommitService;
+    private project;
 
     constructor(chartSection:string, chartOverview:string, releaseService:ReleaseService) {
         this.chartSection = chartSection;
         this.releaseService = releaseService;
         this.chartOverview = chartOverview;
 
+    }
+
+    setCommitService(commitService){
+        this.commitService = commitService;
     }
 
     setReleases(releases){
@@ -52,6 +59,9 @@ export class BreakdownChart {
         this.chartSection = chartSection;
     }
 
+    setProject(prj){
+        this.project = prj;
+    }
 
     createChart() {
         this.tooltip = D3.select("body")
@@ -149,14 +159,20 @@ export class BreakdownChart {
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 
-        let xMin = D3.min(this.remapped, (d) =>{ return new Date(d.x); });
-        let xMax = D3.max(this.remapped, (d) =>{ return new Date(d.x); });
+        let xMin = D3.min(this.remapped, (d) =>{
+            return D3.min(d, (dd)=> {return new Date(dd.x); });
+        });
+        let xMax = D3.max(this.remapped, (d) =>{
+            return D3.max(d, (dd)=> { return new Date(dd.x); });
+        });
         let dateRange = [];
         dateRange.push(xMin);
         dateRange.push(xMax);
 
         if(this.chartSection == ".summary-chart")
             releaseService.setSelectedReleases(dateRange);
+        else if(this.chartSection == '.release-summary')
+            this.commitService.setSelectedCommits(dateRange,this.project);
 
         let yMax = Math.max(20, D3.max(this.remapped, function(d) { return d.y; }));
 
@@ -336,6 +352,8 @@ export class BreakdownChart {
         let s = D3.event.selection || this.x2.range();
         if(this.chartSection == ".summary-chart")
             this.releaseService.setSelectedReleases(s.map(this.x2.invert, this.x2));
+        else if(this.chartSection == '.release-summary')
+            this.commitService.setSelectedCommits(s.map(this.x2.invert, this.x2),this.project);
 
     }
 

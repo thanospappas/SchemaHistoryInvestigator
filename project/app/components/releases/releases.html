@@ -42,9 +42,9 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Chart</a>
+                            <li><a (click)="addCommitChartToStory()">Chart</a>
                             </li>
-                            <li><a href="#">Text Summaries</a>
+                            <li><a (click)="addReleaseDescriptionstToStory()">Release Summaries</a>
                             </li>
                         </ul>
                     </li>
@@ -54,7 +54,7 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                <div class="release-summary">
+                <div class="release-summary" id="release-summary">
 
                 </div>
 
@@ -85,9 +85,9 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Text Summary</a>
+                            <li><a (click)="addTextSummaryToStory()">Text Summary</a>
                             </li>
-                            <li><a href="#">Commit List</a>
+                            <li><a (click)="addCommitsToStory()">Commit List</a>
                             </li>
                         </ul>
                     </li>
@@ -136,3 +136,5 @@
     </div>
 
 </div>
+
+<notifications [showSuccess]="showSuccess"></notifications>

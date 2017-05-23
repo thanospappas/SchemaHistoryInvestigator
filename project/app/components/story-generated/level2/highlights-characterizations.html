@@ -2,28 +2,56 @@
     <div class="x_panel">
         <div class="x_title">
             <h2>Highlights & Characterizations</h2>
-            <ul class="nav navbar-right panel_toolbox">
-                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Settings 1</a>
-                        </li>
-                        <li><a href="#">Settings 2</a>
-                        </li>
-                    </ul>
-                </li>
-                <li><a class="close-link"><i class="fa fa-close"></i></a>
-                </li>
-            </ul>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <div class="release-summary">
-                <h1>Section 1</h1>
+
+            <div class="release-summary-chart"  >
+                <div *ngIf="this.commitChart">
+                    <h3>Commits Chart <a (click)="removeCommitChart()"><i class="fa fa-close"></i></a></h3>
+                </div>
+                <div id="commit-chart-story"></div>
             </div>
 
+
+            <div *ngIf="textSummary" class="release-descriptions-text" id="release-descriptions-text">
+                <h3>Summary Text <a (click)="removeTextSummary()"><i class="fa fa-close"></i></a></h3>
+                <p>{{textSummary}}</p>
+            </div>
+
+
+            <div *ngIf="commits?.length > 0" class="commit-list-story" id="commit-list-story">
+                <h3>List of Commits<a (click)="removeCommitList"><i class="fa fa-close"></i></a></h3>
+                <ul class="list-unstyled timeline scroll-view1" style="overflow-y: scroll;height:350px;">
+                    <li *ngFor="let commit of commits">
+                        <div class="block">
+                            <div class="tags">
+                                <p class="tag">
+                                    <span>Steady</span>
+                                </p>
+                            </div>
+                            <div class="block_content commit-list-information">
+                                <h2 class="title">
+                                    {{commit.text.substring(0,30)}}
+                                </h2>
+                                <div class="byline">
+                                    <span>{{commit.date}}</span> by {{commit.author.name}}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div *ngIf="this.releaseDescriptions?.length">
+                <h3>Release descriptions <a (click)="removeReleaseDescriptions()"><i class="fa fa-close"></i></a></h3>
+                <div *ngFor="let release of releaseDescriptions">
+                    <h2>{{release.name}}</h2>
+                    <p [innerHTML]="release.releaseSummary | newLineFilter"> </p>
+                </div>
+
+            </div>
 
         </div>
     </div>

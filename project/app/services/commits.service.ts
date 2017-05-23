@@ -16,6 +16,8 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {ReleaseFilter} from "../shared/ReleaseFilter";
 import {HttpService} from "./http.service";
+import {serverPort} from "../config/server-info";
+import {ProjectService} from "./Projects.services";
 
 @Injectable()
 export class CommitService {
@@ -23,7 +25,10 @@ export class CommitService {
     private selectedCommit;
     selectedCommitChanged$ = new ReplaySubject(1);
 
-    constructor (private httpService: HttpService) {}
+    private selectedCommits;
+    selectedCommits$ = new ReplaySubject(1);
+
+    constructor (private httpService: HttpService,private releaseFilter:ReleaseFilter,private projectService:ProjectService) {}
 
     getSelectedCommit(url:string){
         this.httpService.get(url)
@@ -59,6 +64,31 @@ export class CommitService {
 
     getSelectedCommitChanges(){
         return this.selectedCommitChanged$;
+    }
+
+    setSelectedCommits(range,project){
+        console.log(range);
+         this.retrieveSelectedCommits(range[0].getTime()/1000, range[1].getTime()/1000,project);
+
+    }
+
+    getSelectedCommits(){
+        return this.selectedCommits$;
+    }
+
+    retrieveSelectedCommits(minDate,maxDate,project){
+        let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            + project.projectId + "/releases?in_range=" + minDate +"," +maxDate;
+        console.log(url);
+        this.httpService.get(url)
+            .subscribe(commits => {
+                    this.selectedCommits =  commits;
+                    this.selectedCommits$.next(this.selectedCommits);
+                },
+                err => {
+                    console.log(err);
+                }
+            );
     }
 
 

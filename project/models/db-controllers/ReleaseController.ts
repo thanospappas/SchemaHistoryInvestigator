@@ -356,7 +356,6 @@ export class ReleaseController extends DatabaseController{
             projectID + " ORDER BY CO_DATE ASC;";
         return new Promise((resolve) => {
             this.database.DB.all(query,  (err, rows) => {
-                console.log(rangeList);
                 resolve(this.populateReleasesWithCommits(rows));
             });
         });
