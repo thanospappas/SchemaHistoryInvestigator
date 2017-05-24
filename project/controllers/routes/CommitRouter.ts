@@ -38,6 +38,12 @@ export class CommitRouter implements ApiRouter{
                     res.json(result);
                 });
         }
+        else if(req.query.in_range){
+            databaseController.getCommitsInRange(req.params.id, req.query.in_range)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
         else{
             databaseController.getAllData(req.params.id)
                 .then((result) => {

@@ -41,4 +41,13 @@ export class HttpService {
             .catch();
     }
 
+    updateIssueScore(url){
+        let headers = new Headers({ 'Content-Type': 'application/json' });
+        let body = JSON.stringify({});
+        return this.http
+            .put(url,body , {headers: headers}).toPromise()
+            .then(() => body)
+            .catch();
+    }
+
 }

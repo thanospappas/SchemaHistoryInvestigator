@@ -3,6 +3,7 @@ import {TableChange} from "../schema-history/TableChange";
 import {AtomicSchemaChange} from "../schema-history/AtomicSchemaChange";
 import {CommitSummary} from "../project/CommitSummary";
 import {ReleaseController} from "./ReleaseController";
+import {Commit} from "../project/Commit";
 
 /**
  * Created by thanosp on 17/4/2017.
@@ -323,6 +324,32 @@ export class CommitController extends DatabaseController{
                 text + "' WHERE Commits.CO_ID=" + commitId + ";", (err, commits) => {
                 console.log(commits);
                 resolve();
+            });
+        });
+    }
+
+    createCommitList(rows){
+        let commits:Array<Commit> = new Array<Commit>();
+        for(let row of rows){
+            let commit = new Commit();
+            commit.setDate(row.CO_DATE);
+            commit.setText(row.CO_TEXT);
+            commit.setAuthor(row.AU_NAME, row.AU_EMAIL);
+            commit.setId(row.CO_ID);
+            commit.setRelease(row.RE_NAME);
+            commits.push(commit);
+        }
+        return commits;
+    }
+
+    getCommitsInRange(projectId, range){
+        let rangeList = range.split(",");
+        let query = "SELECT * FROM Branches, Commits, Authors WHERE CO_DATE BETWEEN " +
+            rangeList[0] + " AND " + rangeList[1] + " AND Authors.AU_ID = CO_AUTHOR_ID AND Branches.BR_PRJ_ID = "+
+            projectId + " AND Branches.BR_ID = Commits.CO_BRANCH_ID ORDER BY CO_DATE ASC;";
+        return new Promise((resolve) => {
+            this.database.DB.all(query,  (err, rows) => {
+                resolve(this.createCommitList(rows));
             });
         });
     }

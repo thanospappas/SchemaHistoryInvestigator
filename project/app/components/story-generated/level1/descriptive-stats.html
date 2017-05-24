@@ -22,7 +22,7 @@
 
 
             <div *ngIf="releases?.length > 0" class="releases-list" id="releases-list">
-                <h3>List of Releases<a class="close-link"><i class="fa fa-close"></i></a></h3>
+                <h3>List of Releases <a (click)="removeReleaseList()"><i class="fa fa-close"></i></a></h3>
                 <ul class="list-unstyled top_profiles scroll-view1" style="overflow-y: scroll;height:350px;">
 
                     <li class="media event" *ngFor='let release of this.releases;let i = index;'>
@@ -46,7 +46,7 @@
 
 
             <div *ngIf="authors?.length > 0" class="authors-list" id="authors-list">
-                <h3>Authors List<a class="close-link"><i class="fa fa-close"></i></a></h3>
+                <h3>Authors List <a (click)="removeAuthors()"><i class="fa fa-close"></i></a></h3>
                 <div>
                     <div class="list-header">
                         <a class="pull-left " style="padding-left:5px">

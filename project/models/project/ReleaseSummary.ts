@@ -23,6 +23,7 @@ export class ReleaseSummary{
 
     public setPosition(pos:number){
         this.commitPositionFromStart = pos+1;
+        console.log(this.commitPositionFromStart);
     }
 
     public getFinalSummary():string{
@@ -50,12 +51,12 @@ export class ReleaseSummary{
         else if(this.commitPositionFromStart  == 3)
             sentence1+= this.commitPositionFromStart + "rd ";
 
-        sentence1 += "from the beginning, it lasted " + this.releaseInfo.duration +
+        sentence1 += "from the beginning, it lasted " + Math.ceil(this.releaseInfo.duration) +
             " days and includes " + this.releaseInfo.contributorNumber + " contributors.";
 
-        let sentence2 = " In this release there are " + this.releaseInfo.stats.getTablesAtEnd() + " and "
-            + this.releaseInfo.stats.getAttributesAtEnd() + " (compared to " + this.releaseInfo.stats.getTablesAtStart() +
-            + " and " + this.releaseInfo.stats.getAttributesAtStart() + "  attributes that the schema had at its beginning).";
+        let sentence2 = " In this release there are " + this.releaseInfo.stats.getTablesAtEnd() + " tables and "
+            + this.releaseInfo.stats.getAttributesAtEnd() + " attributes (compared to " + this.releaseInfo.stats.getTablesAtStart()
+            + " tables and " + this.releaseInfo.stats.getAttributesAtStart() + "  attributes that the schema had at its beginning).";
 
         let sentence3 = " Within this release, " + this.releaseInfo.stats.getTableInsertions()
             + " table births took place resulting in a total of "

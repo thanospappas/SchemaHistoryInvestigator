@@ -19,13 +19,10 @@ import {HttpService} from "../../services/http.service";
 export class SummarySection implements OnInit, OnChanges {
 
     ngOnInit() {
-
         let x = $(".loader-container").css("display","none");
     }
 
-
-    ngOnChanges(changes: SimpleChanges): void {
-    }
+    ngOnChanges(changes: SimpleChanges): void {  }
 
 
 }

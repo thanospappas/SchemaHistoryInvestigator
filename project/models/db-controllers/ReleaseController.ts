@@ -70,6 +70,9 @@ export class ReleaseController extends DatabaseController{
                     releases[i].duration = duration;
                     break;
                 }
+                if(releases[i].duration == null){
+                    releases[i].duration = (new Date("February 3, 2017").getTime() - releases[i].startDate * 1000) / (1000 * 3600 * 24);
+                }
             }
             releases[i].stats.setSchemaSizeTable(1.0*releases[i].stats.getSchemaSizeTable()/releases[i].commitNumber);
             releases[i].stats.setSchemaSizeAttribute(1.0*releases[i].stats.getSchemaSizeAttribute()/releases[i].commitNumber);
@@ -104,7 +107,6 @@ export class ReleaseController extends DatabaseController{
         let i =0;
         //let releaseStats:Stats = new Stats();
         let contributors= [];
-        console.log(rows);
         for(let row of rows){
             let found = false;
             let rel:Release = new Release();
@@ -219,7 +221,6 @@ export class ReleaseController extends DatabaseController{
 
         this.getReleasesOnly(projectID)
             .then((releases) =>{
-                console.log(releases);
                 return this.getReleases(projectID,releases);
             })
             .then((result) => {
@@ -304,7 +305,6 @@ export class ReleaseController extends DatabaseController{
         return new Promise((resolve) => {
             this.database.DB.all("SELECT DISTINCT TA_NAME, RE_NAME, RE_DATE, TR_TRANSITION_ID, CM_DELETIONS, CM_INSERTIONS, CM_TYPE_ALT, CM_KEY FROM Phases, Changes_Metrics, Tables WHERE" +
                 " BR_PRJ_ID =" + projectID + " AND BR_NAME = 'master' AND TR_ID = CM_TR_ID AND CM_TA_ID = Tables.TA_ID AND CM_DELETIONS <> '-' ORDER BY RE_DATE",  (err, rows) => {
-
                 resolve(this.createdata(rows));
             });
         });
@@ -346,6 +346,7 @@ export class ReleaseController extends DatabaseController{
             }
             i++;
         }
+        commits[commits.length-1].getStats().computeAttributeUpdates()
         return commits;
     }
 
@@ -385,7 +386,6 @@ export class ReleaseController extends DatabaseController{
 
         return new Promise((resolve) => {
             this.database.DB.all(query,  (err, rows) => {
-
                 resolve(this.populateReleasesWithCommits(rows));
             });
         });

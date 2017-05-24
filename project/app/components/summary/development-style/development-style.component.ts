@@ -41,12 +41,8 @@ export class DevelopmentChart implements OnInit, OnChanges {
 
         this.releaseChanges.getReleaseChanges().subscribe(
             releases => {
-                //console.log("In breakdown...");
-                //console.log(releases);
                 this.createCommitChart(releases);
                 this.createDurationChart(releases);
-                //this.test();
-
             });
 
         this.setEventListeners();
@@ -247,7 +243,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
             d.releaseID = i;
             data.push(d);
         }
-        ///console.log(data);
+
         this.createBarChart(data, "#commits", "release id",
             ".development-style-commits", 1);
     }
@@ -261,7 +257,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
             d.releaseID = i;
             data.push(d);
         }
-        ///console.log(data);
+
         this.createBarChart(data, "duration in days", "release id",".development-style-durations", 2);
     }
 

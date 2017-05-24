@@ -33,16 +33,13 @@ export class TopNavBar{
   
 
   ngOnInit() {
-
-      this.projectService.retrieveProjects()
-          .subscribe(projects => {
-              projects.splice(1,1);
-                  this.projects = projects;
-              },
-              err => {
-                  console.log(err);
-              }
-          );
+      this.projectService.retrieveProjects().subscribe(projects => {
+          projects.splice(1,1);
+              this.projects = projects;
+          },
+          err => {
+              console.log(err);
+      });
   }
  
 }

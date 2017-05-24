@@ -2,10 +2,6 @@
  * Created by thanosp on 11/5/2017.
  */
 
-/**
- * Created by thanosp on 15/4/2017.
- */
-
 import { Injectable }     from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Release }           from '../../models/project/Release';
@@ -40,20 +36,6 @@ export class CommitService {
                     console.log(err);
                 }
             );
-
-        /*return this.httpservice.get(url)
-            .map((res:Response) => {
-                console.log(res);
-                this.selectedCommit = res.json();
-                console.log(this.selectedCommit);
-                this.setSelectedCommit(this.selectedCommit);
-                return res.json();
-
-            })
-            .catch((error:any) => {
-                return Observable.throw(error.json().error || 'Server error')
-            });*/
-
     }
 
 
@@ -67,9 +49,7 @@ export class CommitService {
     }
 
     setSelectedCommits(range,project){
-        console.log(range);
          this.retrieveSelectedCommits(range[0].getTime()/1000, range[1].getTime()/1000,project);
-
     }
 
     getSelectedCommits(){
@@ -78,8 +58,8 @@ export class CommitService {
 
     retrieveSelectedCommits(minDate,maxDate,project){
         let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
-            + project.projectId + "/releases?in_range=" + minDate +"," +maxDate;
-        console.log(url);
+            + project.projectId + "/commits?in_range=" + minDate +"," +maxDate;
+
         this.httpService.get(url)
             .subscribe(commits => {
                     this.selectedCommits =  commits;
@@ -90,7 +70,5 @@ export class CommitService {
                 }
             );
     }
-
-
 
 }

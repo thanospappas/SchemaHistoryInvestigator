@@ -14,16 +14,8 @@ import * as $ from 'jquery';
 
 export class StoryGenerator implements OnInit {
 
+    constructor() { }
 
-    constructor() {
-
-
-    }
-
-
-    ngOnInit() {
-
-
-    }
+    ngOnInit() {  }
 
 }

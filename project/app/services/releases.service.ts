@@ -24,27 +24,19 @@ export class ReleaseService {
     private selectedRelease;
     selectedRelease$ = new ReplaySubject(1);
 
-
-
     // Resolve HTTP using the constructor
     constructor (private http: Http, private releaseFilter:ReleaseFilter) {}
 
-
     // Fetch all existing comments
     getReleases(url:string) : Observable<Release[]>{
-        // ...using get request
         return this.http.get(url)
-        // ...and calling .json() on the response to return data
             .map((res:Response) => {
-
                 this.releases = res.json();
-
                 this.setReleases(this.releases);
                 this.setSelectedReleases(this.releases);
                 return res.json();
 
             })
-            //...errors if any
             .catch((error:any) => {
                 console.log(error);
                 return Observable.throw(error.json().error || 'Server error')
@@ -68,7 +60,6 @@ export class ReleaseService {
 
     setSelectedReleases(releases){
         let xx = this.releaseFilter.transform(this.releases,releases);
-        //console.log(xx);
         this.selectedReleases = xx;
         this.selectedReleases$.next(this.selectedReleases);
     }

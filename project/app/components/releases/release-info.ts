@@ -14,7 +14,7 @@ import * as d3 from 'd3/build/d3.js';
 import {CommitService} from "../../services/commits.service";
 import {NewlinesFilter} from "../../shared/NewlinesFilter";
 import {HighlightsCharacterizationsService} from "../../services/story-level2-service";
-
+declare var tinymce: any;
 @Component({
     selector: 'releases-comp',
     templateUrl: './releases.html',
@@ -32,6 +32,10 @@ export class ReleaseComponent implements OnInit {
     private pageMode = "viewMode";
     private showSuccess = false;
     private specificReleaseOn = false;
+
+    private releaseForEdit;
+    private summarySaved = false;
+    private editor;
 
     constructor(private releaseChanges:ReleaseService,
                 private httpService:HttpService,
@@ -52,7 +56,6 @@ export class ReleaseComponent implements OnInit {
         if(option == "release"){
             this.specificReleaseOn = true;
             this.selectedRelease = this.selectedReleases[0];
-            console.log(this.selectedRelease);
             this.setSelectedReleaseId();
             this.retrieveCommits();
         }
@@ -66,6 +69,43 @@ export class ReleaseComponent implements OnInit {
     setSelectedReleaseId(){
         this.selectedReleaseId = this.selectedRelease.releaseID;
         this.retrieveCommits();
+    }
+
+    setReleaseForEdit(release){
+        this.releaseForEdit = release;
+        console.log(this.releaseForEdit);
+        tinymce.activeEditor.setContent(this.newlinesFilter.transform(this.releaseForEdit.releaseSummary));
+    }
+
+    updateReleaseSummary(){
+        console.log(tinymce.activeEditor.getContent());
+        const url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            this.projectService.getSelectedProjectData().projectId + "/releases/" + this.releaseForEdit.releaseID;
+        this.httpService.update(url,{commitSummary: tinymce.activeEditor.getContent()});
+        this.summarySaved = true;
+        for(let release of this.selectedReleases){
+            if(release.releaseID == this.releaseForEdit.releaseID){
+                release.releaseSummary = tinymce.activeEditor.getContent();
+            }
+        }
+    }
+
+    getNewInfo(){
+        this.summarySaved = false;
+        //this.releaseChanges.setSelectedReleases(this.selectedReleases);
+        /*let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            + this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId;
+        console.log("url: " + url);
+        this.httpService.get(url)
+            .subscribe(commit => {
+                    this.selectedCommit = commit;
+                    this.selectedCommit.releaseDate = new Date(parseInt(this.selectedCommit.releaseDate)*1000);
+                    this.selectedCommit.commitText = this.selectedCommit.commitText.replace(/\\n/g,'<br/>');
+                },
+                err => {
+                    console.log(err);
+                }
+            );*/
     }
 
     // Load data ones componet is ready
@@ -86,7 +126,6 @@ export class ReleaseComponent implements OnInit {
                 if(this.selectedReleases.length > 0){
                     this.retrieveSelectedCommits(this.selectedReleases[0].startDate,
                         this.selectedReleases[this.selectedReleases.length-1].startDate);
-                    console.log(this.selectedReleases);
                 }
 
             });
@@ -105,10 +144,26 @@ export class ReleaseComponent implements OnInit {
         this.commitService.getSelectedCommits().subscribe(
             commits => {
                 this.commits = commits;
-                console.log(this.commits);
             });
 
        this.setEventListeners();
+    }
+
+    ngAfterViewInit() {
+        tinymce.init({
+            selector: '#' + 111,
+            plugins: ['paste'],
+            skin_url: '../public/assets/skins/lightgray',
+            height : "380",
+            setup: editor => {
+                this.editor = editor;
+                editor.on('keyup', () => {
+                    const content = editor.getContent();
+                });
+                editor.fire('ScrollWindow', function(){});
+            },
+
+        });
     }
 
     retrieveSelectedCommits(minDate,maxDate){
@@ -132,7 +187,6 @@ export class ReleaseComponent implements OnInit {
         this.httpService.get(url)
             .subscribe(commits => {
                     this.commits = commits;
-                    console.log(this.commits);
                     this.commitChangesChart.setReleases(this.commits);
                     this.commitChangesChart.createChart();
 
@@ -147,7 +201,6 @@ export class ReleaseComponent implements OnInit {
     isReleaseSet():boolean{
         if(this.selectedReleaseId == -1)
             return false;
-
         return true;
     }
 
@@ -207,10 +260,7 @@ export class ReleaseComponent implements OnInit {
 
         let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             + this.projectService.getSelectedProjectData().projectId + "/commits/" + id;
-        console.log(url);
         this.commitService.getSelectedCommit(url);
-
-
 
         var $li = $(".commits-menu-item");
         var $currentli = $('#sidebar-menu').find('li.active-sm');
@@ -247,7 +297,13 @@ export class ReleaseComponent implements OnInit {
     }
 
     addReleaseDescriptionstToStory(){
-        this.highlightService.addReleaseDescriptions(this.selectedReleases);
+        if(this.isSingleReleaseOn()){
+            let release = [];
+            release.push(this.selectedRelease);
+            this.highlightService.addReleaseDescriptions(release);
+        }
+        else
+            this.highlightService.addReleaseDescriptions(this.selectedReleases);
         this.showSuccessNotification();
     }
 

@@ -31,6 +31,14 @@ export class IssueRouter implements ApiRouter{
             });
     }
 
+    increaseUsefulness(req: Request, res: Response, next: NextFunction){
+        let databaseController:IssueController = new IssueController();
+        databaseController.increaseUsefulnessScore(req.params.id)
+            .then((result) => {
+                res.json(result);
+            });
+    }
+
     getSingle() {
         throw new Error('Method not implemented.');
     }
@@ -46,6 +54,7 @@ export class IssueRouter implements ApiRouter{
     init() {
         this.router.get('/', this.getAll);
         this.router.get('/:id', this.getSingle);
+        this.router.put('/:id', this.increaseUsefulness);
 
     }
 }

@@ -21,7 +21,7 @@
 
 
             <div *ngIf="commits?.length > 0" class="commit-list-story" id="commit-list-story">
-                <h3>List of Commits<a (click)="removeCommitList"><i class="fa fa-close"></i></a></h3>
+                <h3>List of Commits<a (click)="removeCommitList()"><i class="fa fa-close"></i></a></h3>
                 <ul class="list-unstyled timeline scroll-view1" style="overflow-y: scroll;height:350px;">
                     <li *ngFor="let commit of commits">
                         <div class="block">

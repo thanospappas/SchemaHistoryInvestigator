@@ -60,15 +60,12 @@ export class AreaChart implements OnInit, OnChanges {
             project => {
                 this.selectedProject.selectedPrj = project['selectedPrj'];
                 this.selectedProject.projectId = project['projectId'];
-
                 this.getReleases();
             });
 
         this.releaseService.getSelectedReleases().subscribe(
             releases => {
-
                 this.selectedReleases = releases;
-
             });
 
         $('.collapse-link').on('click', function() {
@@ -170,7 +167,6 @@ export class AreaChart implements OnInit, OnChanges {
     }
 
     releaseDrillDown(selectedRelease){
-        console.log(selectedRelease);
         this.releaseService.setSelectedRelease(selectedRelease);
 
         let $li = $(".releases-menu-item");
@@ -188,9 +184,6 @@ export class AreaChart implements OnInit, OnChanges {
         $selectedTab.delay(400).fadeIn(400, function () {
             $selectedTab.addClass('active');
         });
-
-
-
     }
 
 

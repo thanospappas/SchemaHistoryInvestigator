@@ -2,26 +2,74 @@
     <div class="x_panel">
         <div class="x_title">
             <h2>Explanations</h2>
-            <ul class="nav navbar-right panel_toolbox">
-                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Settings 1</a>
-                        </li>
-                        <li><a href="#">Settings 2</a>
-                        </li>
-                    </ul>
-                </li>
-                <li><a class="close-link"><i class="fa fa-close"></i></a>
-                </li>
-            </ul>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <div class="release-summary">
-                <h1>Section 1</h1>
+            <div *ngIf="textSummaries?.length > 0" class="commit-text-summary" id="commit-text-summary">
+                <h3>Summary Text <a (click)="removeTextSummary()"><i class="fa fa-close"></i></a></h3>
+                <p *ngFor="let textSummary of textSummaries">{{textSummary}}</p>
+            </div>
+
+
+            <div *ngIf="commitReasons" class="commit-reason-story" id="commit-reason-story">
+                <h3>Commits Reasons <a (click)="removeCommitReason()"><i class="fa fa-close"></i></a></h3>
+                <p>{{commitReasons}}</p>
+            </div>
+
+            <div *ngIf="this.stats">
+                <h3>Useful stats <a (click)="removeStats()"><i class="fa fa-close"></i></a></h3>
+                <table class="countries_list" >
+                    <tbody>
+                    <tr>
+                        <td>Table Births</td>
+                        <td class="fs15 fw700 text-right">{{this.stats.tableBirths}}</td>
+                    </tr>
+                    <tr>
+                        <td>Table Deaths</td>
+                        <td class="fs15 fw700 text-right">{{this.stats.tableDeaths}}</td>
+                    </tr>
+                    <tr>
+                        <td>Attribute Additions</td>
+                        <td class="fs15 fw700 text-right">{{this.stats.attributesInsertedAtSurvivingTables}}</td>
+                    </tr>
+                    <tr>
+                        <td>Attribute Deletions</td>
+                        <td class="fs15 fw700 text-right">{{this.stats.attributesDeletedAtSurvivingTables}}</td>
+                    </tr>
+                    <tr>
+                        <td>Key Changes</td>
+                        <td class="fs15 fw700 text-right">{{this.stats.keyChanges}}</td>
+                    </tr>
+                    <tr>
+                        <td>Type Changes</td>
+                        <td class="fs15 fw700 text-right">{{this.stats.typeChanges}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="this.tablesAffected?.length > 0">
+                <h3>Tables affected <a (click)="removeTables()"><i class="fa fa-close"></i></a></h3>
+
+                <div *ngFor='let table of this.tablesAffected;let i = index;'>
+                    <h4 class="panel-title">Table Name: {{table.tableName}} ({{table.changes.length}} changes)</h4>
+                    <ul>
+                        <li *ngFor='let change of table.changes;'>
+                            <strong>EventType:</strong> {{change.eventType}}	| <strong>attrName:</strong>{{change.attributeName}}	<br>
+                            <strong>attrType:</strong> {{change.attributeType}} | <strong>iskey:</strong> {{change.isKey}}
+                            <strong>pkey:</strong> {{change.primaryKey}} | <strong>fkey:</strong>
+                            {{change.foreignKey}}</li>
+
+                    </ul>
+                </div>
+
+            </div>
+
+            <div *ngIf="this.issues?.length > 0">
+                <h3>Issues <a (click)="removeIssues()"><i class="fa fa-close"></i></a></h3>
+                <div *ngFor="let issue of issues">
+                    <p [innerHTML]="issue.IS_BODY"></p>
+                </div>
             </div>
 
 

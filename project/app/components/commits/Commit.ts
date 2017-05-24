@@ -13,6 +13,8 @@ import {serverPort} from "../../config/server-info";
 import {ProjectService} from "../../services/Projects.services";
 import {NewlinesFilter} from "../../shared/NewlinesFilter";
 import * as $ from 'jquery';
+import {ExplanationsService} from "../../services/story-level3-service";
+import {IssuesFilter} from "../../shared/IssueFilter";
 
 declare var tinymce: any;
 @Component({
@@ -36,7 +38,7 @@ export class CommitComponent implements OnInit {
     private summarySaved = false;
 
     constructor(private commitService: CommitService, private httpService:HttpService,private projectService:ProjectService,
-                private newLineFilter:NewlinesFilter) {
+                private newLineFilter:NewlinesFilter, private explanationsService:ExplanationsService, private issuesOrderBy:IssuesFilter) {
 
     }
 
@@ -47,29 +49,16 @@ export class CommitComponent implements OnInit {
                 this.selectedCommit = commit;
                 this.selectedCommit.releaseDate = new Date(parseInt(this.selectedCommit.releaseDate)*1000);
                 this.selectedCommit.commitText = this.selectedCommit.commitText.replace(/\\n/g,'<br/>');
-                console.log(this.selectedCommit);
-                //this.selectedCommit.commitSummary = this.selectedCommit.commitSummary.replace(/\\n/g,'<br/>');
 
-                //this.getRelease();
                 this.getTablesChanged();
                 this.getBuildInfo();
                 this.getIssuesInfo();
-
-
                 tinymce.activeEditor.setContent(this.newLineFilter.transform(this.selectedCommit.commitSummary));
-
             });
     }
 
 
     ngAfterViewInit() {
-        $("body").scroll(function(){
-            console.log("))))))))))))))))))))))))))))))))))")
-        });
-        console.log("yoooooooooo");
-
-
-
         tinymce.init({
             selector: '#' + 111,
             plugins: ['paste'],
@@ -79,10 +68,8 @@ export class CommitComponent implements OnInit {
                 this.editor = editor;
                 editor.on('keyup', () => {
                     const content = editor.getContent();
-                    console.log(content);
-                    //this.onEditorKeyup.emit(content);
                 });
-                editor.fire('ScrollWindow', function(){console.log("-------------")});
+                editor.fire('ScrollWindow', function(){});
             },
 
         });
@@ -96,7 +83,6 @@ export class CommitComponent implements OnInit {
             .subscribe(release => {
                     this.commitsRelease =release[0];
                     this.commitsRelease.RE_DATE = new Date(parseInt(this.commitsRelease.RE_DATE)*1000);
-                    console.log(this.commitsRelease);
                 },
                 err => {
                     console.log(err);
@@ -107,11 +93,9 @@ export class CommitComponent implements OnInit {
     private getTablesChanged(){
         let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             + this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId +"?tables_affected=true";
-        console.log("url: " + url);
         this.httpService.get(url)
             .subscribe(tables => {
                     this.tablesChanged =tables;
-                    console.log(this.tablesChanged);
                 },
                 err => {
                     console.log(err);
@@ -122,11 +106,9 @@ export class CommitComponent implements OnInit {
     private getBuildInfo(){
         let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             + this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId +"?build_info=true";
-        console.log("url: " + url);
         this.httpService.get(url)
             .subscribe(build => {
                     this.buildInfo = build;
-                    console.log(this.buildInfo);
                 },
                 err => {
                     console.log(err);
@@ -137,7 +119,6 @@ export class CommitComponent implements OnInit {
     private getIssuesInfo(){
         let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             + this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId +"?issues_info=true";
-        console.log("url: " + url);
         this.httpService.get(url)
             .subscribe(issues => {
                     this.issues = issues;
@@ -145,7 +126,6 @@ export class CommitComponent implements OnInit {
                         issue.IS_BODY = issue.IS_BODY.substring(2).replace(/\\n/g,'<br/>');
                     }
                     this.selectedIssue = this.issues[0];
-                    console.log(this.issues);
                 },
                 err => {
                     console.log(err);
@@ -158,14 +138,19 @@ export class CommitComponent implements OnInit {
         this.selectedIssue = issue;
     }
 
+    increaseUsefulness(){
+        const url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+            this.projectService.getSelectedProjectData().projectId + "/issues/" + this.selectedIssue.IS_ID;
+        console.log(url);
+        this.httpService.updateIssueScore(url);
+    }
+
     updateCommitSummary(){
         console.log(tinymce.activeEditor.getContent());
         const url = "http://localhost:" + serverPort + "/api/v1/projects/" +
             this.projectService.getSelectedProjectData().projectId + "/commits/" + this.selectedCommit.commitId;
-        console.log(url);
         this.httpService.update(url,{commitSummary: tinymce.activeEditor.getContent()});
         this.summarySaved = true;
-
     }
 
     getNewInfo(){
@@ -183,6 +168,33 @@ export class CommitComponent implements OnInit {
                     console.log(err);
                 }
             );
+    }
+
+
+    addSummaryToStory(){
+        this.explanationsService.addTextSummary(this.selectedCommit.commitSummary);
+    }
+
+    addCommitReasonsToStory(){
+        this.explanationsService.addReasonOfCommit(this.selectedCommit.commitText)
+    }
+
+    addIssuesToStory(){
+        this.explanationsService.addIssuesInfo(this.issues);
+    }
+
+    addSelectedIssueToStory(){
+        let issue = [];
+        issue.push(this.selectedIssue);
+        this.explanationsService.addIssuesInfo(issue);
+    }
+
+    addStatsToStory(){
+        this.explanationsService.addUsefulStats(this.selectedCommit);
+    }
+
+    addTablesAffectedToStory(){
+        this.explanationsService.addTablesAffected(this.tablesChanged);
     }
 
 

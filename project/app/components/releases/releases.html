@@ -64,7 +64,7 @@
 
                 <div *ngIf="this.selectedReleases?.length && !isSingleReleaseOn()">
                     <div *ngFor="let release of selectedReleases">
-                        <h2>{{release.name}}</h2>
+                        <h2>{{release.name}}</h2><button (click)="setReleaseForEdit(release)" type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-edit-modal">Edit Summary</button>
                         <p [innerHTML]="release.releaseSummary | newLineFilter"> </p>
                     </div>
 
@@ -73,12 +73,34 @@
             </div>
         </div>
     </div>
+    <div class="modal fade release-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
 
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Edit Summary</h4>
+                </div>
+                <div class="modal-body">
+                                    <textarea id="111">
+                                    <p *ngIf="this.releaseForEdit" [innerHTML]="this.releaseForEdit.releaseSummary | newLineFilter"> </p>
+                                        </textarea>
+                </div>
+                <div class="modal-footer">
+                    <p *ngIf="summarySaved" style="color:#6dce0c">Summary was saved successfully ... </p>
+                    <button (click)="getNewInfo()" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button (click)="updateReleaseSummary()" type="button" class="btn btn-primary">Save changes</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <div class="col-md-5 col-sm-6 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Commit List </h2>
+                <h2>Text Summary</h2>
                 <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link-commit-list"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -98,22 +120,23 @@
             </div>
             <div class="x_content">
 
-                <div class="x_title">
-                    <h2>Text Summary</h2>
-                    <div class="clearfix"></div>
-                </div>
+
                 <p> Text describing the selected period.</p>
                 <p> Text describing the selected period.</p>
                 <p> Text describing the selected period.</p>
 
+                <div class="x_title" *ngIf="commits?.length > 0">
+                    <h2>Commits ({{commits.length}})</h2>
+                    <div class="clearfix"></div>
+                </div>
                 <ul class="list-unstyled timeline scroll-view1" style="overflow-y: scroll;height:350px;">
 
                     <li *ngFor="let commit of commits">
                         <div class="block">
                             <div class="tags">
-                                <a href="" class="tag">
+                                <p class="tag">
                                     <span>Steady</span>
-                                </a>
+                                </p>
                             </div>
                             <div class="block_content commit-list-information" (mouseover)='highlighCommit(true,i,$event,commit)'
                                  (mouseout)="highlighCommit(false,i,$event,commit)" (click)="showCommitInfo(commit.id)">
@@ -123,8 +146,6 @@
                                 <div class="byline">
                                     <span>{{commit.date}}</span> by <a>{{commit.author.name}}</a>
                                 </div>
-                                <!--<p class="excerpt">{{commit.text}}<a>Read&nbsp;More</a>
-                                </p>-->
                             </div>
                         </div>
                     </li>

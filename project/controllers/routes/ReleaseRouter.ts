@@ -68,6 +68,15 @@ export class ReleaseRouter implements ApiRouter{
 
     }
 
+    updatedSummary(req: Request, res: Response, next: NextFunction){
+        let databaseController:ReleaseController = new ReleaseController();
+        console.log(req.body.commitSummary);
+        databaseController.storeSummary(req.params.release_id,req.body.commitSummary)
+            .then((result) => {
+                res.json(result);
+            });
+    }
+
     getPath(): string {
         return "/:id/releases";
     }
@@ -79,7 +88,7 @@ export class ReleaseRouter implements ApiRouter{
     init() {
         this.router.get('/', this.getAll);
         this.router.get('/:release_id', this.getSingle);
-
+        this.router.put('/:release_id',this.updatedSummary);
         /*initialize all nested routers*/
         this.releaseBasedRouters.push(new ReleaseCommitRouter());
         for(let r of this.releaseBasedRouters){

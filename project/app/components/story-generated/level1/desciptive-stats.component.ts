@@ -44,11 +44,8 @@ export class DescriptiveStatsLevel implements OnInit {
         this.descriptiveStatsService.getChangeBreakdownChart().subscribe(
             chart => {
                 this.selectedChart = chart;
-
                 let newSvg = document.getElementById('change-breakdown-chart');
                 newSvg.innerHTML = this.selectedChart;
-
-
             });
     }
 
@@ -86,7 +83,6 @@ export class DescriptiveStatsLevel implements OnInit {
         this.descriptiveStatsService.getCochangedFiles().subscribe(
             files => {
                 this.coChangedFiles = files;
-                console.log(this.coChangedFiles);
             });
     }
 
@@ -122,6 +118,14 @@ export class DescriptiveStatsLevel implements OnInit {
        this.selectedChart = null;
        let newSvg = document.getElementById('change-breakdown-chart');
        newSvg.innerHTML = '';
+    }
+
+    removeReleaseList(){
+        this.releases = null;
+    }
+
+    removeAuthors(){
+        this.authors = null;
     }
 
     removeDevelopersChart(){

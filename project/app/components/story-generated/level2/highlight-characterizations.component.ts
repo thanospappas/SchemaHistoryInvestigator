@@ -57,8 +57,22 @@ export class HighlightsLevel implements OnInit {
     private waitForReleaseDescriptions(){
         this.highlightsService.getReleaseDescriptions().subscribe(
             releaseDescriptions => {
-                this.releaseDescriptions = releaseDescriptions;
-
+                //Convert data to array so that I can traverse it
+                let selectedReleases = releaseDescriptions as Array<any>;
+                if (this.releaseDescriptions){
+                    for(let i =0; i < selectedReleases.length; i++){
+                        let index = this.releaseDescriptions.findIndex((r) => r.releaseID == selectedReleases[i].releaseID);
+                        if(index == -1){
+                            //release does not exist on the story => add it
+                            this.releaseDescriptions.push(selectedReleases[i]);
+                        }
+                    }
+                }
+                else{
+                    //first time if releaseDesciptions is null then
+                    // assign all the releases to the variable
+                    this.releaseDescriptions = releaseDescriptions;
+                }
             });
     }
 

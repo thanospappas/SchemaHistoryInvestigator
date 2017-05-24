@@ -79,7 +79,7 @@ export class BreakdownChart {
 
     createSummaryChart(){
         this.width = $('.x_content ' + this.chartSection).width() - this.margin.left - this.margin.right;
-        console.log("Width is: " +this.chartSection);
+
         if(this.width < 0)
             this.width = 600;
         D3.select(this.chartSection + " svg").remove();
@@ -109,8 +109,6 @@ export class BreakdownChart {
         });
 
         let releaseService = this.releaseService;
-
-
 
         //var parseTime = D3.timeParse("%Y-%m-%d");
 

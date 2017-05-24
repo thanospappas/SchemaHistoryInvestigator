@@ -53,7 +53,14 @@
 </div>
 <!-- /top tiles -->
 
-<div class="row">
+<!--Error Message-->
+<div style="margin-top: 120px" *ngIf="!this.selectedCommit">
+
+    <h3 style="color:#b92c28"> Please select a commit... </h3>
+</div>
+<!--/Error Message-->
+
+<div class="row" *ngIf="this.selectedCommit">
     <div class="col-md-7 col-sm-6 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
@@ -64,9 +71,9 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Text Summary</a>
+                            <li><a (click)="addSummaryToStory()">Text Summary</a>
                             </li>
-                            <li><a href="#">Reason of Change</a>
+                            <li><a (click)="addCommitReasonsToStory()">Reason of Change</a>
                             </li>
                         </ul>
                     </li>
@@ -78,7 +85,6 @@
             <div class="x_content">
                 <div class="release-summary">
                     <p *ngIf="this.selectedCommit" [innerHTML]="this.selectedCommit.commitSummary | newLineFilter"> </p>
-                    <!-- Small modal -->
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Edit Summary</button>
 
                     <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
@@ -125,7 +131,9 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li><a href="#">Issues</a>
+                                    <li><a (click)="addIssuesToStory()">Issues</a>
+                                    </li>
+                                    <li><a (click)="addSelectedIssueToStory()">Selected Issue</a>
                                     </li>
 
                                 </ul>
@@ -138,7 +146,7 @@
                     <div class="x_content">
                         <div class="row" >
                             <div class="col-sm-4 mail_list_column" style="overflow-y: scroll;height:400px;">
-                                <a *ngFor="let issue of this.issues;let i = index;" id="{{'issue'+i}}" (click)="setSelectedIssue(issue)">
+                                <a *ngFor="let issue of (this.issues | orderByScore);let i = index; " id="{{'issue'+i}}" (click)="setSelectedIssue(issue)">
                                     <div class="mail_list" [class.issue-active]="issue == this.selectedIssue">
                                         <div class="left">
                                             <i class="fa fa-circle"></i> <i class="fa fa-edit"></i>
@@ -150,17 +158,15 @@
                                     </div>
                                 </a>
                             </div>
-                            <!-- /MAIL LIST -->
 
-                            <!-- CONTENT MAIL -->
                             <div class="col-sm-8 mail_view" >
                                 <div class="inbox-body" *ngIf="this.selectedIssue">
                                     <div class="mail_heading row">
                                         <div class="col-md-8">
-                                            <p>Is this helpful?</p>
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-primary" type="button"><i class="fa fa-chevron-up"></i> Upvote</button>
-                                            </div>
+                                            Is this helpful?
+
+                                                <button (click)="increaseUsefulness()" class="btn btn-sm btn-primary" type="button"><i class="fa fa-chevron-up"></i> Upvote</button>
+
                                         </div>
                                         <div class="col-md-4 text-right">
                                             <p class="date"> 8:02 PM 12 FEB 2014</p>
@@ -171,34 +177,34 @@
                                     </div>
                                     <div class="sender-info">
                                         <div class="row">
-                                            <div class="col-md-12">
+                                            <div class="col-md-6">
                                                 <strong>{{this.selectedIssue.IS_ACTOR}}</strong>
                                                 <span></span> assigned to
                                                 <strong>{{this.selectedIssue.IS_ASSIGNEE}}</strong>
-                                                <p><strong>Status:</strong>{{this.selectedIssue.IS_STATUS}}</p>
-                                                <p><strong>Priority:</strong>{{this.selectedIssue.IS_PRIORITY}}</p>
-                                                <p><strong>Type:</strong>{{this.selectedIssue.IS_TYPE}}</p>
-                                                <p><strong>% Done:</strong>{{this.selectedIssue.IS_PERCENTAGE_DONE}}</p>
-                                                <p><strong>Category:</strong>{{this.selectedIssue.IS_CATEGORY}}</p>
-                                                <p><strong>Closed at:</strong>{{this.selectedIssue.IS_CLOSED_AT}}</p>
-                                                <p><strong>Labels:</strong>{{this.selectedIssue.IS_LABELS}}</p>
-                                                <p><strong>Updated at:</strong>{{this.selectedIssue.IS_UPDATED_AT}}</p>
+                                                <strong>Status:</strong> {{this.selectedIssue.IS_STATUS}}<br>
+                                                <strong>Priority:</strong> {{this.selectedIssue.IS_PRIORITY}}<br>
+                                                <strong>% Done:</strong> {{this.selectedIssue.IS_PERCENTAGE_DONE}}
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Type:</strong> {{this.selectedIssue.IS_TYPE}}<br>
+                                                <strong>Category:</strong> {{this.selectedIssue.IS_CATEGORY}}<br>
+                                                <strong>Closed at:</strong> {{this.selectedIssue.IS_CLOSED_AT}}<br>
+                                                <span *ngIf="this.selectedIssue.IS_LABELS"><strong>Labels:</strong> {{this.selectedIssue.IS_LABELS}}<br></span>
+                                                <strong>Updated at:</strong> {{this.selectedIssue.IS_UPDATED_AT}}<br>
 
                                             </div>
                                         </div>
+                                        <hr>
                                     </div>
                                     <div class="view-mail">
                                         <p [innerHTML]="this.selectedIssue.IS_BODY"></p>
                                     </div>
-                                    <p>Is this helpful?</p>
-                                    <div class="btn-group">
-
+                                    Is this helpful?
                                         <button class="btn btn-sm btn-primary" type="button"><i class="fa fa-chevron-up"></i> Upvote</button>
-                                    </div>
                                 </div>
 
                             </div>
-                            <!-- /CONTENT MAIL -->
                         </div>
                     </div>
                 </div>
@@ -239,9 +245,8 @@
             </div>
         </div>
         </div>
-
-
     </div>
+
     <div  class="col-md-5 col-sm-6 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
@@ -252,7 +257,7 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Useful Stats</a>
+                            <li><a (click)="addStatsToStory()">Useful Stats</a>
                             </li>
                         </ul>
                     </li>
@@ -297,14 +302,14 @@
 
         <div class="x_panel">
             <div class="x_title">
-                <h2><i class="fa fa-align-left"></i> Tables affected <small>Sessions</small></h2>
+                <h2><i class="fa fa-align-left"></i> Tables affected</h2>
                 <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Tables Affected</a>
+                            <li><a (click)="addTablesAffectedToStory()">Tables Affected</a>
                             </li>
                         </ul>
                     </li>
@@ -314,11 +319,8 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-
                 <!-- start accordion -->
                 <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true" *ngIf="this.tablesChanged?.length > 0">
-
-
                     <div class="panel" *ngFor='let table of this.tablesChanged;let i = index;'>
                         <a class="panel-heading" role="tab" id="{{'heading' + i}}" data-toggle="collapse" data-parent="#accordion" href="{{'#collapse' + i}}" aria-expanded="false"
                            [attr.aria-controls] ="'collapse' + i">
@@ -334,18 +336,13 @@
                                         {{change.foreignKey}}</li>
 
                                 </ul>
-
                             </div>
                         </div>
                     </div>
-
                 <!-- end of accordion -->
-
-
+                </div>
             </div>
         </div>
-
-
 
     </div>
 

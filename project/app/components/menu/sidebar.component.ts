@@ -31,11 +31,7 @@ export class Sidebar {
        // this.initMenuListeners();
     }
 
-    anchorClicked(event: MouseEvent)
-    {
-
-        console.log(event);
-
+    anchorClicked(event: MouseEvent){
         var target = event.srcElement.id;
 
         var $li = $('#' + target.replace("chevron","li")).parent(); 
