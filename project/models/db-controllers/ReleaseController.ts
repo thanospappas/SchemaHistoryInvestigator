@@ -11,8 +11,8 @@ import {ReleaseSummary} from "../project/ReleaseSummary";
 
 export class ReleaseController extends DatabaseController{
 
-   constructor(){
-        super();
+   constructor(databaseController){
+        super(databaseController);
    }
 
     public getBranchId(projectID:number):Promise<any>{
@@ -90,7 +90,7 @@ export class ReleaseController extends DatabaseController{
     private getReleasesOnly(projectID:number):Promise<any>{
         console.log("SELECT * FROM Releases WHERE " + " Releases.RE_BRANCH_ID =" + projectID + " ORDER BY RE_DATE ASC");
         return new Promise((resolve) => {
-            this.database.DB.all(/*"SELECT * FROM Releases, Projects, Branches WHERE Projects.PRJ_ID = Branches.BR_PRJ_ID"
+            this.database.getDBConnection(projectID).all(/*"SELECT * FROM Releases, Projects, Branches WHERE Projects.PRJ_ID = Branches.BR_PRJ_ID"
                 + " AND Branches.BR_ID =" + projectID + " AND Releases.RE_BRANCH_ID = Projects.PRJ_ID ORDER BY RE_DATE ASC"*/
             "SELECT * FROM Releases WHERE " + " Releases.RE_BRANCH_ID =" + projectID + " ORDER BY RE_DATE ASC", function (err, rows) {
                 let releases:Array<any> = new Array();
@@ -169,8 +169,6 @@ export class ReleaseController extends DatabaseController{
                     release.contributorNumber = 1;
                     releases.push(release);
 
-
-
                 }
 
                 //releaseStats = new Stats();
@@ -191,7 +189,7 @@ export class ReleaseController extends DatabaseController{
         let releases:Array<Release> = new Array;
         //let currentPointer = this;
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Phases,Authors  WHERE BR_PRJ_ID=" + projectID + " AND CO_AUTHOR_ID=Authors.AU_ID ORDER BY CO_DATE ASC;", (err, rows) => {
+            this.database.getDBConnection(projectID).all("SELECT * FROM Phases,Authors  WHERE BR_PRJ_ID=" + projectID + " AND CO_AUTHOR_ID=Authors.AU_ID ORDER BY CO_DATE ASC;", (err, rows) => {
 
                 releases = this.populateReleases(rows);
                 releases.sort((release1:any, release2:any) => release1.startDate - release2.startDate);
@@ -303,7 +301,7 @@ export class ReleaseController extends DatabaseController{
 
     getReleaseTables(projectID){
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT DISTINCT TA_NAME, RE_NAME, RE_DATE, TR_TRANSITION_ID, CM_DELETIONS, CM_INSERTIONS, CM_TYPE_ALT, CM_KEY FROM Phases, Changes_Metrics, Tables WHERE" +
+            this.database.getDBConnection(projectID).all("SELECT DISTINCT TA_NAME, RE_NAME, RE_DATE, TR_TRANSITION_ID, CM_DELETIONS, CM_INSERTIONS, CM_TYPE_ALT, CM_KEY FROM Phases, Changes_Metrics, Tables WHERE" +
                 " BR_PRJ_ID =" + projectID + " AND BR_NAME = 'master' AND TR_ID = CM_TR_ID AND CM_TA_ID = Tables.TA_ID AND CM_DELETIONS <> '-' ORDER BY RE_DATE",  (err, rows) => {
                 resolve(this.createdata(rows));
             });
@@ -356,7 +354,7 @@ export class ReleaseController extends DatabaseController{
             rangeList[0] + " AND " + rangeList[1] + " AND Authors.AU_ID = CO_AUTHOR_ID AND BR_PRJ_ID = "+
             projectID + " ORDER BY CO_DATE ASC;";
         return new Promise((resolve) => {
-            this.database.DB.all(query,  (err, rows) => {
+            this.database.getDBConnection(projectID).all(query,  (err, rows) => {
                 resolve(this.populateReleasesWithCommits(rows));
             });
         });
@@ -385,7 +383,7 @@ export class ReleaseController extends DatabaseController{
         }
 
         return new Promise((resolve) => {
-            this.database.DB.all(query,  (err, rows) => {
+            this.database.getDBConnection(projectID).all(query,  (err, rows) => {
                 resolve(this.populateReleasesWithCommits(rows));
             });
         });
@@ -411,7 +409,7 @@ export class ReleaseController extends DatabaseController{
                 let storePromises = [];
 
                 for(let r of releaseSummaries){
-                    let storePromise = this.storeSummary(r.getReleaseInformation().releaseID, r.getFinalSummary());
+                    let storePromise = this.storeSummary(projectId,r.getReleaseInformation().releaseID, r.getFinalSummary());
                     storePromises.push(storePromise);
                 }
 
@@ -421,27 +419,21 @@ export class ReleaseController extends DatabaseController{
                         resolve("Success");
 
                     });
-
-                //resolve("Success");
             });
 
         });
     }
 
-    storeSummary(releaseId,text:string):Promise<any>{
+    storeSummary(projectID, releaseId,text:string):Promise<any>{
         console.log("UPDATE Releases SET RE_TEXT_SUMMARY = '" +
             text + "' WHERE Releases.RE_ID=" + releaseId + ";");
         return new Promise((resolve) => {
-            this.database.DB.all("UPDATE Releases SET RE_TEXT_SUMMARY = '" +
+            this.database.getDBConnection(projectID).all("UPDATE Releases SET RE_TEXT_SUMMARY = '" +
                 text + "' WHERE Releases.RE_ID=" + releaseId + ";", (err, commits) => {
                 console.log(commits);
                 resolve();
             });
         });
     }
-
-
-
-
 
 }

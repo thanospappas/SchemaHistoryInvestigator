@@ -3,27 +3,28 @@
  */
 
 import {Router, Request, Response, NextFunction} from 'express';
-import {SManager} from "../../models/project/Project";
+import {SManager} from "../../models/db-controllers/Project";
 import {ApiRouter} from "./ApiRouter";
+import {FilesAffectedController} from "../../models/db-controllers/FilesAffectedController";
 
 export class FilesAffectedRouter implements ApiRouter{
 
     router: Router;
+    prjManager;
     /**
      * Initialize the ProjectRouter
      */
-    constructor() {
+    constructor(databaseController) {
         this.router = Router({mergeParams: true});
+        this.prjManager = new FilesAffectedController(databaseController);
     }
 
     /**
      * GET all projects.
      */
-    public getAll(req: Request, res: Response, next: NextFunction) {
+    public getAll(req: Request, res: Response, next: NextFunction, routerObject) {
         //let query = parseInt(req.params.id);
-        let prjManager = new SManager();
-
-        prjManager.getFilesAffected(req.params.id)
+        routerObject.prjManager.getAllData(req.params.id)
             .then((result) => {
                 res.json(result);
             });
@@ -43,7 +44,9 @@ export class FilesAffectedRouter implements ApiRouter{
      * endpoints.
      */
     init() {
-        this.router.get('/', this.getAll);
+        this.router.get('/', (req: Request, res: Response, next: NextFunction) => {
+            return this.getAll(req, res, next, this);
+        });
 
     }
 

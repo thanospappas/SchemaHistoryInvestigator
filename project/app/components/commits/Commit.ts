@@ -172,11 +172,19 @@ export class CommitComponent implements OnInit {
 
 
     addSummaryToStory(){
-        this.explanationsService.addTextSummary(this.selectedCommit.commitSummary);
+        let commitSummaryInfo = {release: -1, commitSummary: '', humanDate:''};
+        commitSummaryInfo.commitSummary = this.selectedCommit.commitSummary;
+        commitSummaryInfo.release = this.selectedCommit.release;
+        commitSummaryInfo.humanDate = this.selectedCommit.commitDate;
+        this.explanationsService.addTextSummary(commitSummaryInfo);
     }
 
     addCommitReasonsToStory(){
-        this.explanationsService.addReasonOfCommit(this.selectedCommit.commitText)
+        let commitSummaryInfo = {release: -1, commitReason: '', humanDate:''};
+        commitSummaryInfo.commitReason = this.selectedCommit.commitText;
+        commitSummaryInfo.release = this.selectedCommit.release;
+        commitSummaryInfo.humanDate = this.selectedCommit.commitDate;
+        this.explanationsService.addReasonOfCommit(commitSummaryInfo)
     }
 
     addIssuesToStory(){
@@ -194,7 +202,12 @@ export class CommitComponent implements OnInit {
     }
 
     addTablesAffectedToStory(){
-        this.explanationsService.addTablesAffected(this.tablesChanged);
+        let commitSummaryInfo = {release: -1, tablesChanged: '', humanDate:'', commitId:-1};
+        commitSummaryInfo.tablesChanged = this.tablesChanged;
+        commitSummaryInfo.release = this.selectedCommit.release;
+        commitSummaryInfo.commitId = this.selectedCommit.commitId;
+        commitSummaryInfo.humanDate = this.selectedCommit.commitDate;
+        this.explanationsService.addTablesAffected(commitSummaryInfo);
     }
 
 

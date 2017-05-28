@@ -11,12 +11,11 @@ import {Commit} from "../project/Commit";
 
 export class CommitController extends DatabaseController{
 
-    constructor(){
-        super();
+    constructor(databaseController){
+        super(databaseController);
     }
 
     assignMetrics(row,value,commit:CommitInformation){
-
             if (row.ME_TYPE_OF_METRIC==("tDel")) {
                 commit.tableDeaths=value;
             } else if (row.ME_TYPE_OF_METRIC==("tIns")) {
@@ -64,8 +63,6 @@ export class CommitController extends DatabaseController{
             rows.push(tmpRows);
         }
 
-        //console.log(rows);
-
         finalCommit.author = rows[0].AU_NAME;
         finalCommit.commitId = rows[0].CO_ID;
         finalCommit.commitDate = rows[0].CO_HUMAN_DATE;
@@ -88,69 +85,57 @@ export class CommitController extends DatabaseController{
         finalCommit.attributesInjectedEjected = finalCommit.attributesInsertedAtSurvivingTables
             + finalCommit.attributesDeletedAtSurvivingTables;
 
-        finalCommit.attributesUpdated = finalCommit.keyChanges + finalCommit.typeChanges;
+        finalCommit.attributesUpdated = finalCommit.keyChanges + finalCommit.typeChanges
+            + finalCommit.attributesInsertedAtSurvivingTables + finalCommit.attributesDeletedAtSurvivingTables;
         finalCommit.schemaGrowth = finalCommit.newTables - finalCommit.oldTables;
         finalCommit.schemaGrowthAttribute = finalCommit.newAttributes - finalCommit.oldAttributes;
 
         finalCommit.totalChanges = finalCommit.attributesUpdated + finalCommit.attributesInjectedEjected
             + finalCommit.attributeDeletionAtDeath + finalCommit.attributeInsertionAtBirth;
 
-
         return finalCommit;
 
     }
 
     getAllData(projectID):Promise<any> {
-
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Commits, Branches WHERE Commits.CO_BRANCH_ID = Branches.BR_ID AND Branches.BR_PRJ_ID = " + projectID
+            this.database.getDBConnection(projectID).all("SELECT * FROM Commits, Branches WHERE Commits.CO_BRANCH_ID = Branches.BR_ID AND Branches.BR_PRJ_ID = " + projectID
                 + " ORDER BY CO_DATE;", function (err, commits) {
 
                 resolve(commits);
             });
         });
-
     }
 
     getSingle(projectID,id):Promise<any> {
-        console.log(id)
         return new Promise((resolve) => {
-            this.database.DB.all(/*"SELECT * FROM Releases, Commits, Transitions, Metrics, Authors WHERE (Commits.CO_ID = " + id +
-            " AND Releases.RE_ID = Commits.CO_PREV_RELEASE_ID AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
-                "AND Authors.AU_ID = Commits.CO_AUTHOR_ID) OR Commits.CO_ID = " + id +
-                " AND Commits.CO_PREV_RELEASE_ID IS NULL AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
-                "AND Authors.AU_ID = Commits.CO_AUTHOR_ID",*/
+            this.database.getDBConnection(projectID).all(
                 "SELECT DISTINCT * FROM Commits LEFT OUTER JOIN Releases ON Commits.CO_PREV_RELEASE_ID = Releases.RE_ID, Transitions, Metrics, Authors WHERE" +
                 "  (Commits.CO_ID = " + id +" AND Commits.CO_TRANSITION_ID = Transitions.TR_ID " +
                 "AND Transitions.TR_ID = Metrics.ME_TR_ID AND Authors.AU_ID = Commits.CO_AUTHOR_ID) ",
-
-
                 (err, commit) => {
-
                     resolve(this.createCommitInfo(commit));
             });
         });
     }
 
     public getCommitsFromRelease(projectID, releaseID){
-
         //TODO Create a view for this
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Projects, Branches, Commits, Releases, Authors  WHERE Projects.PRJ_ID = " + projectID +
+            this.database.getDBConnection(projectID).all("SELECT * FROM Projects, Branches, Commits, Releases, Authors  WHERE Projects.PRJ_ID = " + projectID +
                 " AND Projects.PRJ_ID = Branches.BR_PRJ_ID AND Commits.CO_BRANCH_ID = Branches.BR_ID " +
                 "AND Commits.CO_AUTHOR_ID=Authors.AU_ID AND Commits.CO_PREV_RELEASE_ID = Releases.RE_ID" +
                 " AND Releases.RE_ID = " + releaseID + " ORDER BY CO_DATE ASC;", function (err, commits) {
-
                 resolve(commits);
             });
         });
     }
 
-    getCommitRelease(commitId):Promise<any>{
+    getCommitRelease(projectID,commitId):Promise<any>{
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT RE_DATE, RE_NAME FROM, CO_ID Commits, Releases WHERE Commits.CO_ID = " + commitId
+            this.database.getDBConnection(projectID).all("SELECT RE_DATE, RE_NAME CO_ID FROM Commits, Releases WHERE Commits.CO_ID = " + commitId
             +" AND Commits.CO_PREV_RELEASE_ID = Releases.RE_ID;", function (err, release) {
-
+                console.log(release);
                 resolve(release);
             });
         });
@@ -187,10 +172,10 @@ export class CommitController extends DatabaseController{
 
     }
 
-    getTablesChanged(commitId):Promise<any>{
+    getTablesChanged(projectID, commitId):Promise<any>{
 
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT CH_EVENT_TYPE, CH_ATTRIBUTE_TYPE, CH_IS_KEY, CH_PRIMARY_KEY, CH_FOREIGN_KEY, TA_NAME, CH_ATTRIBUTE_NAME " +
+            this.database.getDBConnection(projectID).all("SELECT CH_EVENT_TYPE, CH_ATTRIBUTE_TYPE, CH_IS_KEY, CH_PRIMARY_KEY, CH_FOREIGN_KEY, TA_NAME, CH_ATTRIBUTE_NAME " +
                 " FROM Commits, Transitions, Changes, Tables WHERE Commits.CO_ID = " + commitId + " AND Commits.CO_TRANSITION_ID = " +
                 " Transitions.TR_ID AND Transitions.TR_ID = Changes.CH_TR_ID AND Changes.CH_TA_ID = Tables.TA_ID;",  (err, tables) => {
                 resolve(this.createTableChangeList(tables));
@@ -198,10 +183,10 @@ export class CommitController extends DatabaseController{
         });
     }
 
-    getBuildInfo(commitId){
+    getBuildInfo(projectID, commitId){
 
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT BU_ID, BU_REPO_ID, BU_EVENT_TYPE, BU_FINISHED_AT, BU_NUMBER, BU_STATE, BU_RESULT," +
+            this.database.getDBConnection(projectID).all("SELECT BU_ID, BU_REPO_ID, BU_EVENT_TYPE, BU_FINISHED_AT, BU_NUMBER, BU_STATE, BU_RESULT," +
                 " BU_DURATION, BU_MESSAGE, BU_STARTED_AT FROM Commits, Builds, Branches WHERE Commits.CO_ID = " +
                 commitId + " AND Commits.CO_BRANCH_ID = Branches.BR_ID AND Commits.CO_SHA = Builds.BU_COMMIT_ID",  (err, build) => {
 
@@ -210,10 +195,10 @@ export class CommitController extends DatabaseController{
         });
     }
 
-    getIssues(commitId){
+    getIssues(projectID, commitId){
 
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Issues, Commits WHERE (Commits.CO_ID = " +
+            this.database.getDBConnection(projectID).all("SELECT * FROM Issues, Commits WHERE (Commits.CO_ID = " +
                 commitId + " AND Commits.CO_ID = Issues.IS_NEXT_CREATED_COMMIT_ID) OR " +
                 "(Commits.CO_ID = " + commitId + " AND Commits.CO_ID = Issues.IS_PREV_CREATED_COMMIT_ID) GROUP BY IS_TITLE;",  (err, issues) => {
 
@@ -223,9 +208,9 @@ export class CommitController extends DatabaseController{
 
     }
 
-    getFilesAffected(commitId):Promise<any>{
+    getFilesAffected(projectID, commitId):Promise<any>{
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Files_Affected WHERE FA_COMMIT_ID = " + commitId, (err, files) => {
+            this.database.getDBConnection(projectID).all("SELECT * FROM Files_Affected WHERE FA_COMMIT_ID = " + commitId, (err, files) => {
                 resolve(files);
             });
         });
@@ -234,7 +219,7 @@ export class CommitController extends DatabaseController{
     getAllInfo(projectID):Promise<any> {
 
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Branches, Commits LEFT OUTER JOIN Releases ON Commits.CO_PREV_RELEASE_ID = Releases.RE_ID, " +
+            this.database.getDBConnection(projectID).all("SELECT * FROM Branches, Commits LEFT OUTER JOIN Releases ON Commits.CO_PREV_RELEASE_ID = Releases.RE_ID, " +
                 "Transitions, Metrics, Authors WHERE Commits.CO_BRANCH_ID = Branches.BR_ID" +
                 " AND Branches.BR_PRJ_ID = " + projectID  +
                 " AND Commits.CO_TRANSITION_ID = Transitions.TR_ID AND Transitions.TR_ID = Metrics.ME_TR_ID " +
@@ -268,7 +253,7 @@ export class CommitController extends DatabaseController{
             .then(commits =>{
                 for(let commit of commits){
                     console.log(commit);
-                    let releasePromise = this.getFilesAffected(commit.commitId);
+                    let releasePromise = this.getFilesAffected(projectId,commit.commitId);
                     releasePromises.push(releasePromise);
                 }
                 Promise.all(releasePromises)
@@ -297,7 +282,7 @@ export class CommitController extends DatabaseController{
                         }
 
                         for(let c of commitSummaries){
-                            let storePromise = this.storeSummary(c.getCommitInformation().commitId, c.getFinalSummary());
+                            let storePromise = this.storeSummary(projectId, c.getCommitInformation().commitId, c.getFinalSummary());
                             storePromises.push(storePromise);
                         }
 
@@ -316,11 +301,11 @@ export class CommitController extends DatabaseController{
 
     }
 
-    storeSummary(commitId,text:string):Promise<any>{
+    storeSummary(projectID, commitId,text:string):Promise<any>{
         console.log("UPDATE Commits SET CO_TEXT_SUMMARY = '" +
             text + "' WHERE Commits.CO_ID=" + commitId + ";");
         return new Promise((resolve) => {
-            this.database.DB.all("UPDATE Commits SET CO_TEXT_SUMMARY = '" +
+            this.database.getDBConnection(projectID).all("UPDATE Commits SET CO_TEXT_SUMMARY = '" +
                 text + "' WHERE Commits.CO_ID=" + commitId + ";", (err, commits) => {
                 console.log(commits);
                 resolve();
@@ -348,7 +333,7 @@ export class CommitController extends DatabaseController{
             rangeList[0] + " AND " + rangeList[1] + " AND Authors.AU_ID = CO_AUTHOR_ID AND Branches.BR_PRJ_ID = "+
             projectId + " AND Branches.BR_ID = Commits.CO_BRANCH_ID ORDER BY CO_DATE ASC;";
         return new Promise((resolve) => {
-            this.database.DB.all(query,  (err, rows) => {
+            this.database.getDBConnection(projectId).all(query,  (err, rows) => {
                 resolve(this.createCommitList(rows));
             });
         });

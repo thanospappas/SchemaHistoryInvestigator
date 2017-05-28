@@ -187,6 +187,7 @@ export class ReleaseComponent implements OnInit {
         this.httpService.get(url)
             .subscribe(commits => {
                     this.commits = commits;
+                    console.log(this.commits);
                     this.commitChangesChart.setReleases(this.commits);
                     this.commitChangesChart.createChart();
 

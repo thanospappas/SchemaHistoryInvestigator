@@ -6,8 +6,8 @@ import {Transition} from "../schema-history/Transition";
 
 export class TransitionController extends DatabaseController{
 
-    constructor(){
-        super();
+    constructor(databaseController){
+        super(databaseController);
     }
 
     private assignStatsValue(tr:Transition, type:string, value:number) {
@@ -71,7 +71,7 @@ export class TransitionController extends DatabaseController{
         let currentPointer = this;
 
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Projects, Branches, Schema_Histories, Transitions,  Metrics " +
+            this.database.getDBConnection(projectID).all("SELECT * FROM Projects, Branches, Schema_Histories, Transitions,  Metrics " +
                 "WHERE Projects.PRJ_ID = " + projectID + " AND Projects.PRJ_ID = Branches.BR_PRJ_ID AND Branches.BR_ID = Schema_Histories.SH_BR_ID" +
                 " AND Transitions.TR_SH_ID = Schema_Histories.SH_ID AND Metrics.ME_TR_ID = Transitions.TR_ID " +
                 "ORDER BY(TR_TRANSITION_ID) ASC", function (err, transitions) {
@@ -89,7 +89,7 @@ export class TransitionController extends DatabaseController{
     getTransitionsFromRelease(projectID,releaseID){
         let currentPointer = this;
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Phases WHERE BR_PRJ_ID = " + projectID + "  AND RE_ID = " + releaseID +
+            this.database.getDBConnection(projectID).all("SELECT * FROM Phases WHERE BR_PRJ_ID = " + projectID + "  AND RE_ID = " + releaseID +
                 " ORDER BY(TR_TRANSITION_ID) ASC", function (err, transitions) {
                 resolve(currentPointer.createTransitions(transitions));
             });

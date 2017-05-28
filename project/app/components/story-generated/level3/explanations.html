@@ -6,61 +6,75 @@
         </div>
         <div class="x_content">
             <div *ngIf="textSummaries?.length > 0" class="commit-text-summary" id="commit-text-summary">
-                <h3>Summary Text <a (click)="removeTextSummary()"><i class="fa fa-close"></i></a></h3>
-                <p *ngFor="let textSummary of textSummaries">{{textSummary}}</p>
+                <h3>Commit Summary <a (click)="removeTextSummary()"><i class="fa fa-close"></i></a></h3>
+                <div *ngFor="let textSummary of textSummaries">
+                    <h4>Commit belongs to {{textSummary.release}} release - {{textSummary.humanDate.replace("T"," ").replace("Z","")}}</h4>
+                    <p>{{textSummary.commitSummary}}</p>
+                </div>
             </div>
 
 
-            <div *ngIf="commitReasons" class="commit-reason-story" id="commit-reason-story">
+            <div *ngIf="commitReasons?.length > 0" class="commit-reason-story" id="commit-reason-story">
                 <h3>Commits Reasons <a (click)="removeCommitReason()"><i class="fa fa-close"></i></a></h3>
-                <p>{{commitReasons}}</p>
+                <div *ngFor="let reasons of commitReasons">
+                    <h4>Commit belongs to {{reasons.release}} release - {{reasons.humanDate.replace("T"," ").replace("Z","")}}</h4>
+                    <p>{{reasons.commitReason}}</p>
+                </div>
+
             </div>
 
-            <div *ngIf="this.stats">
+            <div *ngIf="this.stats?.length > 0">
                 <h3>Useful stats <a (click)="removeStats()"><i class="fa fa-close"></i></a></h3>
-                <table class="countries_list" >
-                    <tbody>
-                    <tr>
-                        <td>Table Births</td>
-                        <td class="fs15 fw700 text-right">{{this.stats.tableBirths}}</td>
-                    </tr>
-                    <tr>
-                        <td>Table Deaths</td>
-                        <td class="fs15 fw700 text-right">{{this.stats.tableDeaths}}</td>
-                    </tr>
-                    <tr>
-                        <td>Attribute Additions</td>
-                        <td class="fs15 fw700 text-right">{{this.stats.attributesInsertedAtSurvivingTables}}</td>
-                    </tr>
-                    <tr>
-                        <td>Attribute Deletions</td>
-                        <td class="fs15 fw700 text-right">{{this.stats.attributesDeletedAtSurvivingTables}}</td>
-                    </tr>
-                    <tr>
-                        <td>Key Changes</td>
-                        <td class="fs15 fw700 text-right">{{this.stats.keyChanges}}</td>
-                    </tr>
-                    <tr>
-                        <td>Type Changes</td>
-                        <td class="fs15 fw700 text-right">{{this.stats.typeChanges}}</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div *ngFor="let stat of stats">
+                    <h4>Commit belongs to {{stat.release}} release - {{stat.commitDate.replace("T"," ").replace("Z","")}}</h4>
+                    <table class="countries_list" >
+                        <tbody>
+                        <tr>
+                            <td>Table Births</td>
+                            <td class="fs15 fw700 text-right">{{stat.tableBirths}}</td>
+                        </tr>
+                        <tr>
+                            <td>Table Deaths</td>
+                            <td class="fs15 fw700 text-right">{{stat.tableDeaths}}</td>
+                        </tr>
+                        <tr>
+                            <td>Attribute Additions</td>
+                            <td class="fs15 fw700 text-right">{{stat.attributesInsertedAtSurvivingTables}}</td>
+                        </tr>
+                        <tr>
+                            <td>Attribute Deletions</td>
+                            <td class="fs15 fw700 text-right">{{stat.attributesDeletedAtSurvivingTables}}</td>
+                        </tr>
+                        <tr>
+                            <td>Key Changes</td>
+                            <td class="fs15 fw700 text-right">{{stat.keyChanges}}</td>
+                        </tr>
+                        <tr>
+                            <td>Type Changes</td>
+                            <td class="fs15 fw700 text-right">{{this.stats.typeChanges}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div *ngIf="this.tablesAffected?.length > 0">
                 <h3>Tables affected <a (click)="removeTables()"><i class="fa fa-close"></i></a></h3>
 
-                <div *ngFor='let table of this.tablesAffected;let i = index;'>
-                    <h4 class="panel-title">Table Name: {{table.tableName}} ({{table.changes.length}} changes)</h4>
-                    <ul>
-                        <li *ngFor='let change of table.changes;'>
-                            <strong>EventType:</strong> {{change.eventType}}	| <strong>attrName:</strong>{{change.attributeName}}	<br>
-                            <strong>attrType:</strong> {{change.attributeType}} | <strong>iskey:</strong> {{change.isKey}}
-                            <strong>pkey:</strong> {{change.primaryKey}} | <strong>fkey:</strong>
-                            {{change.foreignKey}}</li>
+                <div *ngFor='let commitInfo of this.tablesAffected;'>
+                    <h4>Commit belongs to {{commitInfo.release}} release - {{commitInfo.humanDate.replace("T"," ").replace("Z","")}}</h4>
+                    <div *ngFor="let table of commitInfo.tablesChanged">
+                        <h4 class="panel-title">Table Name: {{table.tableName}} ({{table.changes.length}} changes)</h4>
+                        <ul>
+                            <li *ngFor='let change of table.changes;'>
+                                <strong>EventType:</strong> {{change.eventType}}	| <strong>attrName:</strong>{{change.attributeName}}	<br>
+                                <strong>attrType:</strong> {{change.attributeType}} | <strong>iskey:</strong> {{change.isKey}}
+                                <strong>pkey:</strong> {{change.primaryKey}} | <strong>fkey:</strong>
+                                {{change.foreignKey}}</li>
 
-                    </ul>
+                        </ul>
+                    </div>
+
                 </div>
 
             </div>

@@ -5,14 +5,14 @@ import {DatabaseController} from "../DatabaseController";
 
 export class BuildController extends DatabaseController{
 
-    constructor(){
-        super();
+    constructor(databaseController){
+        super(databaseController);
     }
 
     getAllData(projectID):Promise<any> {
 
         return new Promise((resolve) => {
-            this.database.DB.all("SELECT * FROM Branches,Builds WHERE BR_PRJ_ID=" + projectID + " AND BR_NAME='master' AND BU_BRANCH_ID=BR_ID;", function (err, commits) {
+            this.database.getDBConnection(projectID).all("SELECT * FROM Branches,Builds WHERE BR_PRJ_ID=" + projectID + " AND BR_NAME='master' AND BU_BRANCH_ID=BR_ID;", function (err, commits) {
                 resolve(commits);
             });
         });

@@ -13,9 +13,9 @@ import {ExplanationsService} from "../../../services/story-level3-service";
 export class ExplanationsLevel implements OnInit {
 
     private textSummaries = [];
-    private commitReasons;
-    private stats;
-    private tablesAffected;
+    private commitReasons = [];
+    private stats = [];
+    private tablesAffected = [];
     private issues = [];
 
     constructor(private explanationsService:ExplanationsService) {  }
@@ -32,8 +32,7 @@ export class ExplanationsLevel implements OnInit {
     waitForCommitSummary(){
         this.explanationsService.getTextSummary().subscribe(
             summary => {
-                let index = this.textSummaries.findIndex((s) => s == summary);
-                console.log(index);
+                let index = this.textSummaries.findIndex((s) => s.commitSummary == summary['commitSummary']);
                 if(index == -1){
                     this.textSummaries.push(summary);
                 }
@@ -43,21 +42,30 @@ export class ExplanationsLevel implements OnInit {
     waitForReasons(){
         this.explanationsService.getReasonOfCommit().subscribe(
             reasons => {
-                this.commitReasons = reasons;
+                let index = this.commitReasons.findIndex((s) => s.commitReason == reasons['commitReason']);
+                if(index == -1){
+                    this.commitReasons.push(reasons);
+                }
             });
     }
 
     waitForStats(){
         this.explanationsService.getUsefulStats().subscribe(
             stats => {
-                this.stats = stats;
+                let index = this.stats.findIndex((s) => s.commitId == stats['commitId']);
+                if(index == -1){
+                    this.stats.push(stats);
+                }
             });
     }
 
     waitForTablesAffected(){
         this.explanationsService.getTablesAffected().subscribe(
             tables => {
-                this.tablesAffected = tables;
+                let index = this.tablesAffected.findIndex((s) => s.commitId == tables['commitId']);
+                if(index == -1){
+                    this.tablesAffected.push(tables);
+                }
             });
     }
 
@@ -90,19 +98,19 @@ export class ExplanationsLevel implements OnInit {
     }
 
     removeCommitReason(){
-        this.commitReasons = null;
+        this.commitReasons = [];
     }
 
     removeStats(){
-        this.stats = null;
+        this.stats = [];
     }
 
     removeTables(){
-        this.tablesAffected = null;
+        this.tablesAffected = [];
     }
 
     removeIssues(){
-        this.issues = null;
+        this.issues = [];
     }
 
 }

@@ -113,9 +113,11 @@ export class AreaChart implements OnInit, OnChanges {
             this.changebreakdownCart.createChart();
         }
 
-        else */if(this.selectedProject.projectId != -1) {
-            this.loading = true;
+        else */
 
+        if(this.selectedProject.projectId != -1) {
+            this.loading = true;
+            console.log(this.selectedProject.projectId)
             this.releaseService.getReleases(url)
                 .subscribe(releases => {
                         this.releases = releases;

@@ -14,14 +14,14 @@ import {ReleaseController} from "../../models/db-controllers/ReleaseController";
 export class TransitionRouter implements ApiRouter{
 
     router:Router;
-
+    databaseController:TransitionController;
 
     /**
      * Initialize the ProjectRouter
      */
-    constructor(){
+    constructor(databaseController){
         this.router = Router({mergeParams: true});
-
+        this.databaseController = new TransitionController(databaseController);
     }
 
     getPath(): string {
@@ -31,18 +31,17 @@ export class TransitionRouter implements ApiRouter{
     /**
      * GET all commits.
      */
-    public getAll(req: Request, res: Response, next: NextFunction) {
+    public getAll(req: Request, res: Response, next: NextFunction, routerObject) {
 
-        let databaseController:TransitionController = new TransitionController();
+
         if(req.query.release_id){
-            databaseController.getTransitionsFromRelease(req.params.id,req.query.release_id)
+            routerObject.databaseController.getTransitionsFromRelease(req.params.id,req.query.release_id)
                 .then((result) => {
                     res.json(result);
                 });
         }
         else{
-
-            databaseController.getAllData(req.params.id)
+            routerObject.databaseController.getAllData(req.params.id)
                 .then((result) => {
                     res.json(result);
                 });
@@ -59,7 +58,9 @@ export class TransitionRouter implements ApiRouter{
      * endpoints.
      */
     init() {
-        this.router.get('/', this.getAll);
+        this.router.get('/', (req: Request, res: Response, next: NextFunction) => {
+            this.getAll(req, res, next, this);
+        });
         this.router.get('/:id', this.getSingle);
     }
 

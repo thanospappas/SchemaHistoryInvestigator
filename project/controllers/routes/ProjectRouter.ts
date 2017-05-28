@@ -5,33 +5,33 @@
 
 import {Router, Request, Response, NextFunction} from 'express';
 import * as express from 'express';
-import {SManager} from "../../models/project/Project";
+import {SManager} from "../../models/db-controllers/Project";
 import {BuildRouter} from "./BuildRouter";
 import {ApiRouter} from "./ApiRouter";
 
 //const Projects = require('../../public/assets/data.json');
 
-export class ProjectRouter implements ApiRouter{
+export class ProjectRouter{
 
     router: Router;
+    prjManager;
+
     /**
      * Initialize the ProjectRouter
      */
-    constructor() {
+    constructor(databaseController) {
         this.router = express.Router();
+        this.prjManager = new SManager(databaseController);
     }
 
     /**
      * GET all projects.
      */
-    public getAll(req: Request, res: Response, next: NextFunction) {
-        let prjManager = new SManager();
-
-        prjManager.getProjects()
+    public getAll(req: Request, res: Response, next: NextFunction, thisObject) {
+        thisObject.prjManager.getProjects()
             .then((result) => {
                 res.json(result);
             });
-
     }
 
     getSingle() {
@@ -48,8 +48,9 @@ export class ProjectRouter implements ApiRouter{
      * endpoints.
      */
     init() {
-        this.router.get('/', this.getAll);
-
+        this.router.get('/', (req: Request, res: Response, next: NextFunction) => {
+            return this.getAll(req, res, next, this);
+        });
     }
 
 }

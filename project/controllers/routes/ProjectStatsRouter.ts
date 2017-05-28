@@ -13,30 +13,32 @@ import {AuthorsController} from "../../models/db-controllers/ProjectStatsControl
 
 export class AuthorsRouter implements ApiRouter{
     router: Router;
+    databaseController:AuthorsController;
 
     /**
      * Initialize the ProjectRouter
      */
-    constructor() {
+    constructor(databaseController) {
         this.router = express.Router({mergeParams: true});
+        this.databaseController = new AuthorsController(databaseController);
     }
 
     /**
      * GET all builds.
      */
-    public getAll(req: Request, res: Response, next: NextFunction) {
+    public getAll(req: Request, res: Response, next: NextFunction, routerObject) {
         let prjId = parseInt(req.params.id);
-        let databaseController:AuthorsController = new AuthorsController();
+
         let groupby = req.query.group_by;
 
         if(groupby == "release"){
-            databaseController.getReleaseAuthors(prjId)
+            routerObject.databaseController.getReleaseAuthors(prjId)
                 .then((result) => {
                     res.json(result);
                 });
         }
         else{
-            databaseController.getAllData(prjId)
+            routerObject.databaseController.getAllData(prjId)
                 .then((result) => {
                     res.json(result);
                 });
@@ -57,8 +59,12 @@ export class AuthorsRouter implements ApiRouter{
      * endpoints.
      */
     init() {
-        this.router.get('/', this.getAll);
-        this.router.get('/:id', this.getSingle);
+        this.router.get('/', (req: Request, res: Response, next: NextFunction) => {
+            return this.getAll(req, res, next, this);
+        });
+        this.router.get('/:id', (req: Request, res: Response, next: NextFunction) => {
+            return this.getSingle();
+        });
 
     }
 }

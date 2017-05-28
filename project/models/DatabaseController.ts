@@ -7,8 +7,8 @@ export abstract class DatabaseController{
 
     database:DatabaseConnection;
 
-    constructor(){
-        this.database = new DatabaseConnection();
+    constructor(databaseController:DatabaseConnection){
+        this.database = databaseController;// new DatabaseConnection();
     }
 
     abstract getAllData(projectID:any):Promise<any>;

@@ -33,10 +33,13 @@ export class DevelopmentChart implements OnInit, OnChanges {
             project => {
                 this.selectedProject.selectedPrj = project['selectedPrj'];
                 this.selectedProject.projectId = project['projectId'];
-                this.getCochangedAuthors();
-                this.getCochangedFiles();
-                this.getAuthors();
-                this.getTables();
+                if(this.selectedProject.projectId != -1){
+                    this.getCochangedAuthors();
+                    this.getCochangedFiles();
+                    this.getAuthors();
+                    this.getTables();
+                }
+
             });
 
         this.releaseChanges.getReleaseChanges().subscribe(
@@ -46,10 +49,12 @@ export class DevelopmentChart implements OnInit, OnChanges {
             });
 
         this.setEventListeners();
-        this.getCochangedFiles();
-        this.getCochangedAuthors();
-        this.getAuthors();
-        this.getTables();
+        if(this.selectedProject.projectId != -1) {
+            this.getCochangedFiles();
+            this.getCochangedAuthors();
+            this.getAuthors();
+            this.getTables();
+        }
         //this.constructChordDiagramData();
 
 

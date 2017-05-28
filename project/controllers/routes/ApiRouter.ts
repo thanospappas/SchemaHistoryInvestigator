@@ -8,8 +8,8 @@ export interface ApiRouter{
     router: Router;
 
     init();
-    getAll(req: Request, res: Response, next: NextFunction);
-    getSingle(req: Request, res: Response, next: NextFunction);
+    getAll(req: Request, res: Response, next: NextFunction, routerObject:any);
+    getSingle(req: Request, res: Response, next: NextFunction, routerObject:any);
 
     getPath():string;
 

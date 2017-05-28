@@ -117,7 +117,7 @@ export class BreakdownChart {
         this.y = D3.scaleLinear().range([this.height, 0]);
         this.y2 = D3.scaleLinear().range([this.height2, 0]);
 
-        let yDomainRight = [0, D3.max(this.releases, d => d.stats.averageSchemaSizeTables)];
+        let yDomainRight = [0, D3.max(this.releases, d => d.stats.tablesAtEnd)];
 
         // create scales
 
@@ -172,14 +172,19 @@ export class BreakdownChart {
         else if(this.chartSection == '.release-summary')
             this.commitService.setSelectedCommits(dateRange,this.project);
 
-        let yMax = Math.max(20, D3.max(this.remapped, function(d) { return d.y; }));
-
+        //let yMax = Math.max(20, D3.max(this.remapped, function(d) { return d.y; }));
+        let yMax =  D3.max(this.remapped, (d) =>{
+            return D3.max(d, (dd)=> { return  dd.y; });
+        });
 
         this.x.domain([new Date(this.releases[0].dateHuman),
             new Date(this.releases[this.releases.length - 1].dateHuman)]);
-        this.y.domain([0, yMax]);
-        this.y.domain([0, D3.max(this.releases, d => (d.stats.attributeInsertionsAtExistingTables +
+
+        this.y.domain([0, D3.max(this.releases, d => (d.stats.attributesInsertedAtNewTables +
         d.stats.attributesDeletedAtDeletedTables + d.stats.attributesUpdates))]);
+
+        //this.y.domain([0, yMax]);
+
         this.x2.domain([new Date(this.releases[0].dateHuman),
             new Date(this.releases[this.releases.length - 1].dateHuman)]);
 
@@ -287,7 +292,7 @@ export class BreakdownChart {
         this.focusLine = D3.line()
 
             .x((d)=> {   return this.x(new Date(d.dateHuman)); })
-            .y((d)=> { return yScaleRight(d.stats.averageSchemaSizeTables)});
+            .y((d)=> { return yScaleRight(d.stats.tablesAtEnd)});
 
         this.focus.append("path")
             .datum(this.releases)

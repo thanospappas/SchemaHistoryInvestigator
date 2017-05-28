@@ -4,7 +4,7 @@
 
 import {Router, Request, Response, NextFunction} from 'express';
 import * as express from 'express';
-import {SManager} from "../../models/project/Project";
+import {SManager} from "../../models/db-controllers/Project";
 
 export class IndexRouter{
     irouter: Router;

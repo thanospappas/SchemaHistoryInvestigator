@@ -7,48 +7,51 @@ import * as express from 'express';
 import {ApiRouter} from "./ApiRouter";
 import {ReleaseController} from "../../models/db-controllers/ReleaseController";
 import {ReleaseCommitRouter} from "./ReleaseCommitRouter";
+import {DatabaseConnection} from "../../models/DatabaseConnection";
 
 export class ReleaseRouter implements ApiRouter{
 
     router: Router;
     releaseBasedRouters:Array<ApiRouter>;
+    databaseController:ReleaseController;
+    dbController:DatabaseConnection;
 
     /**
      * Initialize the ProjectRouter
      */
-    constructor() {
+    constructor(databaseController) {
         this.router = express.Router({mergeParams: true});
         this.releaseBasedRouters = new Array<ApiRouter>();
+        this.databaseController = new ReleaseController(databaseController);
+        this.dbController = databaseController;
     }
 
     /**
      * GET all projects.
      */
-    public getAll(req: Request, res: Response, next: NextFunction) {
+    public getAll(req: Request, res: Response, next: NextFunction, routerObject) {
         let query = parseInt(req.params.id);
 
-        let databaseController:ReleaseController = new ReleaseController();
-
         if(req.query.group_by == "tables"){
-            databaseController.getReleaseTables(req.params.id)
+            routerObject.databaseController.getReleaseTables(req.params.id)
                 .then((result) => {
                     res.json(result);
                 });
         }
         else if(req.query.in_range){
-            databaseController.getReleaseByDateRange(req.params.id, req.query.in_range)
+            routerObject.databaseController.getReleaseByDateRange(req.params.id, req.query.in_range)
                 .then((result) => {
                     res.json(result);
                 });
         }
         else if(req.query.generate_summary == "true"){
-            databaseController.generateSummary(req.params.id)
+            routerObject.databaseController.generateSummary(req.params.id)
                 .then((result) => {
                     res.json(result);
                 });
         }
         else{
-            databaseController.getAllData(req.params.id)
+            routerObject.databaseController.getAllData(req.params.id)
                 .then((result) => {
                     res.json(result);
                 });
@@ -56,22 +59,17 @@ export class ReleaseRouter implements ApiRouter{
 
     }
 
-    getSingle(req: Request, res: Response, next: NextFunction) {
-        //console.log(req.params.release_id);
-        let databaseController:ReleaseController = new ReleaseController();
-
-        databaseController.getReleaseById(req.params.release_id, req.params.id)
+    getSingle(req: Request, res: Response, next: NextFunction, routerObject) {
+       routerObject.databaseController.getReleaseById(req.params.release_id, req.params.id)
             .then((result) => {
                 res.json(result);
             });
-
-
     }
 
-    updatedSummary(req: Request, res: Response, next: NextFunction){
-        let databaseController:ReleaseController = new ReleaseController();
-        console.log(req.body.commitSummary);
-        databaseController.storeSummary(req.params.release_id,req.body.commitSummary)
+    updatedSummary(req: Request, res: Response, next: NextFunction, routerObject){
+        //let databaseController:ReleaseController = new ReleaseController();
+        //console.log(req.body.commitSummary);
+        routerObject.databaseController.storeSummary(req.params.id, req.params.release_id,req.body.commitSummary)
             .then((result) => {
                 res.json(result);
             });
@@ -86,11 +84,17 @@ export class ReleaseRouter implements ApiRouter{
      * endpoints.
      */
     init() {
-        this.router.get('/', this.getAll);
-        this.router.get('/:release_id', this.getSingle);
-        this.router.put('/:release_id',this.updatedSummary);
+        this.router.get('/', (req: Request, res: Response, next: NextFunction) => {
+            return this.getAll(req, res, next, this);
+        });
+        this.router.get('/:release_id', (req: Request, res: Response, next: NextFunction) => {
+            return this.getSingle(req, res, next, this);
+        });
+        this.router.put('/:release_id',(req: Request, res: Response, next: NextFunction) => {
+            return this.updatedSummary(req, res, next, this);
+        });
         /*initialize all nested routers*/
-        this.releaseBasedRouters.push(new ReleaseCommitRouter());
+        this.releaseBasedRouters.push(new ReleaseCommitRouter(this.dbController));
         for(let r of this.releaseBasedRouters){
             this.router.use(r.getPath(), r.router);
             r.init();

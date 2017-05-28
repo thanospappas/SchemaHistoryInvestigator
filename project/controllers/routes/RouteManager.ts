@@ -10,6 +10,7 @@ import {IssueRouter} from "./IssueRouter";
 import {AuthorsRouter} from "./ProjectStatsRouter";
 import {TransitionRouter} from "./TransitionRouter";
 import {AdminDashboardRouter} from "./AdminDashboardRouter";
+import {DatabaseConnection} from "../../models/DatabaseConnection";
 /**
  * Created by thanosp on 17/4/2017.
  */
@@ -17,24 +18,25 @@ import {AdminDashboardRouter} from "./AdminDashboardRouter";
 export class RouteManager{
 
     private routes:Array<ApiRouter>;
-    database;
+    database:DatabaseConnection;
 
-    constructor(){
+    constructor(db:DatabaseConnection){
         this.routes = new Array<ApiRouter>();
+        this.database = db;
     }
 
     createRoutes(expressApp: express.Application){
-        let prouter = new ProjectRouter();
+        let prouter = new ProjectRouter(this.database);
         let irouter = new IndexRouter();
         let arouter = new AdminDashboardRouter();
 
-        this.routes.push(new BuildRouter());
-        this.routes.push(new ReleaseRouter());
-        this.routes.push(new FilesAffectedRouter());
-        this.routes.push(new CommitRouter(true));
-        this.routes.push(new IssueRouter());
-        this.routes.push(new AuthorsRouter());
-        this.routes.push(new TransitionRouter());
+        this.routes.push(new BuildRouter(this.database));
+        this.routes.push(new ReleaseRouter(this.database));
+        this.routes.push(new FilesAffectedRouter(this.database));
+        this.routes.push(new CommitRouter(true,this.database));
+        this.routes.push(new IssueRouter(this.database));
+        this.routes.push(new AuthorsRouter(this.database));
+        this.routes.push(new TransitionRouter(this.database));
 
         prouter.init();
         irouter.init();

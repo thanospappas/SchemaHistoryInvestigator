@@ -11,29 +11,28 @@ import {IssueController} from "../../models/db-controllers/IssueController";
 
 export class IssueRouter implements ApiRouter{
     router: Router;
-
+    databaseController:IssueController;
     /**
      * Initialize the ProjectRouter
      */
-    constructor() {
+    constructor(databaseController) {
         this.router = express.Router({mergeParams: true});
+        this.databaseController = new IssueController(databaseController);
     }
 
     /**
      * GET all builds.
      */
-    public getAll(req: Request, res: Response, next: NextFunction) {
-        //let query = parseInt(req.params.id);
-        let databaseController:DatabaseController = new IssueController();
-        databaseController.getAllData(req.params.id)
+    public getAll(req: Request, res: Response, next: NextFunction, routerObject) {
+        routerObject.databaseController.getAllData(req.params.id)
             .then((result) => {
                 res.json(result);
             });
     }
 
-    increaseUsefulness(req: Request, res: Response, next: NextFunction){
-        let databaseController:IssueController = new IssueController();
-        databaseController.increaseUsefulnessScore(req.params.id)
+    increaseUsefulness(req: Request, res: Response, next: NextFunction, routerObject){
+        //let databaseController:IssueController = new IssueController();
+        routerObject.databaseController.increaseUsefulnessScore(req.params.id)
             .then((result) => {
                 res.json(result);
             });
@@ -52,9 +51,15 @@ export class IssueRouter implements ApiRouter{
      * endpoints.
      */
     init() {
-        this.router.get('/', this.getAll);
-        this.router.get('/:id', this.getSingle);
-        this.router.put('/:id', this.increaseUsefulness);
+        this.router.get('/', (req: Request, res: Response, next: NextFunction) => {
+            return this.getAll(req, res, next, this);
+        });
+        this.router.get('/:id', (req: Request, res: Response, next: NextFunction) => {
+            return this.getSingle();
+        });
+        this.router.put('/:id', (req: Request, res: Response, next: NextFunction) => {
+            return this.increaseUsefulness(req, res, next, this);
+        });
 
     }
 }

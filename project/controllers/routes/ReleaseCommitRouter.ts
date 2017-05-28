@@ -12,14 +12,14 @@ import {DatabaseController} from "../../models/DatabaseController";
 export class ReleaseCommitRouter implements ApiRouter {
 
     router: Router;
-
+    databaseController: CommitController;
 
     /**
      * Initialize the ProjectRouter
      */
-    constructor() {
+    constructor(databaseController) {
         this.router = Router({mergeParams: true});
-
+        this.databaseController= new CommitController(databaseController);
     }
 
     getPath(): string {
@@ -29,12 +29,12 @@ export class ReleaseCommitRouter implements ApiRouter {
     /**
      * GET all commits.
      */
-    public getAll(req: Request, res: Response, next: NextFunction) {
-        let databaseController: CommitController = new CommitController();
+    public getAll(req: Request, res: Response, next: NextFunction, routerObject) {
+
         let projectID = parseInt(req.params.id);
         let releaseID = parseInt(req.params.release_id);
 
-        databaseController.getCommitsFromRelease(projectID,releaseID)
+        routerObject.databaseController.getCommitsFromRelease(projectID,releaseID)
             .then((result) => {
                 res.json(result);
             });
@@ -50,7 +50,9 @@ export class ReleaseCommitRouter implements ApiRouter {
      * endpoints.
      */
     init() {
-        this.router.get('/', this.getAll);
+        this.router.get('/', (req: Request, res: Response, next: NextFunction) => {
+            this.getAll(req, res, next, this);
+        });
         this.router.get('/:id', this.getSingle);
     }
 
