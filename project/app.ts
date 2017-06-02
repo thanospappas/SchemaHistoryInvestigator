@@ -13,6 +13,7 @@ import {DatabaseConnection} from "./models/DatabaseConnection";
 import {ApiRouter} from "./controllers/routes/ApiRouter";
 import {CommitRouter} from "./controllers/routes/CommitRouter";
 import {RouteManager} from "./controllers/routes/RouteManager";
+import {ReleaseClassifier} from "./models/Classifier/ReleaseClassifier";
 // Creates and configures an ExpressJS web server.
 class App {
 
@@ -28,6 +29,9 @@ class App {
         this.middleware();
         this.routes();
         this.setViews();
+
+        let classifier = new ReleaseClassifier();
+        classifier.readReleases();
 
     }
 
