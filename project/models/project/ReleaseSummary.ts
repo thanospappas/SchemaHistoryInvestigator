@@ -4,17 +4,22 @@
 
 import {CommitInformation} from "../db-controllers/CommitController";
 import {Release} from "./Release";
+import {ReleaseClassifier, ReleaseInformation} from "../Classifier/ReleaseClassifier";
 
 
 export class ReleaseSummary{
 
     private releaseInfo:Release;
     private commitPositionFromStart:number;
-
+    private labels:string;
     private finalSummary:string;
 
     public setReleaseInfo(releaseInfo:Release){
         this.releaseInfo = releaseInfo;
+    }
+
+    public setLabels(labels){
+        this.labels = labels;
     }
 
     public getReleaseInformation(){
@@ -83,7 +88,22 @@ export class ReleaseSummary{
     }
 
     private generateThirdParagraph(){
-        let sentence1 = "This release is characterized by High …, Moderate .. and High …. so we conclude that it is a growth commit.";
+        /*let releaseInfo:ReleaseInformation = {
+            releaseName: '',attrsInjected:-1, attrsEjected:-1, attrsTypeUpdated:-1,
+            attrsKeyUpdated:-1, tableBirths:-1, tableDeaths:-1, growth:-1
+        };
+        releaseInfo.releaseName = this.releaseInfo.name;
+        releaseInfo.attrsInjected = this.releaseInfo.stats.getAttributeInsertionsAtExistingTables();
+        releaseInfo.attrsEjected = this.releaseInfo.stats.getAttributeDeletionsAtExistingTables();
+        releaseInfo.attrsTypeUpdated = this.releaseInfo.stats.getAttributeTypeAlternations();
+        releaseInfo.attrsKeyUpdated = this.releaseInfo.stats.getKeyAlternations();
+        releaseInfo.tableDeaths= this.releaseInfo.stats.getTableDeletions();
+        releaseInfo.tableBirths = this.releaseInfo.stats.getTableInsertions();
+        releaseInfo.growth = this.releaseInfo.schemaGrowth;
+        let rc:ReleaseClassifier = new ReleaseClassifier();
+        rc.addRelease(releaseInfo);*/
+
+        let sentence1 = "This release is characterized by " + this.labels;//"High …, Moderate .. and High …. so we conclude that it is a growth commit.";
         this.finalSummary += sentence1 + "\\n";
     }
 

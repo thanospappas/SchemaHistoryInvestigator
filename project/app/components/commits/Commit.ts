@@ -16,7 +16,7 @@ import * as $ from 'jquery';
 import {ExplanationsService} from "../../services/story-level3-service";
 import {IssuesFilter} from "../../shared/IssueFilter";
 
-declare var tinymce: any;
+declare var tinymce:any;
 @Component({
     selector: 'commits',
     templateUrl: './commits.html',
@@ -37,6 +37,7 @@ export class CommitComponent implements OnInit {
     private editorContent;
     private summarySaved = false;
 
+
     constructor(private commitService: CommitService, private httpService:HttpService,private projectService:ProjectService,
                 private newLineFilter:NewlinesFilter, private explanationsService:ExplanationsService, private issuesOrderBy:IssuesFilter) {
 
@@ -53,19 +54,29 @@ export class CommitComponent implements OnInit {
                 this.getTablesChanged();
                 this.getBuildInfo();
                 this.getIssuesInfo();
+                console.log(this.newLineFilter.transform(this.selectedCommit.commitSummary));
+                console.log(tinymce);
                 tinymce.activeEditor.setContent(this.newLineFilter.transform(this.selectedCommit.commitSummary));
+                console.log(tinymce.activeEditor.getContent());
             });
+
+
     }
 
 
     ngAfterViewInit() {
+
+        console.log("ccccccccc")
+        console.log(tinymce )
         tinymce.init({
-            selector: '#' + 111,
+            selector: '#commitSummary__yo',
             plugins: ['paste'],
             skin_url: '../public/assets/skins/lightgray',
             height : "380",
+
             setup: editor => {
                 this.editor = editor;
+                console.log(editor);
                 editor.on('keyup', () => {
                     const content = editor.getContent();
                 });
@@ -73,6 +84,8 @@ export class CommitComponent implements OnInit {
             },
 
         });
+        console.log(this.editor);
+        console.log(tinymce )
     }
 
     private getRelease(){
@@ -83,6 +96,7 @@ export class CommitComponent implements OnInit {
             .subscribe(release => {
                     this.commitsRelease =release[0];
                     this.commitsRelease.RE_DATE = new Date(parseInt(this.commitsRelease.RE_DATE)*1000);
+
                 },
                 err => {
                     console.log(err);

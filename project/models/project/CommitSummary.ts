@@ -7,11 +7,15 @@ export class CommitSummary{
 
     private commitInfo:CommitInformation;
     private commitPositionFromStart:number;
-
+    private  labels:string;
     private finalSummary:string;
 
     public setCommitInfo(commitInfo:CommitInformation){
         this.commitInfo = commitInfo;
+    }
+
+    public setLabels(labels){
+        this.labels = labels;
     }
 
     public getCommitInformation(){
@@ -73,7 +77,7 @@ export class CommitSummary{
     }
 
     private generateThirdParagraph(){
-        let sentence1 = "This commit is characterized by High …, Moderate .. and High …. so we conclude that it is a growth commit.";
+        let sentence1 = "This commit is characterized by " + this.labels;
         this.finalSummary += sentence1 + "\\n";
     }
 

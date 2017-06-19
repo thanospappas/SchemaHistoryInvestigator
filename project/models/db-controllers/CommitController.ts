@@ -4,6 +4,7 @@ import {AtomicSchemaChange} from "../schema-history/AtomicSchemaChange";
 import {CommitSummary} from "../project/CommitSummary";
 import {ReleaseController} from "./ReleaseController";
 import {Commit} from "../project/Commit";
+import {CommitClassifier} from "../Classifier/CommitClassifier";
 
 /**
  * Created by thanosp on 17/4/2017.
@@ -251,6 +252,12 @@ export class CommitController extends DatabaseController{
         return new Promise((resolve) => {
             this.getAllInfo(projectId)
             .then(commits =>{
+                let cc:CommitClassifier = new CommitClassifier();
+                cc.setCommitsForClassification(commits);
+                cc.computeThresholds();
+                cc.classifyReleases();
+                let classifiedCommits = cc.getClassifiedCommits();
+                console.log(classifiedCommits);
                 for(let commit of commits){
                     console.log(commit);
                     let releasePromise = this.getFilesAffected(projectId,commit.commitId);
@@ -272,6 +279,7 @@ export class CommitController extends DatabaseController{
                             commits[index].filesAffected = files.length;
                             let commitSummary = new CommitSummary();
                             commitSummary.setCommitInfo(commits[index]);
+                            commitSummary.setLabels(classifiedCommits[index].labels.toString());
                             commitSummary.setPosition(index);
                             commitSummaries.push(commitSummary);
                         }

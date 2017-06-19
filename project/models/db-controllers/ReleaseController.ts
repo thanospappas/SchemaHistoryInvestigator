@@ -8,6 +8,7 @@ import {Stats} from "../schema-history/ReleaseStats";
 import {DatabaseController} from "../DatabaseController";
 import {Commit} from "../project/Commit";
 import {ReleaseSummary} from "../project/ReleaseSummary";
+import {ReleaseClassifier} from "../Classifier/ReleaseClassifier";
 
 export class ReleaseController extends DatabaseController{
 
@@ -393,13 +394,20 @@ export class ReleaseController extends DatabaseController{
     generateSummary(projectId){
 
         return new Promise((resolve) => {
-
+            let rc:ReleaseClassifier = new ReleaseClassifier();
             this.getAllData(projectId).then(releases => {
 
                 let releaseSummaries:Array<ReleaseSummary> = new Array<ReleaseSummary>();
+
+                rc.setReleasesForClassification(releases);
+                rc.computeThresholds();
+                rc.classifyReleases();
+                let classifiedReleases = rc.getReleases();
+
                 for(let i = 0; i < releases.length; i++){
                     let releaseSummary = new ReleaseSummary();
                     releaseSummary.setReleaseInfo(releases[i]);
+                    releaseSummary.setLabels(classifiedReleases[i].labels);
                     releaseSummary.setPosition(i);
                     releaseSummary.generateParagraphs();
                     releaseSummaries.push(releaseSummary);

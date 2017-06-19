@@ -46,14 +46,14 @@
 
                     </div>
                     <div *ngIf="!loading">
-                        <div class="x_title">
+                        <!--<div class="x_title">
                             <h2>Text Summary</h2>
                             <div class="clearfix"></div>
                         </div>
                         <p> Text describing the selected period.</p>
                         <p> Text describing the selected period.</p>
                         <p> Text describing the selected period.</p>
-
+-->
                         <div class="x_title">
                             <h2>Releases <span *ngIf="this.selectedReleases?.length > 0">({{this.selectedReleases.length}})</span></h2>
                             <div class="clearfix"></div>
@@ -67,7 +67,7 @@
                                 (click)="releaseDrillDown(release)">
 
                                 <a class="pull-left border-aero profile_thumb">
-                                    <i class="fa fa-user aero"></i>
+                                    <i class="fa fa-tag" aria-hidden="true"></i>
                                 </a>
                                 <div class="media-body">
                                     <a class="title">{{ release.name }}</a>

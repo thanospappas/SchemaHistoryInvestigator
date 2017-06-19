@@ -14,6 +14,7 @@ import {ApiRouter} from "./controllers/routes/ApiRouter";
 import {CommitRouter} from "./controllers/routes/CommitRouter";
 import {RouteManager} from "./controllers/routes/RouteManager";
 import {ReleaseClassifier} from "./models/Classifier/ReleaseClassifier";
+import {CommitClassifier} from "./models/Classifier/CommitClassifier";
 // Creates and configures an ExpressJS web server.
 class App {
 
@@ -31,7 +32,9 @@ class App {
         this.setViews();
 
         let classifier = new ReleaseClassifier();
-        classifier.readReleases();
+        let commitClassifier = new CommitClassifier();
+        //classifier.readReleases();
+        //commitClassifier.readCommits();
 
     }
 

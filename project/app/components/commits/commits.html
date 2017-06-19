@@ -1,7 +1,7 @@
 <!-- top tiles -->
 <div class="row tile_count" style="margin-top: 120px" *ngIf="this.selectedCommit">
     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> # Tables</span>
+        <span class="count_top"><i class="fa fa-table" aria-hidden="true"></i> # Tables</span>
         <div class="count">{{this.selectedCommit.newTables}}</div>
         <span class="count_bottom">
 
@@ -12,7 +12,7 @@
             From last version</span>
     </div>
     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-clock-o"></i> # Attributes</span>
+        <span class="count_top"><i class="fa fa-window-minimize" aria-hidden="true"></i> # Attributes</span>
         <div class="count">{{this.selectedCommit.newAttributes}}</div>
         <span class="count_bottom">
 
@@ -22,11 +22,11 @@
              From last version</span>
     </div>
     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Changes</span>
+        <span class="count_top"><i class="fa fa-line-chart" aria-hidden="true"></i> Total Changes</span>
         <div class="count green">{{this.selectedCommit.totalChanges}}</div>
     </div>
     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Versions Affected</span>
+        <span class="count_top"><i class="fa fa-code-fork" aria-hidden="true"></i> Versions Affected</span>
         <div class="" style="padding-top:15px;"><strong>Old:</strong>
             <span>{{this.selectedCommit.transitionOldVersion}}</span>
             <br>
@@ -35,7 +35,7 @@
         </div>
     </div>
     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Commit Date</span>
+        <span class="count_top"><i class="fa fa-calendar" aria-hidden="true"></i> Commit Date</span>
         <div class="" style="padding-top:15px;">
             <article class="media event">
             <a class="pull-left date">
@@ -45,7 +45,7 @@
         </div>
     </div>
     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" >
-        <span class="count_top"><i class="fa fa-user"></i> Release Info</span>
+        <span class="count_top"><i class="fa fa-tag" aria-hidden="true"></i> Release Info</span>
         <div class="" style="padding-top:10px;"><strong>Release name:</strong> {{this.selectedCommit.release}}<br>
             <strong>Release date: </strong> {{this.selectedCommit.releaseDate | date:'yMMMd'}}
         </div>
@@ -96,8 +96,8 @@
                                     </button>
                                     <h4 class="modal-title" id="myModalLabel">Edit Summary</h4>
                                 </div>
-                                <div class="modal-body">
-                                    <textarea id="111">
+                                <div class="modal-body" >
+                                    <textarea id="commitSummary__yo">
                                     <p *ngIf="this.selectedCommit" [innerHTML]="this.selectedCommit.commitSummary | newLineFilter"> </p>
                                         </textarea>
                                 </div>
@@ -111,6 +111,9 @@
                         </div>
                     </div>
                     <!-- /modals -->
+
+
+
 
                     <h2 style="padding-top:20px;">The reasons of the commit is shown below:</h2>
                     <p *ngIf="this.selectedCommit" [innerHTML]="this.selectedCommit.commitText"></p>

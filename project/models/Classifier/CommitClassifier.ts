@@ -1,11 +1,10 @@
-import {ArgumentOutOfRangeError} from "rxjs";
 /**
- * Created by thanosp on 31/5/2017.
+ * Created by thanosp on 3/6/2017.
  */
 
-export class ReleaseClassifier{
 
-    private releases:Array<ReleaseInformation>;
+export class CommitClassifier{
+    private releases:Array<CommitClassificationInformation>;
     private intraChangesLow:number;
     private intraChangesMedium:number;
 
@@ -13,30 +12,26 @@ export class ReleaseClassifier{
     private birthsDeathsMedium:number;
 
     private inputFiles:Array<string> = [
-        'biosql_releases.csv', 'ensembl_releases.csv',
-        'mediawiki_releases.csv', 'opencart_releases.csv',
-        'phpbb_releases.csv', 'typo_releases.csv'
-            ];
+        'biosql_transitions.csv', 'ensembl_transitions.csv',
+        'mediawiki_transitions.csv', 'opencart_transitions.csv',
+        'phpbb_transitions.csv', 'typo_transitions.csv'
+    ];
     private outputFiles:Array<string> =[
-        'biosql_releases_classified.csv', 'ensembl_releases_classified.csv',
-        'mediawiki_releases_classified.csv', 'opencart_releases_classified.csv',
-        'phpbb_releases_classified.csv', 'typo_releases_classified.csv'
-        ];
+        'biosql_commits_classified.csv', 'ensembl_commits_classified.csv',
+        'mediawiki_commits_classified.csv', 'opencart_commits_classified.csv',
+        'phpbb_commits_classified.csv', 'typo_commits_classified.csv'
+    ];
 
     private outputStatsFiles:Array<string> =[
-        'biosql_releases_classified_stats.csv', 'ensembl_releases_classified_stats.csv',
-        'mediawiki_releases_classified_stats.csv', 'opencart_releases_classified_stats.csv',
-        'phpbb_releases_classified_stats.csv', 'typo_releases_classified_stats.csv'
+        'biosql_commits_classified_stats.csv', 'ensembl_commits_classified_stats.csv',
+        'mediawiki_commits_classified_stats.csv', 'opencart_commits_stats.csv',
+        'phpbb_commits_classified_stats.csv', 'typo_commits_classified_stats.csv'
     ];
 
     constructor(){
-        this.releases = new Array<ReleaseInformation>();
+        this.releases = new Array<CommitClassificationInformation>();
         //this.outputFiles = new Array<string>();
 
-    }
-
-    addRelease(release:ReleaseInformation){
-        this.releases.push(release);
     }
 
     computeThresholds(){
@@ -52,8 +47,8 @@ export class ReleaseClassifier{
         intraTableUpdates.sort((a, b) => {return a-b});
         birthsDeathsTotal.sort((a, b) => {return a-b});
 
-        let lowLimit = Math.floor(intraTableUpdates.length*0.6);
-        let mediumLimit = Math.floor(intraTableUpdates.length*0.9);
+        let lowLimit = Math.floor(intraTableUpdates.length*0.8);
+        let mediumLimit = Math.floor(intraTableUpdates.length*0.95);
         this.intraChangesLow = intraTableUpdates[lowLimit];
         this.intraChangesMedium = intraTableUpdates[mediumLimit];
 
@@ -65,13 +60,14 @@ export class ReleaseClassifier{
 
         if(this.intraChangesLow == this.intraChangesMedium){
             let largerThanLowLimit = intraTableUpdates.filter((num) => { return num > this.intraChangesLow});
+            largerThanLowLimit.sort((a,b) => {return a-b});
             console.log(largerThanLowLimit);
-            this.birthsDeathsMedium[0] = largerThanLowLimit[0];
+            this.birthsDeathsMedium = largerThanLowLimit[0];
         }
         if(this.birthsDeathsLow == this.birthsDeathsMedium){
             let largerThanLowLimit = intraTableUpdates.filter((num) => { return num > this.birthsDeathsLow});
-            console.log(largerThanLowLimit);
-            this.birthsDeathsMedium[0] = largerThanLowLimit[0];
+            //console.log(largerThanLowLimit);
+            this.birthsDeathsMedium = largerThanLowLimit[0];
         }
     }
 
@@ -114,9 +110,9 @@ export class ReleaseClassifier{
                     labels.push(label);
                 }
                 else if (birthPercent > deathPercent + threshold){
-                        //table expansion - restructuring
-                        label += "Growth: table expansion";
-                        labels.push(label);
+                    //table expansion - restructuring
+                    label += "Growth: table expansion";
+                    labels.push(label);
                 }
                 else if(deathPercent > birthPercent + threshold){
                     //table shrinking - restructuring
@@ -155,7 +151,7 @@ export class ReleaseClassifier{
                 }
                 else if(ejectedPercent > ( injectedPercent + threshold)){
                     //maintenance: inter table shrink
-                    label += "Maintenance: intra table shrink";
+                    label += "Maintenance: intra table shrinking";
                     labels.push(label);
                 }
                 else{// intra table maintenance
@@ -208,10 +204,6 @@ export class ReleaseClassifier{
 
     }
 
-    getReleases(){
-        return this.releases;
-    }
-
     export(i){
         let fs = require("fs");
         console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i]);
@@ -219,16 +211,18 @@ export class ReleaseClassifier{
         if(fs.existsSync(outFile))
             fs.truncateSync(outFile);
 
-            fs.appendFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i],
-                "Name;Births;Deaths;aIns@eT;aDel@eT;keyAlt;TypeAlt;Schema Growth;Categories;SummarizedCategories" + "\n");
-            for(let release of this.releases){
-                fs.appendFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i],
-                    release.releaseName + ";" +release.tableBirths + ";" + release.tableDeaths + ";" +
-                    release.attrsInjected + ";" + release.attrsEjected + ";" + release.attrsKeyUpdated
-                    + ";" + release.attrsTypeUpdated + ";" + release.growth + ";" + release.labels.toString() + ";"
-                    + release.summarizedLabels.toString() +"\n");
-            }
-            //fs.close(fd);
+        fs.appendFileSync(outFile,
+            "CommitDate;Name;Births;Deaths;aIns@eT;aDel@eT;keyAlt;TypeAlt;Schema Growth;Categories;SummarizedCategories" + "\n");
+        for(let release of this.releases){
+            fs.appendFileSync(outFile,
+                release.date + ";" + release.releaseName + ";" +release.tableBirths + ";" + release.tableDeaths + ";" +
+                release.attrsInjected + ";" + release.attrsEjected + ";" + release.attrsKeyUpdated
+                + ";" + release.attrsTypeUpdated + ";" + release.growth + ";" + release.labels.toString() + ";"
+                + release.summarizedLabels.toString() +"\n");
+        }
+        //fs.close(fd);
+
+
     }
 
     exportStats(i){
@@ -283,193 +277,76 @@ export class ReleaseClassifier{
                 cat.name + ";" + cat.count  +"\n");
         }
 
-        this.findPatterns(i);
+        //this.findPatterns(i);
 
         //fs.close(fd);
     }
 
-
-    findPatterns(i){
-        let fs = require("fs");
-        let outFile = 'C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i];
-
-        let N = 2;
-        let grams = [];
-        let summarizedGrams = [];
-        for (let i =0; i < this.releases.length-N; i++){
-            let labels = this.releases[i].labels;
-            if(labels.length > 1){
-                labels.sort();
-                if(labels.length > 2){
-                    for(let i=0;i<labels.length;i++){
-                        for(let j=i+1;j<labels.length;j++){
-                            grams.push("{" + labels[i] + "," + labels[j] + "}");
-                        }
-                    }
-                }
-                grams.push("{" + labels.toString() + "}");
-            }
-
-            let sLabels = this.releases[i].summarizedLabels;
-            if(sLabels.length > 1){
-                sLabels.sort();
-                if(sLabels.length > 2){
-                    for(let i=0;i<sLabels.length;i++){
-                        for(let j=i+1;j<sLabels.length;j++){
-                            grams.push("{" + sLabels[i] + "," + sLabels[j] + "}");
-                        }
-                    }
-                }
-                grams.push("{" + sLabels.toString() + "}");
-            }
-
-            for(let label of labels){
-                for(let j = i+1; j < i+N; j++){
-                    for(let l of this.releases[j].labels){
-                        let str = label + "," + l;
-                        grams.push(str);
-                    }
-
-                    if(this.releases[j].labels.length > 1){
-                        let lab = this.releases[j].labels;
-                        lab.sort();
-                        if(lab.length > 2){
-                            for(let i=0;i<lab.length;i++){
-                                for(let j=i+1;j<lab.length;j++){
-                                    grams.push(label + ",{" + lab[i] + "," + lab[j] + "}");
-                                }
-                            }
-                        }
-                        grams.push(label + ",{" + lab.toString() + "}");
-                    }
-                }
-            }
-            for(let label of this.releases[i].summarizedLabels){
-                for(let j = i+1; j < i+N; j++){
-                    for(let l of this.releases[j].summarizedLabels){
-                        let str = label + "," + l;
-                        summarizedGrams.push(str);
-                    }
-
-                    if(this.releases[j].summarizedLabels.length > 1){
-                        let lab = this.releases[j].summarizedLabels;
-                        lab.sort();
-                        if(lab.length > 2){
-                            for(let i=0;i<lab.length;i++){
-                                for(let j=i+1;j<lab.length;j++){
-                                    summarizedGrams.push(label + ",{" + lab[i] + "," + lab[j] + "}");
-                                }
-                            }
-                        }
-                        summarizedGrams.push(label + ",{" + lab.toString() + "}");
-                    }
-
-                }
-            }
-        }
-
-        let patternsCounts = [];
-        for(let gram of grams){
-            let index = patternsCounts.findIndex((c) => c.name.toString() == gram.toString());
-            if (index != -1){
-                patternsCounts[index].count++;
-            }
-            else{
-                let cat = { name: '', count: 0};
-                cat.name = gram.toString();
-                cat.count = 1;
-                patternsCounts.push(cat);
-            }
-        }
-
-        let summarizedPatternsCounts = [];
-        for(let gram of summarizedGrams){
-            let index = summarizedPatternsCounts.findIndex((c) => c.name.toString() == gram.toString());
-            if (index != -1){
-                summarizedPatternsCounts[index].count++;
-            }
-            else{
-                let cat = { name: '', count: 0};
-                cat.name = gram.toString();
-                cat.count = 1;
-                summarizedPatternsCounts.push(cat);
-            }
-        }
-
-        fs.appendFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i],
-            "\nPattern;Count"  +"\n");
-        for(let pattern of patternsCounts){
-            fs.appendFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i],
-                pattern.name + ";" + pattern.count  +"\n");
-        }
-
-
-        fs.appendFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i],
-            "\nSummarizedPattern;Count"  +"\n");
-        for(let pattern of summarizedPatternsCounts){
-            fs.appendFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i],
-                pattern.name + ";" + pattern.count  +"\n");
-        }
-
-        //console.log(patternsCounts);
-        //print itemfreq(grams)
-    }
-
-    readReleases(){
+    readCommits(){
         // Synchronous read
         var fs = require("fs");
         for(let i = 0; i < this.inputFiles.length;i++){
-            this.releases = new Array<ReleaseInformation>();
+            this.releases = new Array<CommitClassificationInformation>();
             console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.inputFiles[i]);
             var data = fs.readFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.inputFiles[i]);
             for(let line of data.toString().split("\n")){
-                if(line.indexOf("Phase") !== -1) continue;
+                if(line.indexOf("trID") !== -1) continue;
                 let splittedLine = line.split(";");
                 if(splittedLine.length < 2) continue;
-                let releaseInfo:ReleaseInformation = {
+                let releaseInfo:CommitClassificationInformation = {
                     releaseName: '',attrsInjected:-1, attrsEjected:-1, attrsTypeUpdated:-1,
                     attrsKeyUpdated:-1, tableBirths:-1, tableDeaths:-1, growth:-1
                 };
 
-                releaseInfo.releaseName = splittedLine[0];
-                releaseInfo.tableBirths = parseInt(splittedLine[2]);
-                releaseInfo.tableDeaths = parseInt(splittedLine[3]);
-                releaseInfo.attrsInjected = parseInt(splittedLine[4]);
-                releaseInfo.attrsEjected = parseInt(splittedLine[7]);
-                releaseInfo.attrsKeyUpdated = parseInt(splittedLine[8]);
-                releaseInfo.attrsTypeUpdated = parseInt(splittedLine[9]);
-                releaseInfo.growth = parseInt(splittedLine[25]);
+                releaseInfo.releaseName = splittedLine[16];
+                releaseInfo.tableBirths = parseInt(splittedLine[8]);
+                releaseInfo.tableDeaths = parseInt(splittedLine[9]);
+                releaseInfo.attrsInjected = parseInt(splittedLine[10]);
+                releaseInfo.attrsEjected = parseInt(splittedLine[11]);
+                releaseInfo.attrsKeyUpdated = parseInt(splittedLine[13]);
+                releaseInfo.attrsTypeUpdated = parseInt(splittedLine[12]);
+                releaseInfo.growth = parseInt(splittedLine[5]) - parseInt(splittedLine[4]);
+
+                releaseInfo.date = splittedLine[0];
                 this.releases.push(releaseInfo);
             }
+
             this.computeThresholds();
-          //  this.classifyReleases(i);
+            //this.classifyReleases(i);
         }
 
     }
 
+    getClassifiedCommits(){
+        return this.releases;
+    }
 
-    setReleasesForClassification(releases){
-        for(let release of releases){
-            let releaseInfo:ReleaseInformation = {
+    setCommitsForClassification(commits){
+
+        for(let commit of commits){
+            let releaseInfo:CommitClassificationInformation = {
                 releaseName: '',attrsInjected:-1, attrsEjected:-1, attrsTypeUpdated:-1,
                 attrsKeyUpdated:-1, tableBirths:-1, tableDeaths:-1, growth:-1
             };
-            releaseInfo.releaseName = release.name;
-            releaseInfo.attrsInjected = release.stats.getAttributeInsertionsAtExistingTables();
-            releaseInfo.attrsEjected = release.stats.getAttributeDeletionsAtExistingTables();
-            releaseInfo.attrsTypeUpdated = release.stats.getAttributeTypeAlternations();
-            releaseInfo.attrsKeyUpdated = release.stats.getKeyAlternations();
-            releaseInfo.tableDeaths= release.stats.getTableDeletions();
-            releaseInfo.tableBirths = release.stats.getTableInsertions();
-            releaseInfo.growth = release.schemaGrowth;
 
+            //releaseInfo.releaseName = splittedLine[16];
+            releaseInfo.tableBirths = commit.tableBirths;
+            releaseInfo.tableDeaths = commit.tableDeaths;
+            releaseInfo.attrsInjected = commit.attributesInsertedAtSurvivingTables;
+            releaseInfo.attrsEjected = commit.attributesDeletedAtSurvivingTables;
+            releaseInfo.attrsKeyUpdated = commit.typeChanges;
+            releaseInfo.attrsTypeUpdated = commit.keyChanges;
+            releaseInfo.growth = commit.schemaGrowth;
+
+            releaseInfo.date = commit.commitDate;
             this.releases.push(releaseInfo);
         }
 
     }
+
 }
 
-export interface ReleaseInformation{
+export interface CommitClassificationInformation{
     releaseName:string;
     attrsInjected:number;
     attrsEjected:number;
@@ -480,4 +357,5 @@ export interface ReleaseInformation{
     growth:number;
     labels?:Array<string>;
     summarizedLabels?:Array<string>;
+    date?:string;
 }

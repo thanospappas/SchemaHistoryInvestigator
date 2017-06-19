@@ -74,6 +74,7 @@ export class ReleaseComponent implements OnInit {
     setReleaseForEdit(release){
         this.releaseForEdit = release;
         console.log(this.releaseForEdit);
+        console.log(tinymce);
         tinymce.activeEditor.setContent(this.newlinesFilter.transform(this.releaseForEdit.releaseSummary));
     }
 
@@ -157,6 +158,7 @@ export class ReleaseComponent implements OnInit {
             height : "380",
             setup: editor => {
                 this.editor = editor;
+                console.log(editor);
                 editor.on('keyup', () => {
                     const content = editor.getContent();
                 });
@@ -164,6 +166,7 @@ export class ReleaseComponent implements OnInit {
             },
 
         });
+        console.log("iiii");
     }
 
     retrieveSelectedCommits(minDate,maxDate){

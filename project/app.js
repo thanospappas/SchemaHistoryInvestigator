@@ -8,6 +8,7 @@ require("reflect-metadata");
 var DatabaseConnection_1 = require("./models/DatabaseConnection");
 var RouteManager_1 = require("./controllers/routes/RouteManager");
 var ReleaseClassifier_1 = require("./models/Classifier/ReleaseClassifier");
+var CommitClassifier_1 = require("./models/Classifier/CommitClassifier");
 // Creates and configures an ExpressJS web server.
 var App = (function () {
     //Run configuration methods on the Express instance.
@@ -18,7 +19,9 @@ var App = (function () {
         this.routes();
         this.setViews();
         var classifier = new ReleaseClassifier_1.ReleaseClassifier();
-        classifier.readReleases();
+        var commitClassifier = new CommitClassifier_1.CommitClassifier();
+        //classifier.readReleases();
+        //commitClassifier.readCommits();
     }
     App.prototype.setViews = function () {
         this.express.set('views', path.join(__dirname + '/app/views'));

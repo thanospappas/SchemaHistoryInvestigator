@@ -100,7 +100,11 @@
     <div class="col-md-5 col-sm-6 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Text Summary</h2>
+                <!--<h2>Text Summary</h2>-->
+               <div *ngIf="commits?.length > 0">
+                    <h2>Commits ({{commits.length}})</h2>
+
+                </div>
                 <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link-commit-list"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -121,14 +125,14 @@
             <div class="x_content">
 
 
-                <p> Text describing the selected period.</p>
+                <!--<p> Text describing the selected period.</p>
                 <p> Text describing the selected period.</p>
                 <p> Text describing the selected period.</p>
 
                 <div class="x_title" *ngIf="commits?.length > 0">
                     <h2>Commits ({{commits.length}})</h2>
                     <div class="clearfix"></div>
-                </div>
+                </div>-->
                 <ul class="list-unstyled timeline scroll-view1" style="overflow-y: scroll;height:350px;">
 
                     <li *ngFor="let commit of commits">
