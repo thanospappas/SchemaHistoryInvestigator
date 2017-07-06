@@ -54,10 +54,10 @@ export class CommitComponent implements OnInit {
                 this.getTablesChanged();
                 this.getBuildInfo();
                 this.getIssuesInfo();
-                console.log(this.newLineFilter.transform(this.selectedCommit.commitSummary));
-                console.log(tinymce);
+                //console.log(this.newLineFilter.transform(this.selectedCommit.commitSummary));
+                //console.log(tinymce);
                 tinymce.activeEditor.setContent(this.newLineFilter.transform(this.selectedCommit.commitSummary));
-                console.log(tinymce.activeEditor.getContent());
+                //console.log(tinymce.activeEditor.getContent());
             });
 
 
@@ -70,17 +70,18 @@ export class CommitComponent implements OnInit {
         tinymce.init({
             selector: '#commitSummary__yo',
             plugins: ['paste'],
+
             skin_url: '../public/assets/skins/lightgray',
             height : "380",
 
-            setup: editor => {
+            /*setup: editor => {
                 this.editor = editor;
                 console.log(editor);
                 editor.on('keyup', () => {
                     const content = editor.getContent();
                 });
                 editor.fire('ScrollWindow', function(){});
-            },
+            },*/
 
         });
         console.log(this.editor);

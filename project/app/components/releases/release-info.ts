@@ -46,6 +46,7 @@ export class ReleaseComponent implements OnInit {
 
         this.commitChangesChart = new BreakdownChart(".release-summary",".commit-overview",releaseChanges);
         this.commitChangesChart.setCommitService(this.commitService);
+        this.commitChangesChart.setProjectService(this.projectService);
     }
 
     isSingleReleaseOn(){

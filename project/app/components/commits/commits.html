@@ -89,9 +89,16 @@
                                     <h4 class="modal-title" id="myModalLabel">Edit Summary</h4>
                                 </div>
                                 <div class="modal-body" >
-                                    <textarea id="commitSummary__yo">
+                                    <app-tiny-editor
+                                            [elementId]="'my-editor'"
+                                            [text]='this.selectedCommit.commitSummary'
+
+                                    >
+                                    </app-tiny-editor>
+
+                                    <!--<textarea id="commitSummary__yo">
                                     <p *ngIf="this.selectedCommit" [innerHTML]="this.selectedCommit.commitSummary | newLineFilter"> </p>
-                                        </textarea>
+                                        </textarea>-->
                                 </div>
                                 <div class="modal-footer">
                                     <p *ngIf="summarySaved" style="color:#6dce0c">Summary was saved successfully ... </p>

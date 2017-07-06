@@ -6,6 +6,7 @@ import * as D3 from 'd3/build/d3.js';
 import * as $ from 'jquery';
 import {ReleaseService} from "../services/releases.service";
 import {CommitService} from "../services/commits.service";
+import {serverPort} from "../config/server-info";
 
 
 export class BreakdownChart {
@@ -38,6 +39,7 @@ export class BreakdownChart {
     private chartOverview:string;
     private releaseService:ReleaseService;
     private commitService:CommitService;
+    private projectService;
     private project;
 
     constructor(chartSection:string, chartOverview:string, releaseService:ReleaseService) {
@@ -45,6 +47,10 @@ export class BreakdownChart {
         this.releaseService = releaseService;
         this.chartOverview = chartOverview;
 
+    }
+
+    setProjectService(projectService){
+        this.projectService = projectService;
     }
 
     setCommitService(commitService){
@@ -103,7 +109,7 @@ export class BreakdownChart {
                     yData = d.stats.attributesUpdates;
                     cat = "attributesUpdates";
                 }
-                return {x: d.dateHuman, y: yData, cat: cat, catID: i };
+                return {x: d.dateHuman, y: yData, cat: cat, catID: i, vid: d.id };
             });
             return xx
         });
@@ -234,6 +240,30 @@ export class BreakdownChart {
                 D3.select(this)
                     .classed("hovered-bar", true);
 
+            })
+            .on("click",(d) => {
+              if(this.chartSection == '.release-summary')  {
+                  let url = "http://localhost:" + serverPort + "/api/v1/projects/" +
+                      + this.projectService.getSelectedProjectData().projectId + "/commits/" + d.vid;
+                  this.commitService.getSelectedCommit(url);
+                  console.log(url);
+
+                  var $li = $(".commits-menu-item");
+                  var $currentli = $('#sidebar-menu').find('li.active-sm');
+                  $currentli.removeClass('active active-sm');
+                  $li.addClass('active active-sm');
+                  //$('.right_col').find('.sidebar-tab-pane').removeClass('active');
+
+                  $('.right_col').find('.sidebar-tab-pane').fadeOut(400, function () {
+                      $('.right_col').find('.sidebar-tab-pane').delay().removeClass('active');
+                  });
+
+                  var $selectedTab = $('.right_col').find("#commits");
+                  //$selectedTab.addClass('active');
+                  $selectedTab.delay(400).fadeIn(400, function () {
+                      $selectedTab.addClass('active');
+                  });
+              }
             });
 
         layer.selectAll('rect')
@@ -542,33 +572,6 @@ export class BreakdownChart {
             .transition()
             .style("stroke-opacity", opacity)
             .style("fill-opacity", opacity);
-    }
-
-
-
-    savetoPng(){
-        let svg = document.querySelector( "svg" );
-        let svgData = new XMLSerializer().serializeToString( svg );
-
-        let canvas = document.createElement( "canvas" );
-        canvas.width = this.width;
-        canvas.height = this.height;
-        let ctx = canvas.getContext( "2d" );
-
-        let img = document.createElement( "img" );
-        img.setAttribute( "src", "data:image/svg+xml;base64," + btoa( svgData ) );
-        let w = this.width;
-        let h = this.height;
-        let filename = "download.png";
-        img.onload = function() {
-            ctx.drawImage( img, 0, 0 , w,h);
-            // Now is done
-            console.log( canvas.toDataURL( "image/png" ) );
-            let a = document.createElement("a");
-            a.download = filename;
-            a.href = canvas.toDataURL( "image/png" );
-            a.click();
-        };
     }
 
 
