@@ -52,16 +52,16 @@ export class ReleaseClassifier{
         intraTableUpdates.sort((a, b) => {return a-b});
         birthsDeathsTotal.sort((a, b) => {return a-b});
 
-        let lowLimit = Math.floor(intraTableUpdates.length*0.6);
-        let mediumLimit = Math.floor(intraTableUpdates.length*0.9);
-        this.intraChangesLow = intraTableUpdates[lowLimit];
-        this.intraChangesMedium = intraTableUpdates[mediumLimit];
-
+        let lowLimit = Math.floor(intraTableUpdates.length*0.8);
+        let mediumLimit = Math.floor(intraTableUpdates.length*0.95);
+        this.intraChangesLow = intraTableUpdates[lowLimit-1];
+        this.intraChangesMedium = intraTableUpdates[mediumLimit-1];
+        console.log(mediumLimit);
         console.log(this.intraChangesLow);
         console.log(this.intraChangesMedium);
 
-        this.birthsDeathsLow = birthsDeathsTotal[lowLimit];
-        this.birthsDeathsMedium = birthsDeathsTotal[mediumLimit];
+        this.birthsDeathsLow = birthsDeathsTotal[lowLimit-1];
+        this.birthsDeathsMedium = birthsDeathsTotal[mediumLimit-1];
 
         if(this.intraChangesLow == this.intraChangesMedium){
             let largerThanLowLimit = intraTableUpdates.filter((num) => { return num > this.intraChangesLow});
@@ -73,6 +73,12 @@ export class ReleaseClassifier{
             console.log(largerThanLowLimit);
             this.birthsDeathsMedium[0] = largerThanLowLimit[0];
         }
+    }
+
+    classifyNExport(i){
+        this.classifyReleases();
+        this.export(i);
+        this.exportStats(i);
     }
 
     classifyReleases(/*i*/){
@@ -185,7 +191,7 @@ export class ReleaseClassifier{
 
             if(updateSum > 0){
                 // maintenance
-                label += "Intra table amendment";
+                label += "Maintenance: intra table amendment";
                 labels.push(label);
                 if(!isUpdLow){
                     summarizedLabels.push(label)
@@ -442,7 +448,7 @@ export class ReleaseClassifier{
                 this.releases.push(releaseInfo);
             }
             this.computeThresholds();
-          //  this.classifyReleases(i);
+            this.classifyNExport(i);
         }
 
     }

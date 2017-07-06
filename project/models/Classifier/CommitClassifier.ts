@@ -313,6 +313,9 @@ export class CommitClassifier{
 
             this.computeThresholds();
             //this.classifyReleases(i);
+            //this.classifyReleases();
+            //this.export(i);
+            //this.exportStats(i);
         }
 
     }

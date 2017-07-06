@@ -241,7 +241,7 @@ export class ReleaseComponent implements OnInit {
          * Display / Hide  the tooltip for the releases
          */
         if(event.type == "mouseover"){
-            d3.select(".releaseTooltip")
+            /*d3.select(".releaseTooltip")
                 .style("opacity", "1")
                 .style("position","absolute")
                 .style("left", (event.clientX + 20) +'px')
@@ -250,7 +250,7 @@ export class ReleaseComponent implements OnInit {
                     "<p><b style='font-size: 1em'>Restructuring</b></p>" +
                     "<p><b>Category of release</b><br>Schema growth: High | Attributes *jected: Moderate" +
                     " | Attributes Updated: Zero"+ "</p></div>" );
-
+                */
             this.commitChangesChart.fadeStackedBarChart(0.2,commit.dateHuman);
         }
         else{

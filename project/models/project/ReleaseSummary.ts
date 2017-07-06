@@ -44,7 +44,7 @@ export class ReleaseSummary{
 
     private generateFirstParagraph(){
 
-        let sentence1 = "This release was released on " +this.releaseInfo.dateHuman
+        let sentence1 = "This release was released on " +this.releaseInfo.dateHuman.toLocaleString()
             + ", it was the ";
 
         if( (this.commitPositionFromStart) > 3)

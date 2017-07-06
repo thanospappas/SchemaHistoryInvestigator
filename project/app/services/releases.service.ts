@@ -34,6 +34,7 @@ export class ReleaseService {
                 this.releases = res.json();
                 this.setReleases(this.releases);
                 this.setSelectedReleases(this.releases);
+                console.log(this.releases);
                 return res.json();
 
             })

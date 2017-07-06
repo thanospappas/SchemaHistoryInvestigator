@@ -66,8 +66,7 @@ export class CommitComponent implements OnInit {
 
     ngAfterViewInit() {
 
-        console.log("ccccccccc")
-        console.log(tinymce )
+
         tinymce.init({
             selector: '#commitSummary__yo',
             plugins: ['paste'],
@@ -137,7 +136,8 @@ export class CommitComponent implements OnInit {
             .subscribe(issues => {
                     this.issues = issues;
                     for(let issue of this.issues){
-                        issue.IS_BODY = issue.IS_BODY.substring(2).replace(/\\n/g,'<br/>');
+                        if(issue.IS_BODY)
+                            issue.IS_BODY = issue.IS_BODY.substring(2).replace(/\\n/g,'<br/>');
                     }
                     this.selectedIssue = this.issues[0];
                 },

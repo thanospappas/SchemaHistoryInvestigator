@@ -150,10 +150,12 @@ export class AreaChart implements OnInit, OnChanges {
                 .style("left", (event.clientX+20) +'px')
                 .style("top", (event.clientY+20)+'px')
                 .html("<div class='release-tooltip-section'><div class='' style=''> " +
-                        "<p><b style='font-size: 1em'>Restructuring</b></p>" +
-                        "<p><b>Category of release</b><br>Schema growth: High | Attributes *jected: Moderate" +
-                    " | Attributes Updated: Zero"+ "</p></div>" +
-                    "<div class=''><p style='padding-top:10px;'><b>More stats</b> <br>Commits:" + release.commitNumber + " | " +
+                        //"<p><b style='font-size: 1em'>Restructuring</b></p>" +
+                        //"<p><b>Category of release</b><br>Schema growth: High | Attributes *jected: Moderate" +
+                    //" | Attributes Updated: Zero"+ "</p></div>" +
+                    "<div class=''><p style='padding-top:10px;'>" +
+                    //"<b>More stats</b>" +
+                    "<br>Commits:" + release.commitNumber + " | " +
                     "Contributors:" + release.contributorNumber + " | " +
                     "Duration:" + release.duration + " days</p></div> </div>");
 
@@ -196,20 +198,5 @@ export class AreaChart implements OnInit, OnChanges {
         }, 4000);
     }
 
-    addSelectedChart(){
-        let svg = D3.select(".summary-chart svg");
-        let s = new XMLSerializer();
-        let XMLS = new XMLSerializer();
-        let inp_xmls = XMLS.serializeToString(svg._groups[0][0]);
-
-        this.descriptiveStatsService.addChangeBreakdownChart(inp_xmls);
-        this.showSuccessNotification();
-
-    }
-
-    addReleasesToStory(){
-        this.descriptiveStatsService.setSelectedReleases(this.selectedReleases);
-        this.showSuccessNotification();
-    }
 
 }

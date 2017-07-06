@@ -50,8 +50,14 @@ export class ReleaseRouter implements ApiRouter{
                     res.json(result);
                 });
         }
+        else if(req.query.generate_release_metrics == "true"){
+            routerObject.databaseController.generateReleaseMetrics(req.params.id)
+                .then((result) => {
+                    res.json(result);
+                });
+        }
         else{
-            routerObject.databaseController.getAllData(req.params.id)
+            routerObject.databaseController.getReleaseMetrics(req.params.id)
                 .then((result) => {
                     res.json(result);
                 });

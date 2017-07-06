@@ -6,23 +6,6 @@
                 <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link-dev"><i class="fa fa-chevron-up"></i></a>
                     </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a (click)="addDeveloperChartToStory()">Developers - Chart</a>
-                            </li>
-                            <li><a (click)="addDeveloperListToStory()">Developers - List</a>
-                            </li>
-                            <li><a (click)="addTopFilesToStory()">Files - Top co-changed files</a>
-                            </li>
-                            <li><a (click)="addCommitChartToStory()">Files - commit chart</a>
-                            </li>
-                            <li><a (click)="addDurationsChartToStory()">Durations - chart</a>
-                            </li>
-                            <li><a (click)="addTablesChartToStory()">Tables - chart</a>
-                            </li>
-                        </ul>
-                    </li>
                     <li><a class="close-link"><i class="fa fa-close"></i></a>
                     </li>
                 </ul>
@@ -112,12 +95,12 @@
                                     <ul class="list-unstyled top_profiles scroll-view1" style="">
 
                                         <li *ngFor='let file of this.cochangedFiles; let i = index;' class="media event">
-                                            <div *ngIf="i > 1">
+                                            <div *ngIf="i > 0">
                                                 <a class="pull-left border-aero profile_thumb">
                                                     <b>{{file.Ranked}}</b>
                                                 </a>
                                                 <div class="media-body filename-title">
-                                                    <b> {{file.FA_NEW_NAME}}</b>
+                                                    <b> {{file.FA_NEW_FULL_PATH}}</b>
                                                 </div>
                                             </div>
                                         </li>

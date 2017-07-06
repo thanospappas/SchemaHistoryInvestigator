@@ -9,7 +9,6 @@ import {ProjectService} from "../../../services/Projects.services";
 import {Project} from "../../../shared/Project";
 import {ReleaseService} from "../../../services/releases.service";
 import {serverPort} from "../../../config/server-info";
-import {DescriptiveStatsLevel} from "../../story-generated/level1/desciptive-stats.component";
 import {DescriptiveStatsService} from "../../../services/story-level1-service";
 @Component({
     selector: 'development-chart',
@@ -590,47 +589,7 @@ export class DevelopmentChart implements OnInit, OnChanges {
         }, 4000);
     }
 
-    addDeveloperChartToStory(){
-        let svg = d3.select("#developers-chord-chart svg");
-        let XMLS = new XMLSerializer();
-        let inp_xmls = XMLS.serializeToString(svg._groups[0][0]);
-        this.descriptiveStatsService.addDevelopersChart(inp_xmls);
-        this.showSuccessNotification();
-    }
 
-    addDeveloperListToStory(){
-        this.descriptiveStatsService.addSelectedAuthors(this.authors);
-        this.showSuccessNotification();
-    }
-
-    addTopFilesToStory(){
-        this.descriptiveStatsService.addCochangedFiles(this.cochangedFiles);
-        this.showSuccessNotification();
-    }
-
-    addCommitChartToStory(){
-        let svg = d3.select("#development-style-commits svg");
-        let XMLS = new XMLSerializer();
-        let inp_xmls = XMLS.serializeToString(svg._groups[0][0]);
-        this.descriptiveStatsService.addCommitNumChart(inp_xmls);
-        this.showSuccessNotification();
-    }
-
-    addDurationsChartToStory(){
-        let svg = d3.select("#development-style-durations svg");
-        let XMLS = new XMLSerializer();
-        let inp_xmls = XMLS.serializeToString(svg._groups[0][0]);
-        this.descriptiveStatsService.addDurationsChart(inp_xmls);
-        this.showSuccessNotification();
-    }
-
-    addTablesChartToStory(){
-        let svg = d3.select("#development-style-tables svg");
-        let XMLS = new XMLSerializer();
-        let inp_xmls = XMLS.serializeToString(svg._groups[0][0]);
-        this.descriptiveStatsService.addTablesChart(inp_xmls);
-        this.showSuccessNotification();
-    }
 
 
 }
