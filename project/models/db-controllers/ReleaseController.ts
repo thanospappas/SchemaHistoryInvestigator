@@ -95,7 +95,7 @@ export class ReleaseController extends DatabaseController{
     }
 
     private getReleasesOnly(projectID:number):Promise<any>{
-        console.log("SELECT * FROM Releases WHERE " + " Releases.RE_BRANCH_ID =" + projectID + " ORDER BY RE_DATE ASC");
+        //console.log("SELECT * FROM Releases WHERE " + " Releases.RE_BRANCH_ID =" + projectID + " ORDER BY RE_DATE ASC");
         return new Promise((resolve) => {
             this.database.getDBConnection(projectID).all(/*"SELECT * FROM Releases, Projects, Branches WHERE Projects.PRJ_ID = Branches.BR_PRJ_ID"
                 + " AND Branches.BR_ID =" + projectID + " AND Releases.RE_BRANCH_ID = Projects.PRJ_ID ORDER BY RE_DATE ASC"*/
@@ -203,7 +203,7 @@ export class ReleaseController extends DatabaseController{
                 releases = this.populateReleases(rows);
                 releases.sort((release1:any, release2:any) => release1.startDate - release2.startDate);
                 this.populateDurations(releases, allReleases);
-                console.log(releases);
+                //console.log(releases);
                 resolve(releases);
             });
         });
@@ -228,7 +228,7 @@ export class ReleaseController extends DatabaseController{
             let releases: Array<Release> = new Array;
             return new Promise((resolve) => {
                 this.database.getDBConnection(projectID).all("SELECT * FROM Releases_Metrics ORDER BY RM_START_DATE ASC;", (err, rows) => {
-                    console.log(rows);
+                    //console.log(rows);
                     for(let i = 0; i < rows.length; i++){
                         let release:Release = new Release();
                         release.releaseID = rows[i].RM_RE_ID;
@@ -274,7 +274,7 @@ export class ReleaseController extends DatabaseController{
                 let storePromises = [];
 
                 for(let r of releases){
-                    console.log(r);
+                    //console.log(r);
                     let storePromise = this.storeReleaseMetrics(projectId,r);
                     storePromises.push(storePromise);
                 }
@@ -291,7 +291,7 @@ export class ReleaseController extends DatabaseController{
 
     storeReleaseMetrics(projectID, release):Promise<any>{
         let dateHuman = release.dateHuman.toDateString();
-        console.log(dateHuman);
+        //console.log(dateHuman);
         return new Promise((resolve) => {
             this.database.getDBConnection(projectID).all("INSERT INTO Releases_Metrics(RM_RE_ID,RM_NAME,RM_START_DATE,RM_DATE_HUMAN," +
                 "RM_DURATION,RM_COMMIT_NUMBER,RM_COMMIT_DURATION,RM_CONTRIBUTOR_NUMBER,RM_SCHEMA_GROWTH,RM_RELEASE_SUMMARY," +
@@ -306,8 +306,8 @@ export class ReleaseController extends DatabaseController{
                 "," + release.stats.getAttributeTypeAlternations() + "," + release.stats.getSchemaSizeTable() + "," +
                 release.stats.getSchemaSizeAttribute() + "," + release.stats.getTablesAtStart() + "," + release.stats.getTablesAtEnd() + ");",
                 (err, commits) => {
-                console.log(commits);
-                console.log(err);
+                //console.log(commits);
+                //console.log(err);
                 resolve();
             });
         });
@@ -507,12 +507,12 @@ export class ReleaseController extends DatabaseController{
     }
 
     storeSummary(projectID, releaseId,text:string):Promise<any>{
-        console.log("UPDATE Releases SET RE_TEXT_SUMMARY = '" +
-            text + "' WHERE Releases.RE_ID=" + releaseId + ";");
+        /*console.log("UPDATE Releases SET RE_TEXT_SUMMARY = '" +
+            text + "' WHERE Releases.RE_ID=" + releaseId + ";");*/
         return new Promise((resolve) => {
             this.database.getDBConnection(projectID).all("UPDATE Releases SET RE_TEXT_SUMMARY = '" +
                 text + "' WHERE Releases.RE_ID=" + releaseId + ";", (err, commits) => {
-                console.log(commits);
+                //console.log(commits);
                 resolve();
             });
         });

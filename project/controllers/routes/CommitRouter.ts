@@ -56,7 +56,7 @@ export class CommitRouter implements ApiRouter{
         if(req.query.belongs_to == "true"){
             routerObject.databaseController.getCommitRelease(req.params.id, req.params.commit_id)
                 .then((result) => {
-                console.log(result);
+                //console.log(result);
                     res.json(result);
                 });
         }

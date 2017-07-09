@@ -28,7 +28,7 @@ export class ReleaseSummary{
 
     public setPosition(pos:number){
         this.commitPositionFromStart = pos+1;
-        console.log(this.commitPositionFromStart);
+        //console.log(this.commitPositionFromStart);
     }
 
     public getFinalSummary():string{
@@ -39,7 +39,7 @@ export class ReleaseSummary{
         this.generateFirstParagraph();
         this.generateSecondParagraph();
         this.generateThirdParagraph();
-        console.log(this.finalSummary);
+        //console.log(this.finalSummary);
     }
 
     private generateFirstParagraph(){
@@ -103,7 +103,7 @@ export class ReleaseSummary{
         let rc:ReleaseClassifier = new ReleaseClassifier();
         rc.addRelease(releaseInfo);*/
 
-        let sentence1 = "This release is characterized by " + this.labels;//"High …, Moderate .. and High …. so we conclude that it is a growth commit.";
+        let sentence1 = "This release is characterized by " + this.labels;
         this.finalSummary += sentence1 + "\\n";
     }
 

@@ -27,7 +27,7 @@ export class IssueController extends DatabaseController{
         return new Promise((resolve) => {
             this.database.getDBConnection(issueId).all("UPDATE Issues SET USEFUL_SCORE = USEFUL_SCORE + 1 WHERE" +
                 " IS_ID=" + issueId + ";", (err, issues) => {
-                console.log(issues);
+                //console.log(issues);
                 resolve();
             });
         });

@@ -136,7 +136,7 @@ export class CommitController extends DatabaseController{
         return new Promise((resolve) => {
             this.database.getDBConnection(projectID).all("SELECT RE_DATE, RE_NAME CO_ID FROM Commits, Releases WHERE Commits.CO_ID = " + commitId
             +" AND Commits.CO_PREV_RELEASE_ID = Releases.RE_ID;", function (err, release) {
-                console.log(release);
+                //console.log(release);
                 resolve(release);
             });
         });
@@ -257,9 +257,9 @@ export class CommitController extends DatabaseController{
                 cc.computeThresholds();
                 cc.classifyReleases();
                 let classifiedCommits = cc.getClassifiedCommits();
-                console.log(classifiedCommits);
+                //console.log(classifiedCommits);
                 for(let commit of commits){
-                    console.log(commit);
+                    //console.log(commit);
                     let releasePromise = this.getFilesAffected(projectId,commit.commitId);
                     releasePromises.push(releasePromise);
                 }
@@ -310,12 +310,12 @@ export class CommitController extends DatabaseController{
     }
 
     storeSummary(projectID, commitId,text:string):Promise<any>{
-        console.log("UPDATE Commits SET CO_TEXT_SUMMARY = '" +
-            text + "' WHERE Commits.CO_ID=" + commitId + ";");
+        /*console.log("UPDATE Commits SET CO_TEXT_SUMMARY = '" +
+            text + "' WHERE Commits.CO_ID=" + commitId + ";");*/
         return new Promise((resolve) => {
             this.database.getDBConnection(projectID).all("UPDATE Commits SET CO_TEXT_SUMMARY = '" +
                 text + "' WHERE Commits.CO_ID=" + commitId + ";", (err, commits) => {
-                console.log(commits);
+                //console.log(commits);
                 resolve();
             });
         });

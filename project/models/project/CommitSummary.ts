@@ -7,7 +7,7 @@ export class CommitSummary{
 
     private commitInfo:CommitInformation;
     private commitPositionFromStart:number;
-    private  labels:string;
+    private labels:string;
     private finalSummary:string;
 
     public setCommitInfo(commitInfo:CommitInformation){
@@ -34,7 +34,7 @@ export class CommitSummary{
         this.generateFirstParagraph();
         this.generateSecondParagraph();
         this.generateThirdParagraph();
-        console.log(this.finalSummary);
+        //console.log(this.finalSummary);
     }
 
     private generateFirstParagraph(){

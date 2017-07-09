@@ -56,21 +56,19 @@ export class ReleaseClassifier{
         let mediumLimit = Math.floor(intraTableUpdates.length*0.95);
         this.intraChangesLow = intraTableUpdates[lowLimit-1];
         this.intraChangesMedium = intraTableUpdates[mediumLimit-1];
-        console.log(mediumLimit);
-        console.log(this.intraChangesLow);
-        console.log(this.intraChangesMedium);
+
 
         this.birthsDeathsLow = birthsDeathsTotal[lowLimit-1];
         this.birthsDeathsMedium = birthsDeathsTotal[mediumLimit-1];
 
         if(this.intraChangesLow == this.intraChangesMedium){
             let largerThanLowLimit = intraTableUpdates.filter((num) => { return num > this.intraChangesLow});
-            console.log(largerThanLowLimit);
+            //console.log(largerThanLowLimit);
             this.birthsDeathsMedium[0] = largerThanLowLimit[0];
         }
         if(this.birthsDeathsLow == this.birthsDeathsMedium){
             let largerThanLowLimit = intraTableUpdates.filter((num) => { return num > this.birthsDeathsLow});
-            console.log(largerThanLowLimit);
+            //console.log(largerThanLowLimit);
             this.birthsDeathsMedium[0] = largerThanLowLimit[0];
         }
     }
@@ -220,7 +218,7 @@ export class ReleaseClassifier{
 
     export(i){
         let fs = require("fs");
-        console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i]);
+        //console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i]);
         let outFile = 'C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i];
         if(fs.existsSync(outFile))
             fs.truncateSync(outFile);
@@ -239,7 +237,7 @@ export class ReleaseClassifier{
 
     exportStats(i){
         let fs = require("fs");
-        console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i]);
+        //console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i]);
         let outFile = 'C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i];
         if(fs.existsSync(outFile))
             fs.truncateSync(outFile);
@@ -426,7 +424,7 @@ export class ReleaseClassifier{
         var fs = require("fs");
         for(let i = 0; i < this.inputFiles.length;i++){
             this.releases = new Array<ReleaseInformation>();
-            console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.inputFiles[i]);
+            //console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.inputFiles[i]);
             var data = fs.readFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.inputFiles[i]);
             for(let line of data.toString().split("\n")){
                 if(line.indexOf("Phase") !== -1) continue;

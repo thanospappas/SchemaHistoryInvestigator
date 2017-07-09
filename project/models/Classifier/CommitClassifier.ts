@@ -52,16 +52,13 @@ export class CommitClassifier{
         this.intraChangesLow = intraTableUpdates[lowLimit];
         this.intraChangesMedium = intraTableUpdates[mediumLimit];
 
-        console.log(this.intraChangesLow);
-        console.log(this.intraChangesMedium);
-
         this.birthsDeathsLow = birthsDeathsTotal[lowLimit];
         this.birthsDeathsMedium = birthsDeathsTotal[mediumLimit];
 
         if(this.intraChangesLow == this.intraChangesMedium){
             let largerThanLowLimit = intraTableUpdates.filter((num) => { return num > this.intraChangesLow});
             largerThanLowLimit.sort((a,b) => {return a-b});
-            console.log(largerThanLowLimit);
+            //console.log(largerThanLowLimit);
             this.birthsDeathsMedium = largerThanLowLimit[0];
         }
         if(this.birthsDeathsLow == this.birthsDeathsMedium){
@@ -206,7 +203,7 @@ export class CommitClassifier{
 
     export(i){
         let fs = require("fs");
-        console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i]);
+        //console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i]);
         let outFile = 'C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputFiles[i];
         if(fs.existsSync(outFile))
             fs.truncateSync(outFile);
@@ -227,7 +224,7 @@ export class CommitClassifier{
 
     exportStats(i){
         let fs = require("fs");
-        console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i]);
+        //console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i]);
         let outFile = 'C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.outputStatsFiles[i];
         if(fs.existsSync(outFile))
             fs.truncateSync(outFile);
@@ -287,7 +284,7 @@ export class CommitClassifier{
         var fs = require("fs");
         for(let i = 0; i < this.inputFiles.length;i++){
             this.releases = new Array<CommitClassificationInformation>();
-            console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.inputFiles[i]);
+            //console.log('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.inputFiles[i]);
             var data = fs.readFileSync('C:\\Users\\thanosp\\Desktop\\Data\\Classifying_releases\\' + this.inputFiles[i]);
             for(let line of data.toString().split("\n")){
                 if(line.indexOf("trID") !== -1) continue;
